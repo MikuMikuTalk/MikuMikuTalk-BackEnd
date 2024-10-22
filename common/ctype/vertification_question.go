@@ -1,6 +1,9 @@
 package ctype
 
-import "encoding/json"
+import (
+	"database/sql/driver"
+	"encoding/json"
+)
 
 type VerificationQuestion struct {
 	Problem1 *string `json:"problem1"`
@@ -12,6 +15,12 @@ type VerificationQuestion struct {
 }
 
 // Scan 取出来的时候的数据
-func (c *VerificationQuestion) Scan(val any) error {
+func (c *VerificationQuestion) Scan(val interface{}) error {
 	return json.Unmarshal(val.([]byte), c)
+}
+
+// Value 入库的数据
+func (c VerificationQuestion) Value() (driver.Value, error) {
+	b, err := json.Marshal(c)
+	return string(b), err
 }
