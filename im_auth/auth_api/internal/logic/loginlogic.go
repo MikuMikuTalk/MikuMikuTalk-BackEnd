@@ -26,11 +26,5 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, err error) {
 	// todo: add your logic here and delete this line
 
-	return &types.LoginResponse{
-		Code: 200,
-		Data: types.LoginInfo{
-			Token: "meowrainydys",
-		},
-		Msg: "登陆测试",
-	}, nil
+	return
 }

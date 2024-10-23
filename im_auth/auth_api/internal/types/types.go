@@ -3,19 +3,13 @@
 
 package types
 
-type LoginInfo struct {
-	Token string `json:"token"`
-}
-
 type LoginRequest struct {
 	UserName string `json:"username"`
 	Password string `json:"password"`
 }
 
 type LoginResponse struct {
-	Code int       `json:"code"`
-	Data LoginInfo `json:"data"` //相应一个LoginInfo对象，里面又Token属性
-	Msg  string    `json:"msg"`
+	Token string `json:"token"`
 }
 
 type OpenLoginInfo struct {
@@ -24,14 +18,9 @@ type OpenLoginInfo struct {
 	Href string `json:"href"` // 跳转地址
 }
 
-type OpenLoginInfoResponse struct {
-	Code int             `json:"code"`
-	Data []OpenLoginInfo `json:"data"`
-	Msg  string          `json:"msg"`
-}
-
-type RegisterInfo struct {
-	UserName string `json:"username"`
+type OpenLoginRequest struct {
+	Code string `json:"code"`
+	Flag string `json:"flag"`
 }
 
 type RegisterRequest struct {
@@ -40,13 +29,5 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	Code int          `json:"code"`
-	Data RegisterInfo `json:"data"`
-	Msg  string       `json:"msg"`
-}
-
-type Response struct {
-	Code int    `json:"code"`
-	Data string `json:"data"`
-	Msg  string `json:"msg"`
+	UserName string `json:"username"`
 }

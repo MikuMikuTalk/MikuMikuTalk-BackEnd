@@ -23,7 +23,7 @@ func NewOpen_loginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Open_l
 	}
 }
 
-func (l *Open_loginLogic) Open_login() (resp *types.LoginResponse, err error) {
+func (l *Open_loginLogic) Open_login(req *types.OpenLoginRequest) (resp *types.LoginResponse, err error) {
 	// todo: add your logic here and delete this line
 
 	return
