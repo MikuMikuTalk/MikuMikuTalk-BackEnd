@@ -1,0 +1,70 @@
+// 用户登陆时候的请求体
+type LoginRequest {
+	UserName string `json:"username"`
+	Password string `json:"password"`
+}
+
+type RegisterRequest {
+	UserName string `json:"username"`
+	Password string `json:"password"`
+}
+
+//通用响应体
+type Response {
+	Code int    `json:"code"`
+	Data string `json:"data"`
+	Msg  string `json:"msg"`
+}
+
+type LoginInfo {
+	Token string `json:"token"`
+}
+
+type RegisterInfo {
+	UserName string `json:"username"`
+}
+
+type LoginResponse {
+	Code int       `json:"code"`
+	Data LoginInfo `json:"data"` //相应一个LoginInfo对象，里面又Token属性
+	Msg  string    `json:"msg"`
+}
+
+type RegisterResponse {
+	Code int          `json:"code"`
+	Data RegisterInfo `json:"data"`
+	Msg  string       `json:"msg"`
+}
+
+type OpenLoginInfo {
+	Name string `json:"name"` //用户名
+	Icon string `json:"icon"` //用户头像
+	Href string `json:"href"` // 跳转地址
+}
+
+type OpenLoginInfoResponse {
+	Code int             `json:"code"`
+	Data []OpenLoginInfo `json:"data"`
+	Msg  string          `json:"msg"`
+}
+
+service auth {
+	@handler login
+	post /api/auth/login (LoginRequest) returns (LoginResponse)
+
+	@handler register
+	post /api/auth/register (RegisterRequest) returns (RegisterResponse)
+
+	@handler authentication
+	post /api/auth/authentication returns (Response)
+
+	@handler logout
+	post /api/auth/logout returns (Response)
+
+	@handler open_login_info
+	get /api/auth/open_login returns (OpenLoginInfoResponse)
+
+	@handler open_login
+	post /api/auth/open_login returns (LoginResponse)
+}
+
