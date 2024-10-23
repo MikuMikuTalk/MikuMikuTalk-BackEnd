@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 
-	"im_server/im_auth/internal/config"
-	"im_server/im_auth/internal/handler"
-	"im_server/im_auth/internal/svc"
+	"im_server/im_auth/auth_api/internal/config"
+	"im_server/im_auth/auth_api/internal/handler"
+	"im_server/im_auth/auth_api/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"

@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -17,11 +16,23 @@ func InitMysql() *gorm.DB {
 		Logger: mysqlLogger,
 	})
 	if err != nil {
-		log.Fatalf(fmt.Sprintf("[%s] mysql连接失败", dsn))
+		fmt.Errorf("%s", fmt.Sprintf("[%s] mysql 连接失败", dsn))
+		// log.Fatalf(fmt.Sprintf("[%s] mysql连接失败", dsn))
+		return nil
 	}
 	sqlDB, _ := db.DB()
 	sqlDB.SetMaxIdleConns(10)               // 最大空闲连接数
 	sqlDB.SetMaxOpenConns(100)              // 最多可容纳
 	sqlDB.SetConnMaxLifetime(time.Hour * 4) // 连接最大复用时间，不能超过mysql的wait_timeout
+	return db
+}
+func InitGorm(MysqlDataSource string) *gorm.DB {
+	db, err := gorm.Open(mysql.Open(MysqlDataSource), &gorm.Config{})
+	if err != nil {
+		panic("连接mysql数据库失败, error=" + err.Error())
+	} else {
+		//TODO: 更换日志库
+		fmt.Println("Mysql连接成功")
+	}
 	return db
 }

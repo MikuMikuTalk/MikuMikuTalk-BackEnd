@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"im_server/im_auth/internal/logic"
-	"im_server/im_auth/internal/svc"
+	"im_server/im_auth/auth_api/internal/logic"
+	"im_server/im_auth/auth_api/internal/svc"
 )
 
 func logoutHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
