@@ -1,0 +1,88 @@
+info(
+	title: "im_auth service"
+	desc: "the api of auth service"
+	author: "MeowRain"
+	email: "meowrain@126.com"
+	version: "1.0"
+)
+
+
+// 用户登陆时候的请求体
+type LoginRequest {
+	UserName string `json:"username"`
+	Password string `json:"password"`
+}
+
+//用户注册的时候的注册结构体，发json的时候是
+/*
+{
+	"username":"xxx",
+	"password": "xxx"
+}
+*/
+type RegisterRequest {
+	UserName string `json:"username"`
+	Password string `json:"password"`
+}
+
+//用户登陆后的相应，响应一个token,用于后期jwt校验
+type LoginResponse {
+	Token string `json:"token"`
+}
+
+//用户注册后的响应，如果注册成功，就相应给用户他的用户名
+type RegisterResponse {
+	UserName string `json:"username"`
+}
+
+//返回第三方登陆账号的信息
+type OpenLoginInfo {
+	Name string `json:"name"` //用户名
+	Icon string `json:"icon"` //用户头像
+	Href string `json:"href"` // 跳转地址
+}
+
+//第三方登陆的请求结构体
+type OpenLoginRequest {
+	Code string `json:"code"`
+	Flag string `json:"flag"`
+}
+
+service auth {
+	@doc(
+		summary: "登陆接口"
+	)
+	@handler login
+	post /api/auth/login (LoginRequest) returns (LoginResponse) //登陆接口，接受一个LoginRequest结构体，里面有username和password,返回登陆响应token
+
+	@doc(
+		summary: "注册接口"
+	)
+	@handler register
+	post /api/auth/register (RegisterRequest) returns (RegisterResponse) //注册接口，接受一个RegisterRequest结构体，里面有username和password
+
+	@doc(
+		summary: "认证接口"
+	)
+	@handler authentication
+	post /api/auth/authentication returns (string) //认证接口，用来返回jwt信息
+
+	@doc(
+		summary: "注销接口"
+	)
+	@handler logout
+	post /api/auth/logout returns (string) //注销接口，返回注销后的信息
+
+	@doc(
+		summary: "第三方登陆信息接口"
+	)
+	@handler open_login_info
+	get /api/auth/open_login returns ([]OpenLoginInfo) // 第三方登陆信息接口，返回第三方登陆信息
+
+	@doc(
+		summary: "第三方登陆接口"
+	)
+	@handler open_login
+	post /api/auth/open_login (OpenLoginRequest) returns (LoginResponse) //第三方登陆接口，返回登陆响应结构体,返回登陆响应token
+}
+
