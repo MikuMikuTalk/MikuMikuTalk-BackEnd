@@ -1,11 +1,10 @@
-info(
-	title: "im_auth service"
-	desc: "the api of auth service"
-	author: "MeowRain"
-	email: "meowrain@126.com"
+info (
+	title:   "im_auth service"
+	desc:    "the api of auth service"
+	author:  "MeowRain"
+	email:   "meowrain@126.com"
 	version: "1.0"
 )
-
 
 // 用户登陆时候的请求体
 type LoginRequest {
@@ -49,37 +48,37 @@ type OpenLoginRequest {
 }
 
 service auth {
-	@doc(
+	@doc (
 		summary: "登陆接口"
 	)
 	@handler login
 	post /api/auth/login (LoginRequest) returns (LoginResponse) //登陆接口，接受一个LoginRequest结构体，里面有username和password,返回登陆响应token
 
-	@doc(
+	@doc (
 		summary: "注册接口"
 	)
 	@handler register
 	post /api/auth/register (RegisterRequest) returns (RegisterResponse) //注册接口，接受一个RegisterRequest结构体，里面有username和password
 
-	@doc(
+	@doc (
 		summary: "认证接口"
 	)
 	@handler authentication
 	post /api/auth/authentication returns (string) //认证接口，用来返回jwt信息
 
-	@doc(
+	@doc (
 		summary: "注销接口"
 	)
 	@handler logout
 	post /api/auth/logout returns (string) //注销接口，返回注销后的信息
 
-	@doc(
+	@doc (
 		summary: "第三方登陆信息接口"
 	)
 	@handler open_login_info
 	get /api/auth/open_login returns ([]OpenLoginInfo) // 第三方登陆信息接口，返回第三方登陆信息
 
-	@doc(
+	@doc (
 		summary: "第三方登陆接口"
 	)
 	@handler open_login

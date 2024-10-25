@@ -15,31 +15,37 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// 认证接口
 				Method:  http.MethodPost,
 				Path:    "/api/auth/authentication",
 				Handler: authenticationHandler(serverCtx),
 			},
 			{
+				// 登陆接口
 				Method:  http.MethodPost,
 				Path:    "/api/auth/login",
 				Handler: loginHandler(serverCtx),
 			},
 			{
+				// 注销接口
 				Method:  http.MethodPost,
 				Path:    "/api/auth/logout",
 				Handler: logoutHandler(serverCtx),
 			},
 			{
+				// 第三方登陆信息接口
 				Method:  http.MethodGet,
 				Path:    "/api/auth/open_login",
 				Handler: open_login_infoHandler(serverCtx),
 			},
 			{
+				// 第三方登陆接口
 				Method:  http.MethodPost,
 				Path:    "/api/auth/open_login",
 				Handler: open_loginHandler(serverCtx),
 			},
 			{
+				// 注册接口
 				Method:  http.MethodPost,
 				Path:    "/api/auth/register",
 				Handler: registerHandler(serverCtx),
