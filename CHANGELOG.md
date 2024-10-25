@@ -1,4 +1,26 @@
 
+<a name="v0.1.2"></a>
+## [v0.1.2](https://github.com/meowrain/im_server/compare/v0.1.1...v0.1.2) (2024-10-25)
+
+### Feat
+
+* 可以使用脚本调用数据库创建相关表结构
+
+### Style
+
+* auth_api.api引起的代码格式化
+
+
+<a name="v0.1.1"></a>
+## [v0.1.1](https://github.com/meowrain/im_server/compare/v0.1.0...v0.1.1) (2024-10-25)
+
+### Feat
+
+* 添加jwt封装功能: 可以生成和解析token
+* 编写密码加密和比对功能，用于数据库存储用户信息
+* Changelog功能添加
+
+
 <a name="v0.1.0"></a>
 ## v0.1.0 (2024-10-25)
 
