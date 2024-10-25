@@ -2,7 +2,13 @@ module im_server
 
 go 1.23.2
 
-require github.com/zeromicro/go-zero v1.7.3
+require (
+	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/zeromicro/go-zero v1.7.3
+	golang.org/x/crypto v0.28.0
+	gorm.io/driver/mysql v1.5.7
+	gorm.io/gorm v1.25.12
+)
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
@@ -49,6 +55,4 @@ require (
 	google.golang.org/grpc v1.65.0 // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/driver/mysql v1.5.7 // indirect
-	gorm.io/gorm v1.25.12 // indirect
 )
