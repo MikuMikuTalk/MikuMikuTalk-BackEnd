@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"im_server/im_auth/auth_api/internal/config"
@@ -30,7 +31,7 @@ func main() {
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
-
-	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
+	slog.Info(fmt.Sprintf("im_auth服务 正在监听 %s:%d...\n", c.Host, c.Port))
+	// fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()
 }

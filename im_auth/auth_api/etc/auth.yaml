@@ -3,6 +3,10 @@ Host: 0.0.0.0
 Port: 8888
 Mysql:
   DataSource: root:123456@tcp(127.0.0.1:3306)/im_server_db?charset=utf8mb4&parseTime=True&loc=Local
+Redis:
+  Addr: 127.0.0.1:6379
+  Password: 
+  DB: 0
 Auth:
   AuthSecret: fdsafasfdsfadsf
   AuthExpire: 10000
