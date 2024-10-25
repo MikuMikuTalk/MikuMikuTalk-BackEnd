@@ -6,3 +6,8 @@ Mysql:
 Auth:
   AuthSecret: fdsafasfdsfadsf
   AuthExpire: 10000
+Log:
+  Encoding: plain
+  Timeout: 2006-01-02 15:04:05
+  Level: debug
+  Stat: false
