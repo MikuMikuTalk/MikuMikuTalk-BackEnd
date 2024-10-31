@@ -2,11 +2,11 @@ package logic
 
 import (
 	"context"
-	"errors"
 
 	"im_server/im_auth/auth_api/internal/svc"
 	"im_server/im_auth/auth_api/internal/types"
-	"im_server/im_auth/auth_models"
+	"im_server/im_user/user_rpc/types/user_rpc"
+	"im_server/utils/logs"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -26,12 +26,19 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.RegisterResponse, err error) {
-	// todo: add your logic here and delete this line
-	var user auth_models.UserModel
-	err = l.svcCtx.DB.Where("nickname = ?", req.UserName).First(&user).Error
-	if err == nil {
-		return nil, errors.New("用户已经存在，请不要重复注册！")
+	logs.Info("注册服务调用")
+	res, err := l.svcCtx.UserRpc.UserCreate(context.Background(), &user_rpc.UserCreateRequest{
+		NickName:       req.UserName,
+		Password:       req.Password,
+		Role:           2,
+		Avatar:         "",
+		RegisterSource: "账户密码注册",
+	})
+	if err != nil {
+		logs.Error(err)
+		return nil, err
 	}
-	//使用user_rpc创建用户
-	return
+	return &types.RegisterResponse{
+		UserName: res.GetUserName(),
+	}, nil
 }
