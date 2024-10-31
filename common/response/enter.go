@@ -18,7 +18,7 @@ Response 函数 接受三个参数，分别为请求io,写入io,要响应的内�
 */
 func Response(r *http.Request, w http.ResponseWriter, resp any, err error) {
 	if err == nil {
-		//如果没有错误
+		// 如果没有错误
 		r := &Body{
 			Code: 0,
 			Msg:  "成功",

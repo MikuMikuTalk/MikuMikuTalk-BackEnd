@@ -41,7 +41,7 @@ func (l *LogoutLogic) Logout(token string) (string, error) {
 	expiration := payload.ExpiresAt.Time.Sub(now)
 
 	key := fmt.Sprintf("logout_%s", payload.Nickname)
-	//设置redis中数据过期时间
+	// 设置redis中数据过期时间
 	l.svcCtx.RDB.SetNX(key, "", expiration)
 	return "注销成功", nil
 }

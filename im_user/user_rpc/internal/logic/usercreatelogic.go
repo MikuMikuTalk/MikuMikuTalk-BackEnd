@@ -28,7 +28,6 @@ func NewUserCreateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserCr
 }
 
 func (l *UserCreateLogic) UserCreate(in *user_rpc.UserCreateRequest) (*user_rpc.UserCreateResponse, error) {
-
 	err := l.svcCtx.DB.Take("nickname = ?", in.NickName).Error
 	if err == nil {
 		return nil, errors.New("用户已经存在，请不要重复注册！")

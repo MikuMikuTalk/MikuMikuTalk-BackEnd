@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+
 	"im_server/core"
 	models2 "im_server/im_chat/chat_models"
 	models3 "im_server/im_group/group_models"
@@ -14,7 +15,6 @@ type Options struct {
 }
 
 func main() {
-
 	var opt Options
 	flag.BoolVar(&opt.DB, "db", false, "db")
 	flag.Parse()

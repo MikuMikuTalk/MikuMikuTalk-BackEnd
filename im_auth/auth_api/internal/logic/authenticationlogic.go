@@ -26,7 +26,6 @@ func NewAuthenticationLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Au
 }
 
 func (l *AuthenticationLogic) Authentication(token string) (resp string, err error) {
-
 	if token == "" {
 		err = errors.New("认证失败")
 		return
@@ -36,9 +35,9 @@ func (l *AuthenticationLogic) Authentication(token string) (resp string, err err
 		err = errors.New("认证失败")
 		return
 	}
-	//从Redis中找一下，能不能找到，找到说明注销了，找不到说明没注销
+	// 从Redis中找一下，能不能找到，找到说明注销了，找不到说明没注销
 	_, err = l.svcCtx.RDB.Get(fmt.Sprintf("logout_%s", payload.Nickname)).Result()
-	//如果找到了相关数据，那就注销了，直接返回认证失败
+	// 如果找到了相关数据，那就注销了，直接返回认证失败
 	if err == nil {
 		err = errors.New("认证失败")
 		return

@@ -1,8 +1,9 @@
 package core
 
 import (
-	"im_server/utils/logs"
 	"time"
+
+	"im_server/utils/logs"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
@@ -17,5 +18,4 @@ func InitEtcd(addr string) *clientv3.Client {
 		panic(err)
 	}
 	return client
-
 }

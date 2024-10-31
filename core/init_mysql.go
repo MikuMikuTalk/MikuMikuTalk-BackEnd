@@ -26,12 +26,13 @@ func InitMysql() *gorm.DB {
 	sqlDB.SetConnMaxLifetime(time.Hour * 4) // 连接最大复用时间，不能超过mysql的wait_timeout
 	return db
 }
+
 func InitGorm(MysqlDataSource string) *gorm.DB {
 	db, err := gorm.Open(mysql.Open(MysqlDataSource), &gorm.Config{})
 	if err != nil {
 		panic("连接mysql数据库失败, error=" + err.Error())
 	} else {
-		//TODO: 更换日志库
+		// TODO: 更换日志库
 		fmt.Println("Mysql连接成功")
 	}
 	return db
