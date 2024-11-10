@@ -3,7 +3,6 @@ package logic
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"im_server/im_auth/auth_api/internal/svc"
 	"im_server/im_auth/auth_api/internal/types"
@@ -32,19 +31,13 @@ func (l *AuthenticationLogic) Authentication(req *types.AuthenticationRequest) (
 	if whitelist.IsInList(req.ValidPath, l.svcCtx.Config.WhiteList) {
 		return "ok", nil
 	}
+	// 检查是否提供了 Authorization
 	if req.Authorization == "" {
-		err = errors.New("认证失败")
-		return
+		return "", errors.New("认证失败：缺少授权信息")
 	}
-	payload, err := jwts.ParseToken(req.Authorization, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		err = errors.New("认证失败")
-		return
-	}
-	//从Redis中找一下，能不能找到，找到说明注销了，找不到说明没注销
-	_, err = l.svcCtx.RDB.Get(fmt.Sprintf("logout_%s", payload.Nickname)).Result()
-	//如果找到了相关数据，那就注销了，直接返回认证失败
-	if err == nil {
+	// 验证Token是否有效
+	isValid, err := jwts.ValidateToken(req.Authorization, l.svcCtx.Config.Auth.AuthSecret, l.svcCtx.RDB)
+	if err != nil || !isValid {
 		err = errors.New("认证失败")
 		return
 	}

@@ -32,16 +32,23 @@ func (l *LogoutLogic) Logout(token string) (string, error) {
 		return "", errors.New("登陆后才可以注销哦")
 	}
 
-	payload, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
+	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
 	if err != nil {
 		return "", err
 	}
+	//获取jti
+	jti := jwts.ExtractJTI(claims)
+	// 获取 Token 的过期时间
 	now := time.Now()
-	// 过期时间就是这个jwt的失效时间
-	expiration := payload.ExpiresAt.Time.Sub(now)
-
-	key := fmt.Sprintf("logout_%s", payload.Nickname)
+	expiration := claims.ExpiresAt.Time.Sub(now)
+	// 将 JTI 存入 Redis，设置为注销状态
+	key := fmt.Sprintf("logout_%s", jti)
 	// 设置redis中数据过期时间
-	l.svcCtx.RDB.SetNX(key, "", expiration)
+	_, err = l.svcCtx.RDB.SetNX(key, "invalid", expiration).Result()
+	if err != nil {
+		l.Logger.Error("Redis 错误: ", err)
+		return "", errors.New("注销失败，请稍后重试")
+	}
+
 	return "注销成功", nil
 }
