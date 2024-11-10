@@ -3,6 +3,11 @@
 
 package types
 
+type AuthenticationRequest struct {
+	Authorization string `header:"Authorization,optional"`
+	ValidPath     string `header:"ValidPath,optional"`
+}
+
 type LoginRequest struct {
 	UserName string `json:"username"`
 	Password string `json:"password"`

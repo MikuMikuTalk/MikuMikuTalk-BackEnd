@@ -26,6 +26,7 @@ func toJson(data Data) []byte {
 	byteData, _ := json.MarshalIndent(data, "", "  ")
 	return byteData
 }
+
 func gateway(res http.ResponseWriter, req *http.Request) {
 	// 更精确地匹配请求前缀 /api/user/xx
 	regex, _ := regexp.Compile(`/api/([^/]+)/`)
@@ -46,9 +47,52 @@ func gateway(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// 认证中间件
+
 	// 获取客户端 IP 地址
 	remoteAddr := strings.Split(req.RemoteAddr, ":")[0]
 	logs.MyLogger.Infoln("remoteAddr:", req.RemoteAddr)
+	// 请求auth_api服务，充当中间件，拦截后续请求
+	authAPIAddr := etcd.GetServiceAddr(config.Etcd, "auth_api")
+	auth_url := fmt.Sprintf("http://%s/api/auth/authentication", authAPIAddr)
+	auth_req, err := http.NewRequest("POST", auth_url, nil)
+	auth_req.Header.Set("Authorization", req.Header.Get("Authorization"))
+	auth_req.Header.Set("X-Forwarded-For", remoteAddr)
+	auth_req.Header.Set("ValidPath", req.URL.Path)
+	if err != nil {
+		logs.MyLogger.Errorln("创建认证请求失败:", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write(toJson(Data{Code: 7, Msg: "服务错误"}))
+		return
+	}
+
+	auth_res, err := http.DefaultClient.Do(auth_req)
+	if err != nil {
+		logs.MyLogger.Errorln("认证请求失败:", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write(toJson(Data{Code: 7, Msg: "服务错误"}))
+		return
+	}
+	auth_response_bytes, err := io.ReadAll(auth_res.Body)
+	if err != nil {
+		logs.MyLogger.Errorln("认证请求失败:", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write(toJson(Data{Code: 7, Msg: "服务错误"}))
+		return
+	}
+	auth_response := Data{}
+	err = json.Unmarshal(auth_response_bytes, &auth_response)
+	if err != nil {
+		logs.MyLogger.Errorln("认证请求失败:", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write(toJson(Data{Code: 7, Msg: "服务错误"}))
+		return
+	}
+	if auth_response.Data != "ok" {
+		res.WriteHeader(http.StatusUnauthorized)
+		res.Write(toJson(Data{Code: 7, Msg: "认证失败"}))
+		return
+	}
 
 	// 生成目标请求 URL
 	url := fmt.Sprintf("http://%s%s", addr, req.URL.RequestURI())

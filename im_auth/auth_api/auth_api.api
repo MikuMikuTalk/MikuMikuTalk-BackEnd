@@ -18,6 +18,7 @@ type LoginRequest {
 	"username":"xxx",
 	"password": "xxx"
 }
+
 */
 type RegisterRequest {
 	UserName string `json:"username"`
@@ -47,6 +48,12 @@ type OpenLoginRequest {
 	Flag string `json:"flag"`
 }
 
+type AuthenticationRequest {
+	Authorization string `header:"Authorization,optional"`
+	ValidPath     string `header:"ValidPath,optional"`
+}
+
+// 认证请求
 service auth {
 	@doc (
 		summary: "登陆接口"
@@ -64,7 +71,7 @@ service auth {
 		summary: "认证接口"
 	)
 	@handler authentication
-	post /api/auth/authentication returns (string) //认证接口，用来返回jwt信息
+	post /api/auth/authentication (AuthenticationRequest) returns (string) //认证接口，用来返回jwt信息
 
 	@doc (
 		summary: "注销接口"

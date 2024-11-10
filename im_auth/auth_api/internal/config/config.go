@@ -20,5 +20,6 @@ type Config struct {
 		AuthSecret string
 		AuthExpire int64
 	}
-	UserRpc zrpc.RpcClientConf
+	UserRpc   zrpc.RpcClientConf
+	WhiteList []string //白名单
 }

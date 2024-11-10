@@ -3,13 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log/slog"
 	"net/http"
 
 	"im_server/common/etcd"
 	"im_server/im_auth/auth_api/internal/config"
 	"im_server/im_auth/auth_api/internal/handler"
 	"im_server/im_auth/auth_api/internal/svc"
+	"im_server/utils/logs"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
@@ -32,7 +32,8 @@ func main() {
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
+
 	etcd.DeliveryAddress(c.Etcd, c.Name+"_api", fmt.Sprintf("%s:%d", c.Host, c.Port))
-	slog.Info(fmt.Sprintf("im_auth服务 正在监听 %s:%d...\n", c.Host, c.Port))
+	logs.MyLogger.Info(fmt.Sprintf("im_auth服务 正在监听 %s:%d...\n", c.Host, c.Port))
 	server.Start()
 }
