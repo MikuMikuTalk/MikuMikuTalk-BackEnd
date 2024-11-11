@@ -1,8 +1,9 @@
 package core
 
 import (
-	"im_server/core/config"
 	"time"
+
+	"im_server/core/config"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	clientv3 "go.etcd.io/etcd/client/v3"

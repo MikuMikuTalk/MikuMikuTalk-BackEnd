@@ -42,5 +42,4 @@ func (l *AuthenticationLogic) Authentication(req *types.AuthenticationRequest) (
 		return
 	}
 	return "ok", nil
-
 }

@@ -30,7 +30,6 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, err error) {
-	// todo: add your logic here and delete this line
 	var user auth_models.UserModel
 	err = l.svcCtx.DB.Take(&user, "nickname = ?", req.UserName).Error
 	if err != nil {

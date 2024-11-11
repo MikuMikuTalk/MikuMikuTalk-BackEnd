@@ -36,7 +36,7 @@ func (l *LogoutLogic) Logout(token string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	//获取jti
+	// 获取jti
 	jti := jwts.ExtractJTI(claims)
 	// 获取 Token 的过期时间
 	now := time.Now()

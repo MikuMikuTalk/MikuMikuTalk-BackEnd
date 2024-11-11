@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"im_server/common/etcd"
 	"io"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"im_server/common/etcd"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"

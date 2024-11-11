@@ -28,6 +28,7 @@ func generateJTI() string {
 func ExtractJTI(claims *CustomClaims) string {
 	return claims.ID
 }
+
 func GenerateJwtToken(payload JwtPayload, accessSecret string, expires int) (string, error) {
 	cliams := CustomClaims{
 		JwtPayload: payload,
@@ -52,6 +53,7 @@ func ParseToken(jwtToken string, accessSecret string) (*CustomClaims, error) {
 	}
 	return nil, errors.New("非法jwt token")
 }
+
 func ValidateToken(jwtToken string, accessSecret string, redisClient *redis.Client) (bool, error) {
 	claims, err := ParseToken(jwtToken, accessSecret)
 	if err != nil {
@@ -60,9 +62,8 @@ func ValidateToken(jwtToken string, accessSecret string, redisClient *redis.Clie
 	// 提取 JTI
 	jti := ExtractJTI(claims)
 	key := "logout_" + jti
-	//如果已经存在在redis中，那么说明这个jwt token已经是被注销了，不能再用了
+	// 如果已经存在在redis中，那么说明这个jwt token已经是被注销了，不能再用了
 	exists, err := redisClient.Exists(key).Result()
-
 	if err != nil {
 		return false, errors.New("Redis 校验失败")
 	}
