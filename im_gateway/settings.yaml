@@ -1,0 +1,8 @@
+addr: 0.0.0.0:8080
+etcd: 127.0.0.1:2379
+Log:
+  ServiceName: gateway
+  Encoding: plain
+  Timeout: 2006-01-02 15:04:05
+  Level: debug
+  Stat: false

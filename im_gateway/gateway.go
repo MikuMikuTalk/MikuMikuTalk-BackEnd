@@ -31,7 +31,7 @@ type Response struct {
 }
 
 // 配置文件路径的命令行参数
-var configFile = flag.String("f", "etc/settings.yaml", "the config file")
+var configFile = flag.String("f", "settings.yaml", "the config file")
 
 // 网关服务结构体
 type GatewayService struct {
