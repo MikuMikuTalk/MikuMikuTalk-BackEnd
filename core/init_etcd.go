@@ -1,10 +1,10 @@
 package core
 
 import (
+	"im_server/core/config"
 	"time"
 
-	"im_server/utils/logs"
-
+	"github.com/zeromicro/go-zero/core/logx"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -14,7 +14,8 @@ func InitEtcd(addr string) *clientv3.Client {
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
-		logs.Error(err)
+		logx.MustSetup(config.GetConfig())
+		logx.Error(err)
 		panic(err)
 	}
 	return client

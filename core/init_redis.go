@@ -1,12 +1,14 @@
 package core
 
 import (
-	"log/slog"
+	"im_server/core/config"
 
 	"github.com/go-redis/redis"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 func InitRedis(addr, pwd string, db int) (client *redis.Client) {
+	logx.MustSetup(config.GetConfig())
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: pwd,
@@ -14,9 +16,9 @@ func InitRedis(addr, pwd string, db int) (client *redis.Client) {
 	})
 	err := rdb.Ping().Err()
 	if err != nil {
-		slog.Error("redis connect failed ", "error:", err)
+		logx.Error("redis connect failed ", "error:", err)
 		panic(err)
 	}
-	slog.Info("Redis连接成功")
+	logx.Info("Redis连接成功")
 	return rdb
 }

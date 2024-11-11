@@ -9,9 +9,9 @@ import (
 	"im_server/im_auth/auth_api/internal/config"
 	"im_server/im_auth/auth_api/internal/handler"
 	"im_server/im_auth/auth_api/internal/svc"
-	"im_server/utils/logs"
 
 	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest"
 )
 
@@ -34,6 +34,6 @@ func main() {
 	handler.RegisterHandlers(server, ctx)
 
 	etcd.DeliveryAddress(c.Etcd, c.Name+"_api", fmt.Sprintf("%s:%d", c.Host, c.Port))
-	logs.MyLogger.Info(fmt.Sprintf("im_auth服务 正在监听 %s:%d...\n", c.Host, c.Port))
+	logx.Infof("im_auth服务 正在监听 %s:%d...\n", c.Host, c.Port)
 	server.Start()
 }
