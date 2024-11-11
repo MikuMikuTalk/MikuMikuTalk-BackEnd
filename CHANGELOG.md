@@ -1,4 +1,39 @@
 
+<a name="v0.1.3"></a>
+## [v0.1.3](https://github.com/meowrain/im_server/compare/v0.1.2...v0.1.3) (2024-11-11)
+
+### Feat
+
+* 添加和修改一些配置
+* 创建user_api服务
+*  实现白名单功能，放行login和register接口;实习auth服务中间件
+* auth进行注册
+* 添加网关
+* etcd注册和发现服务
+* 配合user_rpc完成注册服务
+* 添加user_rpc服务,现提供用户注册功能
+* 添加etcd服务初始化函数,方便后续网关服务进行分配服务
+* user_models添加RegisterSource字段
+* 添加自定义日志功能
+* 认证功能完成
+* 添加redis,完成logout功能
+*  创建auth_model,更新包名，添加DB到auth服务，完成登陆的logic编写,CHNAGELOG.md更新
+
+### Fix
+
+* 修复网关启动找不到文件的问题
+* 修复日志不一致的问题
+* 修复可重复注销的问题
+
+### Run
+
+* gofumpt -w .
+
+### Style
+
+* 代码格式化,user_rpc服务添加logx配置
+
+
 <a name="v0.1.2"></a>
 ## [v0.1.2](https://github.com/meowrain/im_server/compare/v0.1.1...v0.1.2) (2024-10-25)
 
