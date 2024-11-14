@@ -10,8 +10,17 @@ message UserCreateRequest {
 }
 message UserCreateResponse { string user_name = 1; }
 
+//用户信息请求
+message UserInfoRequest {
+  uint32 user_id = 1;
+}
+
+message UserInfoResponse {
+  bytes data = 1;
+}
 service Users {
   rpc UserCreate(UserCreateRequest) returns (UserCreateResponse);
+  rpc UserInfo(UserInfoRequest) returns (UserInfoResponse);
 }
 
 // goctl rpc protoc user_rpc.proto --go_out=./types --go-grpc_out=./types

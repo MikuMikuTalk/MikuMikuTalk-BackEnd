@@ -1,4 +1,4 @@
-Name: users
+Name: user
 Host: 0.0.0.0
 Port: 20022
 Etcd: 127.0.0.1:2379
