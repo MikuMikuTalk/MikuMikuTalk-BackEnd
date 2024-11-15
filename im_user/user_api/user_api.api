@@ -44,6 +44,18 @@ type UserInfoUpdateRequest {
 
 type UserInfoUpdateResponse {}
 
+type FriendInfoRequest {
+	FriendName string `form:"friend_name"`
+}
+
+type FriendInfoResponse {
+	FriendID uint   `json:"friendID"`
+	Nickname string `json:"nickname"`
+	Abstract string `json:"abstract"`
+	Avatar   string `json:"avatar"`
+	Notice   string `json:"notice"`
+}
+
 service users {
 	@doc (
 		summary: "用户信息获取接口"
@@ -56,5 +68,11 @@ service users {
 	)
 	@handler UserInfoUpdate
 	put /api/user/info (UserInfoUpdateRequest) returns (UserInfoUpdateResponse)
+
+	@doc (
+		summary: "好友信息接口"
+	)
+	@handler FriendInfo
+	get /api/user/friend_info (FriendInfoRequest) returns (FriendInfoResponse)
 }
 

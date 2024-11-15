@@ -47,7 +47,7 @@ func (l *UserCreateLogic) UserCreate(in *user_rpc.UserCreateRequest) (*user_rpc.
 		UserID:        user.ID,
 		RecallMessage: nil,   // 撤回消息的提示内容  撤回了一条消息
 		FriendOnline:  false, // 关闭好友上线提醒
-		Sound:         true,  // 开启声音
+		EnableSound:   true,  // 开启声音
 		SecureLink:    false, // 关闭安全链接
 		SavePwd:       false, // 不保存密码
 		SearchUser:    2,     // 可以通过用户id和昵称搜索

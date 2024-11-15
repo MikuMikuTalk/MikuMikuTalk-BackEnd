@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"gorm.io/gorm"
 	"im_server/im_user/user_models"
 	"im_server/im_user/user_rpc/types/user_rpc"
+
+	"gorm.io/gorm"
 
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
@@ -72,7 +73,7 @@ func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserIn
 	if user.UserConfModel != nil {
 		resp.RecallMessage = user.UserConfModel.RecallMessage
 		resp.FriendOnline = user.UserConfModel.FriendOnline
-		resp.Sound = user.UserConfModel.Sound
+		resp.Sound = user.UserConfModel.EnableSound
 		resp.SecureLink = user.UserConfModel.SecureLink
 		resp.SavePwd = user.UserConfModel.SavePwd
 		resp.SearchUser = user.UserConfModel.SearchUser

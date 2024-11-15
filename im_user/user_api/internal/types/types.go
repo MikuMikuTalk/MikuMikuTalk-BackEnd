@@ -3,6 +3,18 @@
 
 package types
 
+type FriendInfoRequest struct {
+	FriendName string `form:"friend_name"`
+}
+
+type FriendInfoResponse struct {
+	FriendID uint   `json:"friendID"`
+	Nickname string `json:"nickname"`
+	Abstract string `json:"abstract"`
+	Avatar   string `json:"avatar"`
+	Notice   string `json:"notice"`
+}
+
 type UserInfoRequest struct {
 	UserName string `json:"username"`
 }

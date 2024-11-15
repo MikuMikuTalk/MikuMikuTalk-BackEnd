@@ -30,7 +30,7 @@ func NewUserInfoUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Us
 }
 
 func (l *UserInfoUpdateLogic) UserInfoUpdate(token string, req *types.UserInfoUpdateRequest) (resp *types.UserInfoUpdateResponse, err error) {
-	// todo: add your logic here and delete this line
+
 	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
 	if err != nil {
 		logx.Error("error: ", err)
