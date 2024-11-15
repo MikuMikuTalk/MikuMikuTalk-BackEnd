@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+
 	"im_server/im_user/user_models"
 	"im_server/im_user/user_rpc/types/user_rpc"
 
@@ -43,7 +44,7 @@ func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserIn
 		}
 	}
 
-	//提取用户信息
+	// 提取用户信息
 	res, err := l.svcCtx.UserRpc.UserInfo(context.Background(), &user_rpc.UserInfoRequest{
 		UserId: uint32(user.ID),
 	})
@@ -52,7 +53,7 @@ func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserIn
 		return nil, err
 	}
 
-	//logx.Infof("UserRpc 返回数据: %+v", res)
+	// logx.Infof("UserRpc 返回数据: %+v", res)
 
 	err = json.Unmarshal(res.Data, &user)
 	if err != nil {
@@ -60,7 +61,7 @@ func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserIn
 		return nil, errors.New("数据错误")
 	}
 
-	//logx.Infof("解析后的用户数据: %+v", user)
+	// logx.Infof("解析后的用户数据: %+v", user)
 	if user.UserConfModel == nil {
 		logx.Error("UserConfModel 为空")
 	}

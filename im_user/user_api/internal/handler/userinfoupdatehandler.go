@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"im_server/common/response"
 	"net/http"
+
+	"im_server/common/response"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 	"im_server/im_user/user_api/internal/logic"
@@ -14,7 +15,7 @@ import (
 func UserInfoUpdateHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.UserInfoUpdateRequest
-		//获取jwt token,提取userid
+		// 获取jwt token,提取userid
 		token := r.Header.Get("Authorization")
 		if err := httpx.Parse(r, &req); err != nil {
 			response.Response(r, w, nil, err)

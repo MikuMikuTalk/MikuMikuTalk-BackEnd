@@ -29,7 +29,7 @@ func NewFriendInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Friend
 }
 
 func (l *FriendInfoLogic) FriendInfo(req *types.FriendInfoRequest, token string) (resp *types.FriendInfoResponse, err error) {
-	//确定查的用户是自己的好友
+	// 确定查的用户是自己的好友
 	var user user_models.UserModel
 	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
 	if err != nil {

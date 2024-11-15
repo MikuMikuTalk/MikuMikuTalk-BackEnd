@@ -12,5 +12,5 @@ type UserModel struct {
 	Addr           string         `gorm:"size:64;comment:'地址'" json:"addr"`                  // 地址
 	Role           int8           `json:"role" gorm:"comment:'角色 1是管理员 2是普通用户'"`             // 角色 1 管理员  2 普通用户
 	RegisterSource string         `gorm:"size:16;comment:'注册来源'" json:"registerSource"`      // 注册来源
-	UserConfModel  *UserConfModel `gorm:"foreignKey:UserID;comment:''" json:"UserConfModel"` //用户配置外键
+	UserConfModel  *UserConfModel `gorm:"foreignKey:UserID;comment:''" json:"UserConfModel"` // 用户配置外键
 }

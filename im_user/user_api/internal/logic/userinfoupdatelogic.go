@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+
 	"im_server/common/ctype"
 	"im_server/im_user/user_models"
 	"im_server/utils/jwts"
@@ -30,7 +31,6 @@ func NewUserInfoUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Us
 }
 
 func (l *UserInfoUpdateLogic) UserInfoUpdate(token string, req *types.UserInfoUpdateRequest) (resp *types.UserInfoUpdateResponse, err error) {
-
 	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
 	if err != nil {
 		logx.Error("error: ", err)

@@ -2,10 +2,11 @@ package handler
 
 import (
 	"errors"
+	"net/http"
+
 	"im_server/common/response"
 	"im_server/im_user/user_api/internal/logic"
 	"im_server/im_user/user_api/internal/types"
-	"net/http"
 
 	"im_server/im_user/user_api/internal/svc"
 )
