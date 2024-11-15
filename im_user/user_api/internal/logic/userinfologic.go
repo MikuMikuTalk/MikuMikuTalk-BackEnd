@@ -14,22 +14,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type InfoLogic struct {
+type UserInfoLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
 // 用户信息获取接口
-func NewInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *InfoLogic {
-	return &InfoLogic{
+func NewUserInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserInfoLogic {
+	return &UserInfoLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *InfoLogic) Info(req *types.UserInfoRequest) (resp *types.UserInfoResponse, err error) {
+func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserInfoResponse, err error) {
 	var user user_models.UserModel
 	err = l.svcCtx.DB.Select("id").Where("nickname = ?", req.UserName).First(&user).Error
 	if err != nil {
@@ -52,6 +52,7 @@ func (l *InfoLogic) Info(req *types.UserInfoRequest) (resp *types.UserInfoRespon
 	}
 
 	//logx.Infof("UserRpc 返回数据: %+v", res)
+
 	err = json.Unmarshal(res.Data, &user)
 	if err != nil {
 		logx.Errorf("JSON 解析失败: %v", err)
@@ -89,5 +90,4 @@ func (l *InfoLogic) Info(req *types.UserInfoRequest) (resp *types.UserInfoRespon
 	}
 	logx.Infof("最终返回数据: %+v", resp)
 	return resp, nil
-
 }

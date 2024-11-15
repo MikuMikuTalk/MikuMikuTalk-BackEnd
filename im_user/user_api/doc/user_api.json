@@ -1,0 +1,250 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "",
+    "version": ""
+  },
+  "host": "0.0.0.0:8888",
+  "basePath": "/",
+  "schemes": [
+    "http",
+    "ws"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/user/info": {
+      "get": {
+        "summary": "用户信息获取接口",
+        "operationId": "UserInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/UserInfoResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      },
+      "put": {
+        "summary": "用户信息更新接口",
+        "operationId": "UserInfoUpdate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/UserInfoUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserInfoUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "UserInfoRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        }
+      },
+      "title": "UserInfoRequest",
+      "required": [
+        "username"
+      ]
+    },
+    "UserInfoResponse": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "integer",
+          "format": "uint32"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "recallMessage": {
+          "type": "string"
+        },
+        "friendOnline": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sound": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "secureLink": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "savePwd": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "searchUser": {
+          "type": "integer",
+          "format": "int8"
+        },
+        "verification": {
+          "type": "integer",
+          "format": "int8"
+        },
+        "verificationQuestion": {
+          "$ref": "#/definitions/VerificationQuestion"
+        }
+      },
+      "title": "UserInfoResponse",
+      "required": [
+        "userID",
+        "nickname",
+        "abstract",
+        "avatar",
+        "recallMessage",
+        "friendOnline",
+        "sound",
+        "secureLink",
+        "savePwd",
+        "searchUser",
+        "verification",
+        "verificationQuestion"
+      ]
+    },
+    "UserInfoUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "nickname": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "recallMessage": {
+          "type": "string"
+        },
+        "friendOnline": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sound": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "secureLink": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "savePwd": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "searchUser": {
+          "type": "integer",
+          "format": "int8"
+        },
+        "verification": {
+          "type": "integer",
+          "format": "int8"
+        },
+        "verificationQuestion": {
+          "$ref": "#/definitions/VerificationQuestion"
+        }
+      },
+      "title": "UserInfoUpdateRequest",
+      "required": [
+        "nickname",
+        "abstract",
+        "avatar",
+        "recall_message",
+        "friend_online",
+        "sound",
+        "secure_link",
+        "save_pwd",
+        "search_user",
+        "verification",
+        "verification_question"
+      ]
+    },
+    "UserInfoUpdateResponse": {
+      "type": "object",
+      "title": "UserInfoUpdateResponse"
+    },
+    "VerificationQuestion": {
+      "type": "object",
+      "properties": {
+        "problem1": {
+          "type": "string"
+        },
+        "problem2": {
+          "type": "string"
+        },
+        "problem3": {
+          "type": "string"
+        },
+        "answer1": {
+          "type": "string"
+        },
+        "answer2": {
+          "type": "string"
+        },
+        "answer3": {
+          "type": "string"
+        }
+      },
+      "title": "VerificationQuestion",
+      "required": [
+        "problem1",
+        "problem2",
+        "problem3",
+        "answer1",
+        "answer2",
+        "answer3"
+      ]
+    }
+  },
+  "securityDefinitions": {
+    "apiKey": {
+      "type": "apiKey",
+      "description": "Enter JWT Bearer token **_only_**",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}

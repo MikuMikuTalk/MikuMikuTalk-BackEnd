@@ -18,7 +18,13 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				// 用户信息获取接口
 				Method:  http.MethodGet,
 				Path:    "/api/user/info",
-				Handler: infoHandler(serverCtx),
+				Handler: UserInfoHandler(serverCtx),
+			},
+			{
+				// 用户信息更新接口
+				Method:  http.MethodPut,
+				Path:    "/api/user/info",
+				Handler: UserInfoUpdateHandler(serverCtx),
 			},
 		},
 	)
