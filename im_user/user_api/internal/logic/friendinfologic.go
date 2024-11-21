@@ -68,7 +68,7 @@ func (l *FriendInfoLogic) FriendInfo(req *types.FriendInfoRequest, token string)
 		Nickname: friend_info.Nickname,
 		Abstract: friend_info.Abstract,
 		Avatar:   friend_info.Abstract,
-		Notice:   friend.Notice,
+		Notice:   friend.GetUserNotice(user.ID),
 	}
 	return resp, nil
 }
