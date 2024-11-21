@@ -3,6 +3,7 @@
 
 # 系统服务端口
 
+```
 im_server
   api
     im_gateway   网关            127.0.0.1:9000
@@ -17,4 +18,4 @@ im_server
     im_chat      对话rpc服务         127.0.0.1:30023
     im_file      文件rpc服务         127.0.0.1:30024
     im_group     群聊rpc服务         127.0.0.1:30025
-    
+```
