@@ -212,8 +212,16 @@ func (g *GatewayService) sendProxyRequest(proxyReq *http.Request, res http.Respo
 }
 
 // 处理错误响应
+// 处理错误响应
 func (g *GatewayService) handleError(res http.ResponseWriter, status int, message string) {
+	// 设置响应头为 JSON 格式
+	res.Header().Set("Content-Type", "application/json")
+	res.Header().Set("Cache-Control", "no-store") // 禁用缓存
+
+	// 设置响应状态码
 	res.WriteHeader(status)
+
+	// 返回 JSON 格式的错误响应
 	json.NewEncoder(res).Encode(Response{
 		Code: 7,
 		Msg:  message,
@@ -237,7 +245,7 @@ func (g *GatewayService) HandleRequest(res http.ResponseWriter, req *http.Reques
 
 	// 认证
 	if err := g.authenticate(req); err != nil {
-		g.handleError(res, http.StatusUnauthorized, "认证失败")
+		g.handleError(res, http.StatusUnauthorized, err.Error())
 		return
 	}
 
