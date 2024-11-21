@@ -15,11 +15,11 @@ type FriendModel struct {
 
 func (f *FriendModel) GetUserNotice(userID uint) string {
 	if userID == f.SendUserID {
-		//如果我是发起验证方
+		// 如果我是发起验证方
 		return f.SenUserNotice
 	}
 	if userID == f.RevUserID {
-		//如果我是接收方
+		// 如果我是接收方
 		return f.RevUserNotice
 	}
 	return ""
