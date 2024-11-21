@@ -31,7 +31,7 @@ func (l *AuthenticationLogic) Authentication(req *types.AuthenticationRequest) (
 	// if whitelist.IsInList(req.ValidPath, l.svcCtx.Config.WhiteList) {
 	// 	return "ok", nil
 	// }
-	//使用正则表达式
+	// 使用正则表达式
 	if whitelist.IsInListByRegex(l.svcCtx.Config.WhiteList, req.ValidPath) {
 		logx.Infof("%s 在白名单中", req.ValidPath)
 		return

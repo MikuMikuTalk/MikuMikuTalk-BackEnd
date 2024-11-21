@@ -3,14 +3,15 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"im_server/common/response"
-	"im_server/im_file/file_api/internal/logic"
-	"im_server/im_file/file_api/internal/svc"
-	"im_server/im_file/file_api/internal/types"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"im_server/common/response"
+	"im_server/im_file/file_api/internal/logic"
+	"im_server/im_file/file_api/internal/svc"
+	"im_server/im_file/file_api/internal/types"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 )

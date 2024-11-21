@@ -14,6 +14,7 @@ func IsInList(path string, whitelist []string) bool {
 	}
 	return false
 }
+
 func IsInListByRegex(list []string, key string) bool {
 	for _, s := range list {
 		regex, err := regexp.Compile(s)
