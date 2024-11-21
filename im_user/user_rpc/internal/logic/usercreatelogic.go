@@ -2,7 +2,8 @@ package logic
 
 import (
 	"context"
-	"errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"im_server/im_user/user_models"
 	"im_server/im_user/user_rpc/internal/svc"
@@ -27,10 +28,11 @@ func NewUserCreateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserCr
 }
 
 func (l *UserCreateLogic) UserCreate(in *user_rpc.UserCreateRequest) (*user_rpc.UserCreateResponse, error) {
-	err := l.svcCtx.DB.Take("nickname = ?", in.NickName).Error
+	err := l.svcCtx.DB.Take(&user_models.UserModel{}, "nickname = ?", in.NickName).Error
 	if err == nil {
-		return nil, errors.New("用户已经存在，请不要重复注册！")
+		return nil, status.Errorf(codes.AlreadyExists, "用户已经存在，请不要重复注册！")
 	}
+
 	var user user_models.UserModel = user_models.UserModel{
 		Nickname:       in.NickName,
 		Pwd:            pwd.HashPassword(in.Password),
@@ -41,7 +43,7 @@ func (l *UserCreateLogic) UserCreate(in *user_rpc.UserCreateRequest) (*user_rpc.
 	err = l.svcCtx.DB.Create(&user).Error
 	if err != nil {
 		logx.Error("用户创建失败")
-		return nil, errors.New("用户创建失败")
+		return nil, status.Errorf(codes.Aborted, "用户创建失败")
 	}
 	var userconf user_models.UserConfModel = user_models.UserConfModel{
 		UserID:        user.ID,
@@ -57,7 +59,7 @@ func (l *UserCreateLogic) UserCreate(in *user_rpc.UserCreateRequest) (*user_rpc.
 	err = l.svcCtx.DB.Create(&userconf).Error
 	if err != nil {
 		logx.Error("用户配置信息创建失败")
-		return nil, errors.New("用户配置信息创建失败")
+		return nil, status.Errorf(codes.Aborted, "用户配置信息创建失败")
 	}
 
 	return &user_rpc.UserCreateResponse{
