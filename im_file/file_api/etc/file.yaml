@@ -3,3 +3,9 @@ Host: 0.0.0.0
 Port: 20025
 Etcd: 127.0.0.1:2379
 MaxBytes: 5368709120
+Log:
+  ServiceName: file
+  Encoding: plain
+  Timeout: 2006-01-02 15:04:05
+  Level: debug
+  Stat: false

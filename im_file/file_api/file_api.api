@@ -13,12 +13,23 @@ type ImageResponse {
 	Url string `json:"url"`
 }
 
+type ImagePreviewRequest {
+	ImageType string `path:"imageType"`
+	ImageName string `path:"imageName"`
+}
+
 service file {
 	@doc (
 		summary: "图片上传服务"
 	)
 	@handler Image
 	post /api/file/image (ImageRequest) returns (ImageResponse)
+
+	@doc (
+		summary: "图片预览服务"
+	)
+	@handler ImagePreview
+	get /api/file/uploads/:imageType/:imageName (ImagePreviewRequest)
 }
 
 //goctl api go -api file_api.api -dir . --home ../../template

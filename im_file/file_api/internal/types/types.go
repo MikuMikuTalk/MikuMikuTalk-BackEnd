@@ -3,6 +3,11 @@
 
 package types
 
+type ImagePreviewRequest struct {
+	ImageType string `path:"imageType"`
+	ImageName string `path:"imageName"`
+}
+
 type ImageRequest struct {
 }
 
