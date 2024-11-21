@@ -13,6 +13,7 @@ import (
 	"im_server/im_file/file_api/internal/svc"
 	"im_server/im_file/file_api/internal/types"
 
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
@@ -36,6 +37,12 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 		fileName := fileHeader.Filename
+		fileSize := float64(fileHeader.Size) / float64(1024) / float64(1024)
+		logx.Info("fileSize:", fileSize)
+		if fileSize > svcCtx.Config.FileSize {
+			response.Response(r, w, nil, fmt.Errorf("图片大小超过限制，最大只能上传%.2fMB大小的图片", svcCtx.Config.FileSize))
+			return
+		}
 		err = os.MkdirAll(fmt.Sprintf("uploads/%s", imageType), os.ModePerm)
 		if err != nil {
 			response.Response(r, w, nil, errors.New("文件夹创建失败"))

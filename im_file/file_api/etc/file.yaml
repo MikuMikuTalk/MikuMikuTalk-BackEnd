@@ -9,3 +9,4 @@ Log:
   Timeout: 2006-01-02 15:04:05
   Level: debug
   Stat: false
+FileSize: 10 # 图片上传大小 MB
