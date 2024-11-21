@@ -1,0 +1,24 @@
+syntax = "v1"
+
+info (
+	title:  "fileAPI"
+	desc:   "文件上传服务"
+	author: "MeowRain"
+	email:  "meowrain@126.com"
+)
+
+type ImageRequest {}
+
+type ImageResponse {
+	Url string `json:"url"`
+}
+
+service file {
+	@doc (
+		summary: "图片上传服务"
+	)
+	@handler Image
+	post /api/file/image (ImageRequest) returns (ImageResponse)
+}
+
+//goctl api go -api file_api.api -dir . --home ../../template
