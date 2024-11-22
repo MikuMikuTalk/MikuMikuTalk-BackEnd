@@ -6,8 +6,8 @@ import (
 
 	"im_server/im_auth/auth_api/internal/svc"
 	"im_server/im_auth/auth_api/internal/types"
-	"im_server/im_auth/whitelist"
 	"im_server/utils/jwts"
+	"im_server/utils/whitelist"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

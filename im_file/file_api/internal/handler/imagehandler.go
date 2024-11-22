@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 
 	"im_server/common/response"
 	"im_server/im_file/file_api/internal/logic"
 	"im_server/im_file/file_api/internal/svc"
 	"im_server/im_file/file_api/internal/types"
+	"im_server/utils/whitelist"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -37,6 +39,17 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 		fileName := fileHeader.Filename
+		// 文件后缀白名单
+		nameList := strings.Split(fileName, ".")
+		var suffix string
+		if len(nameList) > 1 {
+			suffix = nameList[len(nameList)-1]
+		}
+		if !whitelist.IsInList(suffix, svcCtx.Config.WhiteList) {
+			response.Response(r, w, nil, errors.New("不可以上传这种格式的图片！"))
+			return
+		}
+
 		fileSize := float64(fileHeader.Size) / float64(1024) / float64(1024)
 		logx.Info("fileSize:", fileSize)
 		if fileSize > svcCtx.Config.FileSize {
