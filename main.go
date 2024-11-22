@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	"im_server/core"
-	models2 "im_server/im_chat/chat_models"
-	models3 "im_server/im_group/group_models"
-	models "im_server/im_user/user_models"
+	"im_server/im_chat/chat_models"
+	"im_server/im_file/file_api/file_models"
+	"im_server/im_group/group_models"
+	"im_server/im_user/user_models"
 )
 
 type Options struct {
@@ -22,15 +23,16 @@ func main() {
 	if opt.DB {
 		db := core.InitGorm("root:123456@tcp(127.0.0.1:3306)/im_server_db?charset=utf8mb4&parseTime=True&loc=Local")
 		err := db.AutoMigrate(
-			&models.UserModel{},         // 用户表
-			&models.FriendModel{},       // 好友表
-			&models.FriendVerifyModel{}, // 好友验证表
-			&models.UserConfModel{},     // 用户配置表
-			&models2.ChatModel{},        // 对话表
-			&models3.GroupModel{},       // 群组表
-			&models3.GroupMemberModel{}, // 群成员表
-			&models3.GroupMsgModel{},    // 群消息表
-			&models3.GroupVerifyModel{}, // 群验证表
+			&user_models.UserModel{},         // 用户表
+			&user_models.FriendModel{},       // 好友表
+			&user_models.FriendVerifyModel{}, // 好友验证表
+			&user_models.UserConfModel{},     // 用户配置表
+			&chat_models.ChatModel{},         // 对话表
+			&group_models.GroupModel{},       // 群组表
+			&group_models.GroupMemberModel{}, // 群成员表
+			&group_models.GroupMsgModel{},    // 群消息表
+			&group_models.GroupVerifyModel{}, // 群验证表
+			&file_models.FileModel{},         //文件表
 		)
 		if err != nil {
 			fmt.Println("表结构生成失败", err)

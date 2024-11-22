@@ -15,6 +15,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// 文件上传服务
+				Method:  http.MethodPost,
+				Path:    "/api/file/file",
+				Handler: FileHandler(serverCtx),
+			},
+			{
 				// 图片上传服务
 				Method:  http.MethodPost,
 				Path:    "/api/file/image",

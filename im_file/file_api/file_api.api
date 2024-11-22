@@ -18,6 +18,14 @@ type ImagePreviewRequest {
 	ImageName string `path:"imageName"`
 }
 
+type FileRequest {
+	UserID uint `header:"User-ID"`
+}
+
+type FileResponse {
+	Src string `json:"src"`
+}
+
 service file {
 	@doc (
 		summary: "图片上传服务"
@@ -30,6 +38,12 @@ service file {
 	)
 	@handler ImagePreview
 	get /api/file/uploads/:imageType/:imageName (ImagePreviewRequest)
+
+	@doc (
+		summary: "文件上传服务"
+	)
+	@handler File
+	post /api/file/file (FileRequest) returns (FileResponse)
 }
 
 //goctl api go -api file_api.api -dir . --home ../../template

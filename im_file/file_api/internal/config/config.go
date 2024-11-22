@@ -7,4 +7,7 @@ type Config struct {
 	Etcd      string
 	FileSize  float64
 	WhiteList []string
+	Mysql     struct {
+		DataSource string
+	}
 }
