@@ -115,6 +115,7 @@ func validateFileSize(size int64, maxSize float64) bool {
 	fileSizeMB := float64(size) / 1024 / 1024
 	return fileSizeMB <= maxSize
 }
+
 func isFileInDirectory(dirName string, fileName string) bool {
 	dirs, _ := os.ReadDir(dirName)
 	return direcotry.InDir(dirs, fileName)
@@ -151,6 +152,7 @@ func saveFile(filePath string, file io.Reader) error {
 	_, err = io.Copy(outFile, file)
 	return err
 }
+
 func renameFile(fileName string) string {
 	fileNameWithoudExt := file_utils.GetFileNameWithoutExt(fileName)
 	logx.Info("fileNameWithoudExt: ", fileNameWithoudExt)
