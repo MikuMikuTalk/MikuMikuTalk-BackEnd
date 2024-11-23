@@ -21,6 +21,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: FriendInfoHandler(serverCtx),
 			},
 			{
+				// 好友列表获取
+				Method:  http.MethodGet,
+				Path:    "/api/user/friend_list",
+				Handler: FriendListHandler(serverCtx),
+			},
+			{
 				// 用户信息获取接口
 				Method:  http.MethodGet,
 				Path:    "/api/user/info",

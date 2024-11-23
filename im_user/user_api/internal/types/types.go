@@ -15,6 +15,17 @@ type FriendInfoResponse struct {
 	Notice   string `json:"notice"`
 }
 
+type FriendListRequest struct {
+	Role  int8 `header:"Role"`
+	Page  int  `form:"page,optional"`
+	Limit int  `form:"limit,optional"`
+}
+
+type FriendListResponse struct {
+	List  []FriendInfoResponse `json:"list"`
+	Count int64                `json:"count"`
+}
+
 type UserInfoRequest struct {
 	UserName string `json:"username"`
 }

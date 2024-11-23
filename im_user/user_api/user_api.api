@@ -56,6 +56,17 @@ type FriendInfoResponse {
 	Notice   string `json:"notice"`
 }
 
+type FriendListRequest {
+	Role  int8 `header:"Role"`
+	Page  int  `form:"page,optional"`
+	Limit int  `form:"limit,optional"`
+}
+
+type FriendListResponse {
+	List  []FriendInfoResponse `json:"list"`
+	Count int64                `json:"count"`
+}
+
 service users {
 	@doc (
 		summary: "用户信息获取接口"
@@ -74,5 +85,11 @@ service users {
 	)
 	@handler FriendInfo
 	get /api/user/friend_info (FriendInfoRequest) returns (FriendInfoResponse)
+
+	@doc (
+		summary: "好友列表获取"
+	)
+	@handler FriendList
+	get /api/user/friend_list (FriendListRequest) returns (FriendListResponse)
 }
 
