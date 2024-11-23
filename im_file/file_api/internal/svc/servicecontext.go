@@ -11,16 +11,16 @@ import (
 )
 
 type ServiceContext struct {
-	Config config.Config
-	DB     *gorm.DB
+	Config  config.Config
+	DB      *gorm.DB
 	UserRpc user_rpc.UsersClient
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	mysqlDb := core.InitGorm(c.Mysql.DataSource)
 	return &ServiceContext{
-		Config: c,
-		DB:     mysqlDb,
+		Config:  c,
+		DB:      mysqlDb,
 		UserRpc: users.NewUsers(zrpc.MustNewClient(c.UserRpc)),
 	}
 }

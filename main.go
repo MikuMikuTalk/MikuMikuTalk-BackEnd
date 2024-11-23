@@ -32,7 +32,7 @@ func main() {
 			&group_models.GroupMemberModel{}, // 群成员表
 			&group_models.GroupMsgModel{},    // 群消息表
 			&group_models.GroupVerifyModel{}, // 群验证表
-			&file_models.FileModel{},         //文件表
+			&file_models.FileModel{},         // 文件表
 		)
 		if err != nil {
 			fmt.Println("表结构生成失败", err)

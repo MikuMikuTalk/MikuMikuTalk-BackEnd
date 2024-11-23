@@ -2,15 +2,16 @@ package handler
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+
 	"im_server/common/response"
 	direcotry "im_server/utils/directory"
 	"im_server/utils/file_utils"
 	"im_server/utils/md5_util"
 	"im_server/utils/str_util"
 	"im_server/utils/whitelist"
-	"io"
-	"net/http"
-	"os"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
