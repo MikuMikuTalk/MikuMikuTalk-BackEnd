@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="im_server" type="CompoundRunConfigurationType">
+    <toRun name="go build auth.go" type="GoApplicationRunConfiguration" />
+    <toRun name="go build file.go" type="GoApplicationRunConfiguration" />
+    <toRun name="go build gateway.go" type="GoApplicationRunConfiguration" />
+    <toRun name="go build userrpc.go" type="GoApplicationRunConfiguration" />
+    <toRun name="go build users.go" type="GoApplicationRunConfiguration" />
+    <method v="2" />
+  </configuration>
+</component>

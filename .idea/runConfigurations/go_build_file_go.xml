@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build file.go" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+    <module name="im_server" />
+    <working_directory value="$PROJECT_DIR$/im_file/file_api" />
+    <kind value="FILE" />
+    <package value="im_server" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/im_file/file_api/file.go" />
+    <method v="2" />
+  </configuration>
+</component>
