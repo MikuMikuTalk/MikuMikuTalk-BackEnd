@@ -4,11 +4,10 @@
 package types
 
 type FileRequest struct {
-	UserID uint `header:"User-ID"`
 }
 
 type FileResponse struct {
-	Src string `json:"src"`
+	Src []string `json:"src"`
 }
 
 type ImagePreviewRequest struct {

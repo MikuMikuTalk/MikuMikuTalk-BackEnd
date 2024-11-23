@@ -15,7 +15,7 @@ type FileLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
-// 文件上传服务
+// 文件下载服务
 func NewFileLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FileLogic {
 	return &FileLogic{
 		Logger: logx.WithContext(ctx),
@@ -25,7 +25,6 @@ func NewFileLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FileLogic {
 }
 
 func (l *FileLogic) File(req *types.FileRequest) (resp *types.FileResponse, err error) {
-	// todo: add your logic here and delete this line
-
+	resp = new(types.FileResponse)
 	return
 }

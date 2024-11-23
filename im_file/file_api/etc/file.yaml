@@ -9,7 +9,8 @@ Log:
   Level: debug
   Stat: false
 MaxBytes: 5368709120
-FileSize: 10 # 图片上传大小 MB
+FileSize: 4096 # 图片上传大小 MB
+ImageSize: 10
 WhiteList:
   - png
   - jpg
@@ -18,3 +19,8 @@ WhiteList:
   - webp
 Mysql:
   DataSource: root:123456@tcp(127.0.0.1:3306)/im_server_db?charset=utf8mb4&parseTime=True&loc=Local
+UserRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: userrpc.rpc

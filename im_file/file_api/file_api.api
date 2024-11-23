@@ -18,12 +18,10 @@ type ImagePreviewRequest {
 	ImageName string `path:"imageName"`
 }
 
-type FileRequest {
-	UserID uint `header:"User-ID"`
-}
+type FileRequest {}
 
 type FileResponse {
-	Src string `json:"src"`
+	Src []string `json:"src"`
 }
 
 service file {
@@ -40,7 +38,7 @@ service file {
 	get /api/file/uploads/:imageType/:imageName (ImagePreviewRequest)
 
 	@doc (
-		summary: "文件上传服务"
+		summary: "文件下载服务"
 	)
 	@handler File
 	post /api/file/file (FileRequest) returns (FileResponse)
