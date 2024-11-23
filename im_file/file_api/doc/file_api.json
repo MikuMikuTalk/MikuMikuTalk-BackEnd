@@ -1,0 +1,154 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "fileAPI",
+    "description": "文件上传服务",
+    "version": ""
+  },
+  "host": "0.0.0.0:8888",
+  "basePath": "/",
+  "schemes": [
+    "http",
+    "ws"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/file/file": {
+      "post": {
+        "summary": "文件下载服务",
+        "operationId": "File",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/FileResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FileRequest"
+            }
+          }
+        ],
+        "tags": [
+          "file"
+        ]
+      }
+    },
+    "/api/file/image": {
+      "post": {
+        "summary": "图片上传服务",
+        "operationId": "Image",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ImageResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "file"
+        ]
+      }
+    },
+    "/api/file/uploads/{imageType}/{imageName}": {
+      "get": {
+        "summary": "图片预览服务",
+        "operationId": "ImagePreview",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        },
+        "parameters": [
+          {
+            "name": "imageType",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "imageName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "file"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "FileRequest": {
+      "type": "object",
+      "title": "FileRequest"
+    },
+    "FileResponse": {
+      "type": "object",
+      "properties": {
+        "src": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "FileResponse",
+      "required": [
+        "src"
+      ]
+    },
+    "ImagePreviewRequest": {
+      "type": "object",
+      "title": "ImagePreviewRequest"
+    },
+    "ImageRequest": {
+      "type": "object",
+      "title": "ImageRequest"
+    },
+    "ImageResponse": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      },
+      "title": "ImageResponse",
+      "required": [
+        "url"
+      ]
+    }
+  },
+  "securityDefinitions": {
+    "apiKey": {
+      "type": "apiKey",
+      "description": "Enter JWT Bearer token **_only_**",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}
