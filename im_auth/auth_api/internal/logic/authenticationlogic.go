@@ -28,10 +28,12 @@ func NewAuthenticationLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Au
 }
 
 func (l *AuthenticationLogic) Authentication(req *types.AuthenticationRequest) (resp string, err error) {
-	// if whitelist.IsInList(req.ValidPath, l.svcCtx.Config.WhiteList) {
-	// 	return "ok", nil
-	// }
+	// 常规方法
+	if whitelist.IsInList(req.ValidPath, l.svcCtx.Config.WhiteList) {
+		return "ok", nil
+	}
 	// 使用正则表达式
+
 	if whitelist.IsInListByRegex(l.svcCtx.Config.WhiteList, req.ValidPath) {
 		logx.Infof("%s 在白名单中", req.ValidPath)
 		return

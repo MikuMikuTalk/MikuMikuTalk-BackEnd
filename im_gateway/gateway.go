@@ -212,7 +212,6 @@ func (g *GatewayService) sendProxyRequest(proxyReq *http.Request, res http.Respo
 }
 
 // 处理错误响应
-// 处理错误响应
 func (g *GatewayService) handleError(res http.ResponseWriter, status int, message string) {
 	// 设置响应头为 JSON 格式
 	res.Header().Set("Content-Type", "application/json")
