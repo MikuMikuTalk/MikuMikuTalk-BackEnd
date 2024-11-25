@@ -34,6 +34,7 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest, token string)
 		return nil, err
 	}
 	user_id := clamis.UserID
+	//使用通用列表查询
 	friend_list, count, _ := list_query.ListQuery(l.svcCtx.DB, user_models.FriendModel{}, list_query.Option{
 		PageInfo: models.PageInfo{
 			Page:  req.Page,

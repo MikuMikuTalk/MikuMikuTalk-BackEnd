@@ -67,6 +67,13 @@ type FriendListResponse {
 	Count int64                `json:"count"`
 }
 
+type FriendNoticeUpdateRequest {
+	FriendID uint   `json:"friendID"`
+	Notice   string `json:"notice"` // 备注
+}
+
+type FriendNoticeUpdateResponse {}
+
 service users {
 	@doc (
 		summary: "用户信息获取接口"
@@ -91,5 +98,11 @@ service users {
 	)
 	@handler FriendList
 	get /api/user/friend_list (FriendListRequest) returns (FriendListResponse)
+
+	@doc (
+		summary: "好友备注修改"
+	)
+	@handler FriendNoticeUpdate
+	put /api/user/friends (FriendNoticeUpdateRequest) returns (FriendNoticeUpdateResponse) // 修改好友备注
 }
 

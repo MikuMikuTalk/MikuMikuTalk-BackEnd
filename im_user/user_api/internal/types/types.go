@@ -26,6 +26,14 @@ type FriendListResponse struct {
 	Count int64                `json:"count"`
 }
 
+type FriendNoticeUpdateRequest struct {
+	FriendID uint   `json:"friendID"`
+	Notice   string `json:"notice"` // 备注
+}
+
+type FriendNoticeUpdateResponse struct {
+}
+
 type UserInfoRequest struct {
 	UserName string `json:"username"`
 }
