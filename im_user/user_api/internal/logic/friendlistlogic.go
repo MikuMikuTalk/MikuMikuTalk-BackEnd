@@ -35,7 +35,17 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest, token string)
 	var count int64
 	l.svcCtx.DB.Model(user_models.FriendModel{}).Where("send_user_id = ? or rev_user_id = ?", user_id, user_id).Count(&count)
 	var friend_list []user_models.FriendModel
-	l.svcCtx.DB.Preload("SendUserModel").Preload("RevUserModel").Find(&friend_list, "send_user_id = ? or rev_user_id = ?", user_id, user_id)
+
+	// l.svcCtx.DB.Preload("SendUserModel").Preload("RevUserModel").Find(&friend_list, "send_user_id = ? or rev_user_id = ?", user_id, user_id)
+	//使用分页查询
+	if req.Limit <= 0 {
+		req.Limit = 10
+	}
+	if req.Page <= 0 {
+		req.Page = 1
+	}
+	offset := (req.Page - 1) * req.Limit
+	l.svcCtx.DB.Preload("SendUserModel").Preload("RevUserModel").Limit(req.Limit).Offset(offset).Find(&friend_list, "send_user_id = ? or rev_user_id = ?", user_id, user_id)
 	var friend_info_responses []types.FriendInfoResponse
 	for _, friend := range friend_list {
 		info := types.FriendInfoResponse{}
@@ -46,7 +56,7 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest, token string)
 				Nickname: friend.RevUserModel.Nickname,
 				Abstract: friend.RevUserModel.Abstract,
 				Avatar:   friend.RevUserModel.Avatar,
-				Notice:   friend.RevUserNotice,
+				Notice:   friend.SenUserNotice,
 			}
 		}
 		if friend.RevUserID == user_id {
@@ -56,7 +66,7 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest, token string)
 				Nickname: friend.SendUserModel.Nickname,
 				Abstract: friend.SendUserModel.Abstract,
 				Avatar:   friend.SendUserModel.Avatar,
-				Notice:   friend.SenUserNotice,
+				Notice:   friend.RevUserNotice,
 			}
 		}
 		friend_info_responses = append(friend_info_responses, info)
