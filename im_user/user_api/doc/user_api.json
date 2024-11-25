@@ -88,6 +88,33 @@
         ]
       }
     },
+    "/api/user/friends": {
+      "put": {
+        "summary": "好友备注修改",
+        "operationId": "FriendNoticeUpdate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/FriendNoticeUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FriendNoticeUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
     "/api/user/info": {
       "get": {
         "summary": "用户信息获取接口",
@@ -135,6 +162,57 @@
         ],
         "tags": [
           "users"
+        ]
+      }
+    },
+    "/api/user/search": {
+      "get": {
+        "summary": "好友搜索接口",
+        "operationId": "FriendSearch",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/SearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "key",
+            "description": "用户id和昵称",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "online",
+            "description": "搜索在线得用户",
+            "in": "query",
+            "required": true,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "users"
+        ],
+        "consumes": [
+          "multipart/form-data"
         ]
       }
     }
@@ -210,6 +288,101 @@
         }
       },
       "title": "FriendListResponse",
+      "required": [
+        "list",
+        "count"
+      ]
+    },
+    "FriendNoticeUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "friendID": {
+          "type": "integer",
+          "format": "uint32"
+        },
+        "notice": {
+          "type": "string",
+          "description": " 备注"
+        }
+      },
+      "title": "FriendNoticeUpdateRequest",
+      "required": [
+        "friendID",
+        "notice"
+      ]
+    },
+    "FriendNoticeUpdateResponse": {
+      "type": "object",
+      "title": "FriendNoticeUpdateResponse"
+    },
+    "SearchInfo": {
+      "type": "object",
+      "properties": {
+        "nickname": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "isFriend": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "是否为好友"
+        }
+      },
+      "title": "SearchInfo",
+      "required": [
+        "nickname",
+        "abstract",
+        "avatar",
+        "isFriend"
+      ]
+    },
+    "SearchRequest": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "用户id和昵称"
+        },
+        "online": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "搜索在线得用户"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "SearchRequest",
+      "required": [
+        "key",
+        "online"
+      ]
+    },
+    "SearchResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SearchInfo"
+          }
+        },
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "SearchResponse",
       "required": [
         "list",
         "count"
