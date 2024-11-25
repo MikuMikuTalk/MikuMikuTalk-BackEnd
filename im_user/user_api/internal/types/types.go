@@ -34,6 +34,25 @@ type FriendNoticeUpdateRequest struct {
 type FriendNoticeUpdateResponse struct {
 }
 
+type SearchInfo struct {
+	NickName string `json:"nickname"`
+	Abstract string `json:"abstract"`
+	Avatar   string `json:"avatar"`
+	IsFriend bool   `json:"isFriend"` //是否为好友
+}
+
+type SearchRequest struct {
+	Key    string `form:"key"`    //用户id和昵称
+	Online bool   `form:"online"` //搜索在线得用户
+	Page   int    `form:"page,optional"`
+	Limit  int    `form:"limit,optional"`
+}
+
+type SearchResponse struct {
+	List  []SearchInfo `json:"list"`
+	Count int64        `json:"count"`
+}
+
 type UserInfoRequest struct {
 	UserName string `json:"username"`
 }

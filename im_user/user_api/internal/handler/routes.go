@@ -44,6 +44,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/api/user/info",
 				Handler: UserInfoUpdateHandler(serverCtx),
 			},
+			{
+				// 好友搜索接口
+				Method:  http.MethodGet,
+				Path:    "/api/user/search",
+				Handler: FriendSearchHandler(serverCtx),
+			},
 		},
 	)
 }
