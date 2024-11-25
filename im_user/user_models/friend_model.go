@@ -1,6 +1,10 @@
 package user_models
 
-import "im_server/common/models"
+import (
+	"im_server/common/models"
+
+	"gorm.io/gorm"
+)
 
 // FriendModel 好友表
 type FriendModel struct {
@@ -23,4 +27,9 @@ func (f *FriendModel) GetUserNotice(userID uint) string {
 		return f.RevUserNotice
 	}
 	return ""
+}
+
+func (f *FriendModel) IsFriend(db *gorm.DB, A, B uint) bool {
+	err := db.Take(&f, "(send_user_id = ? and rev_user_id = ? ) or (send_user_id = ? and rev_user_id = ? )", A, B, B, A).Error
+	return err == nil
 }
