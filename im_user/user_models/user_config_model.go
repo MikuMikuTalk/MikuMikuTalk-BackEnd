@@ -20,3 +20,19 @@ type UserConfModel struct {
 	VerificationQuestion *ctype.VerificationQuestion `gorm:"type:json;comment:'验证问题'" json:"verificationQuestion"`
 	Online               bool                        `gorm:"default:false;comment:'是否在线'" json:"online"`
 }
+
+// ProblemCount 问题的个数
+func (uc UserConfModel) ProblemCount() (c int) {
+	if uc.VerificationQuestion != nil {
+		if uc.VerificationQuestion.Problem1 != nil {
+			c += 1
+		}
+		if uc.VerificationQuestion.Problem2 != nil {
+			c += 1
+		}
+		if uc.VerificationQuestion.Problem3 != nil {
+			c += 1
+		}
+	}
+	return
+}
