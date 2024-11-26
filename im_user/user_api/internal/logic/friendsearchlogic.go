@@ -36,7 +36,7 @@ func (l *FriendSearchLogic) FriendSearch(req *types.SearchRequest, token string)
 	}
 	user_id := claims.UserID
 
-	//所有用户
+	// 所有用户
 	user_list, count, _ := list_query.ListQuery(l.svcCtx.DB, user_models.UserConfModel{
 		Online: req.Online,
 	}, list_query.Option{

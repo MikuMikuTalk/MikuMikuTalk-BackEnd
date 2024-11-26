@@ -28,7 +28,6 @@ func NewFriendNoticeUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *FriendNoticeUpdateLogic) FriendNoticeUpdate(req *types.FriendNoticeUpdateRequest, token string) (resp *types.FriendNoticeUpdateResponse, err error) {
-
 	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
 	if err != nil {
 		return nil, err
@@ -41,14 +40,14 @@ func (l *FriendNoticeUpdateLogic) FriendNoticeUpdate(req *types.FriendNoticeUpda
 		return
 	}
 	if friend.SendUserID == user_id {
-		//我是发起方
+		// 我是发起方
 		if friend.SenUserNotice == req.Notice {
 			return
 		}
 		l.svcCtx.DB.Model(&friend).Update("sen_user_notice", req.Notice)
 	}
 	if friend.RevUserID == user_id {
-		//我是接收方
+		// 我是接收方
 		if friend.RevUserNotice == req.Notice {
 			return
 		}

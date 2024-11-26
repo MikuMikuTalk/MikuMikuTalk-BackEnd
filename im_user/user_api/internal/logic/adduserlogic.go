@@ -48,7 +48,7 @@ func (l *AddUserLogic) AddUser(req *types.AddFriendRequest, token string) (resp 
 		return nil, errors.New("用户不存在")
 	}
 
-	//查看找的是不是自己的好友
+	// 查看找的是不是自己的好友
 	var friend user_models.FriendModel
 	err = l.svcCtx.DB.Take(&friend, "(send_user_id = ? and rev_user_id = ?) or (send_user_id = ? and rev_user_id = ?)", my_id, user.ID, user.ID, my_id).Error
 	// 如果查出来是自己的好友，那就不要重复添加
@@ -58,7 +58,7 @@ func (l *AddUserLogic) AddUser(req *types.AddFriendRequest, token string) (resp 
 		return
 	}
 	resp = new(types.AddFriendResponse)
-	var verifyModel = user_models.FriendVerifyModel{
+	verifyModel := user_models.FriendVerifyModel{
 		SendUserID:         my_id,
 		RevUserID:          user.ID,
 		AdditionalMessages: req.Verify,
@@ -71,7 +71,7 @@ func (l *AddUserLogic) AddUser(req *types.AddFriendRequest, token string) (resp 
 		// 直接成为好友
 		// 先往验证表里面加一条记录，然后通过
 		verifyModel.Status = 1
-		var userFriend = user_models.FriendModel{
+		userFriend := user_models.FriendModel{
 			SendUserID: my_id,
 			RevUserID:  user.ID,
 		}
@@ -115,7 +115,7 @@ func (l *AddUserLogic) AddUser(req *types.AddFriendRequest, token string) (resp 
 			verifyModel.Status = 1
 			verifyModel.VerificationQuestion = userConf.VerificationQuestion
 			// 加好友
-			var userFriend = user_models.FriendModel{
+			userFriend := user_models.FriendModel{
 				SendUserID: my_id,
 				RevUserID:  user.ID,
 			}

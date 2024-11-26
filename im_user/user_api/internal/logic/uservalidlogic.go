@@ -48,7 +48,7 @@ func (l *UserValidLogic) UserValid(req *types.UserValidRequest, token string) (r
 		logx.Error("查找的好友不存在！")
 		return
 	}
-	//查看找的是不是自己的好友
+	// 查看找的是不是自己的好友
 	var friend user_models.FriendModel
 	err = l.svcCtx.DB.Take(&friend, "(send_user_id = ? and rev_user_id = ?) or (send_user_id = ? and rev_user_id = ?)", my_id, user.ID, user.ID, my_id).Error
 	// 如果查出来是自己的好友，那就不要重复添加
@@ -62,12 +62,12 @@ func (l *UserValidLogic) UserValid(req *types.UserValidRequest, token string) (r
 	resp.Verification = user_conf.Verification
 	// 0 不允许任何人, 1 允许任何人, 2 验证消息, 3 回答问题, 4 正确回答问题
 	switch user_conf.Verification {
-	case 0: //不允许任何人添加
+	case 0: // 不允许任何人添加
 	case 1:
-		//允许任何人添加
-		//直接成为好友
+		// 允许任何人添加
+		// 直接成为好友
 	case 2:
-		//需要先验证问题
+		// 需要先验证问题
 	case 3, 4:
 		// 需要正确回答问题
 		if user_conf.VerificationQuestion != nil {
