@@ -93,6 +93,23 @@ type SearchResponse {
 	Count int64        `json:"count"`
 }
 
+type UserValidRequest {
+	FriendName string `json:"friend_name"`
+}
+
+type UserValidResponse {
+	Verification         int8                 `json:"verification"` // 好友验证
+	VerificationQuestion VerificationQuestion `json:"verificationQuestion"` // 问题和答案，但是答案不要返回
+}
+
+type AddFriendRequest {
+	FriendName           string                `json:"friend_name"`
+	Verify               string                `json:"verify,optional"` // 验证消息
+	VerificationQuestion *VerificationQuestion `json:"verificationQuestion,optional"` // 问题和答案
+}
+
+type AddFriendResponse {}
+
 service users {
 	@doc (
 		summary: "用户信息获取接口"
@@ -129,5 +146,17 @@ service users {
 	)
 	@handler FriendSearch
 	get /api/user/search (SearchRequest) returns (SearchResponse)
+
+	@doc (
+		summary: "好友验证接口"
+	)
+	@handler UserValid
+	post /api/user/valid (UserValidRequest) returns (UserValidResponse)
+
+	@doc (
+		summary: "好友添加接口"
+	)
+	@handler AddUser
+	post /api/user/add (AddFriendRequest) returns (AddFriendResponse)
 }
 

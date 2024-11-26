@@ -3,6 +3,15 @@
 
 package types
 
+type AddFriendRequest struct {
+	FriendName           string                `json:"friend_name"`
+	Verify               string                `json:"verify,optional"`               // 验证消息
+	VerificationQuestion *VerificationQuestion `json:"verificationQuestion,optional"` // 问题和答案
+}
+
+type AddFriendResponse struct {
+}
+
 type FriendInfoRequest struct {
 	FriendName string `form:"friend_name"`
 }

@@ -15,6 +15,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// 好友添加接口
+				Method:  http.MethodPost,
+				Path:    "/api/user/add",
+				Handler: AddUserHandler(serverCtx),
+			},
+			{
 				// 好友信息接口
 				Method:  http.MethodGet,
 				Path:    "/api/user/friend_info",
