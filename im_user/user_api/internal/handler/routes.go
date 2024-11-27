@@ -17,69 +17,70 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				// 好友添加接口
 				Method:  http.MethodPost,
-				Path:    "/api/user/add",
+				Path:    "/add",
 				Handler: AddUserHandler(serverCtx),
 			},
 			{
 				// 好友信息接口
 				Method:  http.MethodGet,
-				Path:    "/api/user/friend_info",
+				Path:    "/friend_info",
 				Handler: FriendInfoHandler(serverCtx),
 			},
 			{
 				// 好友列表获取
 				Method:  http.MethodGet,
-				Path:    "/api/user/friend_list",
+				Path:    "/friend_list",
 				Handler: FriendListHandler(serverCtx),
 			},
 			{
 				// 好友备注修改
 				Method:  http.MethodPut,
-				Path:    "/api/user/friends",
+				Path:    "/friends",
 				Handler: FriendNoticeUpdateHandler(serverCtx),
 			},
 			{
 				// 好友删除接口
 				Method:  http.MethodDelete,
-				Path:    "/api/user/friends",
+				Path:    "/friends",
 				Handler: FriendDeleteHandler(serverCtx),
 			},
 			{
 				// 用户信息获取接口
 				Method:  http.MethodGet,
-				Path:    "/api/user/info",
+				Path:    "/info",
 				Handler: UserInfoHandler(serverCtx),
 			},
 			{
 				// 用户信息更新接口
 				Method:  http.MethodPut,
-				Path:    "/api/user/info",
+				Path:    "/info",
 				Handler: UserInfoUpdateHandler(serverCtx),
 			},
 			{
 				// 好友搜索接口
 				Method:  http.MethodGet,
-				Path:    "/api/user/search",
+				Path:    "/search",
 				Handler: FriendSearchHandler(serverCtx),
 			},
 			{
 				// 好友验证接口
 				Method:  http.MethodPost,
-				Path:    "/api/user/valid",
+				Path:    "/valid",
 				Handler: UserValidHandler(serverCtx),
 			},
 			{
 				// 好友验证列表
 				Method:  http.MethodGet,
-				Path:    "/api/user/valid",
+				Path:    "/valid",
 				Handler: UserValidListHandler(serverCtx),
 			},
 			{
 				// 好友验证状态操作
 				Method:  http.MethodPut,
-				Path:    "/api/user/valid_status",
+				Path:    "/valid_status",
 				Handler: validStatusHandler(serverCtx),
 			},
 		},
+		rest.WithPrefix("/api/user"),
 	)
 }
