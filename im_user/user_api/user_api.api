@@ -1,5 +1,13 @@
 syntax = "v1"
 
+info (
+	title: "用户API"
+	desc: "用户API 文档"
+	author: "MeowRain"
+	email: "meowrian@126.com"
+	version: "1.0.0"
+)
+
 type UserInfoRequest {
 	UserName string `json:"username"`
 }
@@ -75,7 +83,7 @@ type FriendNoticeUpdateRequest {
 type FriendNoticeUpdateResponse {}
 
 type SearchRequest {
-	Key    string `form:"key"` //用户id和昵称
+	Key    string `form:"key"`    //用户id和昵称
 	Online bool   `form:"online"` //搜索在线得用户
 	Page   int    `form:"page,optional"`
 	Limit  int    `form:"limit,optional"`
@@ -98,13 +106,13 @@ type UserValidRequest {
 }
 
 type UserValidResponse {
-	Verification         int8                 `json:"verification"` // 好友验证
+	Verification         int8                 `json:"verification"`         // 好友验证
 	VerificationQuestion VerificationQuestion `json:"verificationQuestion"` // 问题和答案，但是答案不要返回
 }
 
 type AddFriendRequest {
 	FriendName           string                `json:"friend_name"`
-	Verify               string                `json:"verify,optional"` // 验证消息
+	Verify               string                `json:"verify,optional"`               // 验证消息
 	VerificationQuestion *VerificationQuestion `json:"verificationQuestion,optional"` // 问题和答案
 }
 
@@ -119,21 +127,21 @@ type FriendValidInfo {
 	UserID               uint                  `json:"userID"`
 	Nickname             string                `json:"nickname"`
 	Avatar               string                `json:"avatar"`
-	AdditionalMessages   string                `json:"additionalMessages"` // 附加消息
+	AdditionalMessages   string                `json:"additionalMessages"`   // 附加消息
 	VerificationQuestion *VerificationQuestion `json:"verificationQuestion"` // 验证问题  为3和4的时候需要
-	Status               int8                  `json:"status"` // 状态 0 未操作 1 同意 2 拒绝 3 忽略
-	Verification         int8                  `json:"verification"` // 好友验证
-	ID                   uint                  `json:"id"` // 验证记录的id
+	Status               int8                  `json:"status"`               // 状态 0 未操作 1 同意 2 拒绝 3 忽略 4 删除
+	Verification         int8                  `json:"verification"`         // 好友验证
+	ID                   uint                  `json:"id"`                   // 验证记录的id
 }
 
 type FriendValidResponse {
-	List  []FriendValidInfo `json:"list"`
-	Count int64             `json:"count"`
+	List  []FriendValidInfo `json:"list"`  // 好友验证信息表
+	Count int64             `json:"count"` // 数量
 }
 
 type FriendValidStatusRequest {
-	VerifyID uint `json:"verifyId"`
-	Status   int8 `json:"status"` // 状态
+	VerifyID uint `json:"verifyId"` //验证消息的id-> 在表中能看到
+	Status   int8 `json:"status"`   // 状态
 }
 
 type FriendValidStatusResponse {}
@@ -183,20 +191,22 @@ service users {
 
 	@doc (
 		summary: "好友添加接口"
+		description: "向这个接口要加的用户名，就会提取我和这个用户的id到friend_verify_model表（记录用户验证信息的）"
 	)
 	@handler AddUser
 	post /api/user/add (AddFriendRequest) returns (AddFriendResponse)
 
 	@doc (
 		summary: "好友验证列表"
+		description: "从friend_verify_model表中获取接收或者发送用户为我的user_id的相关信息，可以看到有谁想加我或者我向谁发送了好友请求"
 	)
 	@handler UserValidList
 	get /api/user/valid (FriendValidRequest) returns (FriendValidResponse)
 
 	@doc (
 		summary: "好友验证状态操作"
+		description: "假如有我和好友B，我按照他的用户名（唯一）找到他的账号并向他发送好友请求验证，这个验证信息会被存储在friend_verify_models表中，这样我能看到我发出了这个好友验证请求，而好友B能看到我向他发送了这个好友请求，这时候好友可以选择同意我的好友请求，或者拒绝我的好友请求，也可以忽略或者删除我的好友请求。如果我的好友请求被拒绝的话，我的客户端也能看到被拒绝的信息，我可以重新想 他发起好友验证请求。如果我的好友请求被B同意的话，就会把我和它的id存储在friend_model表中，表明我和他已经成为好友"
 	)
 	@handler validStatus
 	put /api/user/valid_status (FriendValidStatusRequest) returns (FriendValidStatusResponse) // 好友验证状态操作
 }
-
