@@ -62,6 +62,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/api/user/valid",
 				Handler: UserValidHandler(serverCtx),
 			},
+			{
+				// 好友验证列表
+				Method:  http.MethodGet,
+				Path:    "/api/user/valid",
+				Handler: UserValidListHandler(serverCtx),
+			},
 		},
 	)
 }
