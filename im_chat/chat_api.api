@@ -1,0 +1,30 @@
+syntax = "v1"
+
+type ChatHistoryRequest {
+	Page  int `form:"page"`
+	Limit int `form:"limit"`
+}
+
+type ChatHistoryResponse {
+	ID        uint   `json:"id"`
+	UserID    uint   `json:"userId"`
+	Avatar    string `json:"avatar"`
+	Nickname  string `json:"nickname"`
+	CreatedAt string `json:"created_at"` // 消息时间
+// Msg any `json:"msg"`
+// SystemMsg any `json:"systemMsg"`
+}
+
+@server (
+	prefix: /api/chat
+)
+service chat {
+	@doc (
+		summary:     "聊天记录接口"
+		description: "聊天记录接口"
+	)
+	@handler chatHistory
+	get /history (ChatHistoryRequest) returns (ChatHistoryResponse)
+}
+
+//goctl api go -api chat_api.api -dir ./chat_api --home ../template
