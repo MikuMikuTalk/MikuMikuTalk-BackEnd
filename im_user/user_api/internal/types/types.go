@@ -12,6 +12,13 @@ type AddFriendRequest struct {
 type AddFriendResponse struct {
 }
 
+type FriendDeleteRequest struct {
+	FriendName string `json:"friend_name"`
+}
+
+type FriendDeleteResponse struct {
+}
+
 type FriendInfoRequest struct {
 	FriendName string `form:"friend_name"`
 }

@@ -147,6 +147,12 @@ type FriendValidStatusRequest {
 
 type FriendValidStatusResponse {}
 
+type FriendDeleteRequest {
+	FriendName string `json:"friend_name"`
+}
+
+type FriendDeleteResponse {}
+
 service users {
 	@doc (
 		summary: "用户信息获取接口"
@@ -177,6 +183,13 @@ service users {
 	)
 	@handler FriendNoticeUpdate
 	put /api/user/friends (FriendNoticeUpdateRequest) returns (FriendNoticeUpdateResponse) // 修改好友备注
+
+	@doc (
+		summary:     "好友删除接口"
+		description: "删除好友操作"
+	)
+	@handler FriendDelete
+	delete /api/user/friends (FriendDeleteRequest) returns (FriendDeleteResponse)
 
 	@doc (
 		summary: "好友搜索接口"
