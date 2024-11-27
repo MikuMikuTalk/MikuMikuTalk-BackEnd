@@ -34,13 +34,12 @@ func (l *UserValidListLogic) UserValidList(req *types.FriendValidRequest, token 
 		return
 	}
 	my_id := claims.UserID
-	fvs, count, _ := list_query.ListQuery(l.svcCtx.DB, user_models.FriendVerifyModel{
-		SendUserID: my_id,
-	}, list_query.Option{
+	fvs, count, _ := list_query.ListQuery(l.svcCtx.DB, user_models.FriendVerifyModel{}, list_query.Option{
 		PageInfo: models.PageInfo{
 			Page:  req.Page,
 			Limit: req.Limit,
 		},
+		Where:   l.svcCtx.DB.Where("send_user_id = ? or rev_user_id = ?", my_id, my_id),
 		Preload: []string{"RevUserModel.UserConfModel"},
 	})
 	var list []types.FriendValidInfo
@@ -52,6 +51,7 @@ func (l *UserValidListLogic) UserValidList(req *types.FriendValidRequest, token 
 			AdditionalMessages: fv.AdditionalMessages,
 			Status:             fv.Status,
 			Verification:       fv.RevUserModel.UserConfModel.Verification,
+			ID:                 fv.ID,
 		}
 		if fv.VerificationQuestion != nil {
 			info.VerificationQuestion = &types.VerificationQuestion{
