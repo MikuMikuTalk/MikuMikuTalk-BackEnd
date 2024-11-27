@@ -82,5 +82,4 @@ func (l *UserValidListLogic) UserValidList(req *types.FriendValidRequest, token 
 		List:  list,
 		Count: count,
 	}, nil
-
 }

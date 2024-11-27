@@ -34,7 +34,7 @@ func (l *ValidStatusLogic) ValidStatus(req *types.FriendValidStatusRequest, toke
 	}
 	my_id := claims.UserID
 
-	//别人给我发好友请求，在请求的验证表里找到了接受用户是我的验证
+	// 别人给我发好友请求，在请求的验证表里找到了接受用户是我的验证
 	var friendVerify user_models.FriendVerifyModel
 	err = l.svcCtx.DB.Take(&friendVerify, "id = ? and rev_user_id = ?", req.VerifyID, my_id).Error
 	if err != nil {
@@ -46,19 +46,19 @@ func (l *ValidStatusLogic) ValidStatus(req *types.FriendValidStatusRequest, toke
 		return
 	}
 	switch req.Status {
-	case 1: //同意
+	case 1: // 同意
 		friendVerify.RevStatus = 1
-		//加入到好友表中
+		// 加入到好友表中
 		l.svcCtx.DB.Create(&user_models.FriendModel{
 			SendUserID: friendVerify.SendUserID,
 			RevUserID:  friendVerify.RevUserID,
 		})
-	case 2: //拒绝
+	case 2: // 拒绝
 		friendVerify.RevStatus = 2
-	case 3: //忽略
+	case 3: // 忽略
 		friendVerify.RevStatus = 3
-	case 4: //删除
-		//删除验证记录
+	case 4: // 删除
+		// 删除验证记录
 		l.svcCtx.DB.Delete(&friendVerify)
 		err = nil
 		return
