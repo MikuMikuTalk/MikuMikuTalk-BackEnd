@@ -49,9 +49,10 @@ type FriendValidInfo struct {
 	Avatar               string                `json:"avatar"`
 	AdditionalMessages   string                `json:"additionalMessages"`   // 附加消息
 	VerificationQuestion *VerificationQuestion `json:"verificationQuestion"` // 验证问题  为3和4的时候需要
-	Status               int8                  `json:"status"`               // 状态 0 未操作 1 同意 2 拒绝 3 忽略
+	Status               int8                  `json:"status"`               // 状态 0 未操作 1 同意 2 拒绝 3 忽略 4 删除
 	Verification         int8                  `json:"verification"`         // 好友验证
 	ID                   uint                  `json:"id"`                   // 验证记录的id
+	Flag                 string                `json:"flag"`                 // send 我是发起方  rev 我是接收方
 }
 
 type FriendValidRequest struct {
@@ -60,13 +61,13 @@ type FriendValidRequest struct {
 }
 
 type FriendValidResponse struct {
-	List  []FriendValidInfo `json:"list"`
-	Count int64             `json:"count"`
+	List  []FriendValidInfo `json:"list"`  // 好友验证信息表
+	Count int64             `json:"count"` // 数量
 }
 
 type FriendValidStatusRequest struct {
-	VerifyID uint `json:"verifyId"`
-	Status   int8 `json:"status"` // 状态
+	VerifyID uint `json:"verifyId"` //验证消息的id-> 在表中能看到
+	Status   int8 `json:"status"`   // 状态
 }
 
 type FriendValidStatusResponse struct {

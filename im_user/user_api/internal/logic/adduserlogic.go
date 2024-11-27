@@ -70,7 +70,7 @@ func (l *AddUserLogic) AddUser(req *types.AddFriendRequest, token string) (resp 
 	case 1: // 允许任何人添加
 		// 直接成为好友
 		// 先往验证表里面加一条记录，然后通过
-		verifyModel.Status = 1
+		verifyModel.RevStatus = 1
 		userFriend := user_models.FriendModel{
 			SendUserID: my_id,
 			RevUserID:  user.ID,
@@ -112,7 +112,7 @@ func (l *AddUserLogic) AddUser(req *types.AddFriendRequest, token string) (resp 
 				return nil, errors.New("答案错误")
 			}
 			// 直接加好友
-			verifyModel.Status = 1
+			verifyModel.RevStatus = 1
 			verifyModel.VerificationQuestion = userConf.VerificationQuestion
 			// 加好友
 			userFriend := user_models.FriendModel{
