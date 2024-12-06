@@ -2,3 +2,19 @@ Name: chat
 Host: 0.0.0.0
 Port: 20023
 Etcd: 127.0.0.1:2379
+Mysql:
+  DataSource: root:123456@tcp(127.0.0.1:3306)/im_server_db?charset=utf8mb4&parseTime=True&loc=Local
+Auth:
+  AuthSecret: fdsafasfdsfadsf
+  AuthExpire: 10000
+Log:
+  ServiceName: auth
+  Encoding: plain
+  Timeout: 2006-01-02 15:04:05
+  Level: debug
+  Stat: false
+UserRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: userrpc.rpc
