@@ -1,8 +1,8 @@
 syntax = "v1"
 
 type ChatHistoryRequest {
-	Page  int `form:"page"`
-	Limit int `form:"limit"`
+	Page  int `form:"page,optional"`
+	Limit int `form:"limit,optional"`
 }
 
 type ChatHistoryResponse {
@@ -15,6 +15,25 @@ type ChatHistoryResponse {
 // SystemMsg any `json:"systemMsg"`
 }
 
+type ChatSessionRequest {
+	Page  int `form:"page,optional"`
+	Limit int `form:"limit,optional"`
+	Key   int `form:"key,optional"`
+}
+
+type ChatSession {
+	UserID     uint   `json:"userId"`
+	Avatar     string `json:"avatar"`
+	Nickname   string `json:"nickname"`
+	CreatedAt  string `json:"created_at"` // 消息时间
+	MsgPreview string `json:"msgPreview"` // 消息预览
+}
+
+type ChatSessionResponse {
+	List  []ChatSession `json:"list"`
+	Count int64         `json:"count"`
+}
+
 @server (
 	prefix: /api/chat
 )
@@ -25,6 +44,13 @@ service chat {
 	)
 	@handler chatHistory
 	get /history (ChatHistoryRequest) returns (ChatHistoryResponse)
+
+	@doc (
+		summary:     "最近聊天会话列表"
+		description: "最新聊天会话列表"
+	)
+	@handler chatSession
+	get /session (ChatSessionRequest) returns (ChatSessionResponse) // 最近会话列表
 }
 
 //goctl api go -api chat_api.api -dir ./chat_api --home ../template

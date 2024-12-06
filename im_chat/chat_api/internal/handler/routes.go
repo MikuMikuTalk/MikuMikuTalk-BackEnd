@@ -20,6 +20,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/history",
 				Handler: chatHistoryHandler(serverCtx),
 			},
+			{
+				// 最近聊天会话列表
+				Method:  http.MethodGet,
+				Path:    "/session",
+				Handler: chatSessionHandler(serverCtx),
+			},
 		},
 		rest.WithPrefix("/api/chat"),
 	)
