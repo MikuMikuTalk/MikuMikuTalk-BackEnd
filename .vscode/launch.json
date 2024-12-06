@@ -54,7 +54,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/im_chat/chat.go",
+            "program": "${workspaceFolder}/im_chat/chat_api/chat.go",
             "env": {},
             "cwd": "${workspaceFolder}/im_chat"
         },
