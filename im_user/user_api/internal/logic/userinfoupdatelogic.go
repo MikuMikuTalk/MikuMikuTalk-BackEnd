@@ -48,6 +48,8 @@ func (l *UserInfoUpdateLogic) UserInfoUpdate(token string, req *types.UserInfoUp
 		if err != nil {
 			return nil, errors.New("用户不存在")
 		}
+
+		// 防止用户重名，优化重名baocuo
 		if nick, ok := userMaps["nickname"].(string); ok && nick != user.Nickname {
 			var existingUser user_models.UserModel
 			err = l.svcCtx.DB.Where("nickname = ?", nick).First(&existingUser).Error
@@ -65,7 +67,6 @@ func (l *UserInfoUpdateLogic) UserInfoUpdate(token string, req *types.UserInfoUp
 		}
 		err = l.svcCtx.DB.Model(&user).Updates(userMaps).Error
 		if err != nil {
-
 			return nil, errors.New("用户信息更新失败")
 		}
 	}

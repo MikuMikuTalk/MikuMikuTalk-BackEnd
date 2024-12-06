@@ -8,7 +8,7 @@ func DeduplicationList[T string | int | uint32](req []T) (response []T) {
 			i32Map[i32] = true
 		}
 	}
-	for key, _ := range i32Map {
+	for key := range i32Map {
 		response = append(response, key)
 	}
 	return

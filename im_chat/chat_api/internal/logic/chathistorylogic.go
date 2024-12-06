@@ -74,7 +74,7 @@ func (l *ChatHistoryLogic) ChatHistory(req *types.ChatHistoryRequest, token stri
 		userIDList = append(userIDList, uint32(model.RevUserID))
 	}
 
-	//去重
+	// 去重
 	userIDList = list_util.DeduplicationList(userIDList)
 	// 去调用户服务的rpc方法，获取用户信息 {用户id：{用户信息}}
 	response, err := l.svcCtx.UserRpc.UserListInfo(context.Background(), &user_rpc.UserListInfoRequest{
@@ -85,7 +85,7 @@ func (l *ChatHistoryLogic) ChatHistory(req *types.ChatHistoryRequest, token stri
 		return nil, errors.New("用户服务错误")
 	}
 
-	var list = make([]ChatHistory, 0)
+	list := make([]ChatHistory, 0)
 	for _, model := range chatList {
 		sendUser := UserInfo{
 			ID:       model.SendUserID,

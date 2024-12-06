@@ -28,7 +28,6 @@ func NewFriendDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Frie
 }
 
 func (l *FriendDeleteLogic) FriendDelete(req *types.FriendDeleteRequest, token string) (resp *types.FriendDeleteResponse, err error) {
-
 	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
 	if err != nil {
 		return
