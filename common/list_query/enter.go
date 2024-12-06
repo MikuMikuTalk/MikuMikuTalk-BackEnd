@@ -2,7 +2,6 @@ package list_query
 
 import (
 	"fmt"
-
 	"im_server/common/models"
 
 	"gorm.io/gorm"
@@ -12,11 +11,14 @@ type Option struct {
 	PageInfo models.PageInfo
 	Where    *gorm.DB // 高级查询
 	Joins    string
-	Likes    []string // 模糊匹配的字段
-	Preload  []string // 预加载字段
+	Likes    []string             // 模糊匹配的字段
+	Preload  []string             // 预加载字段
+	Table    func() (string, any) // 子查询
+	Groups   []string             // 分组
 }
 
 func ListQuery[T any](db *gorm.DB, model T, option Option) (list []T, count int64, err error) {
+
 	// 把结构体自己的查询条件查了
 	query := db.Where(model)
 
@@ -34,12 +36,23 @@ func ListQuery[T any](db *gorm.DB, model T, option Option) (list []T, count int6
 		query.Where(likeQuery)
 	}
 
+	if option.Table != nil {
+		table, data := option.Table()
+		query = query.Table(table, data)
+	}
+
 	if option.Joins != "" {
 		query = query.Joins(option.Joins)
 	}
 
 	if option.Where != nil {
 		query = query.Where(option.Where)
+	}
+
+	if len(option.Groups) > 0 {
+		for _, group := range option.Groups {
+			query = query.Group(group)
+		}
 	}
 
 	// 求总数
@@ -59,6 +72,10 @@ func ListQuery[T any](db *gorm.DB, model T, option Option) (list []T, count int6
 	}
 
 	offset := (option.PageInfo.Page - 1) * option.PageInfo.Limit
+
+	if option.PageInfo.Sort != "" {
+		query.Order(option.PageInfo.Sort)
+	}
 
 	err = query.Limit(option.PageInfo.Limit).Offset(offset).Find(&list).Error
 	return
