@@ -49,17 +49,26 @@
             "env": {},
             "cwd": "${workspaceFolder}/im_gateway"
         },
+        {
+            "name": "运行im_chat服务",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/im_chat/chat.go",
+            "env": {},
+            "cwd": "${workspaceFolder}/im_chat"
+        },
     ],
     "compounds": [
-    {
-      "name": "运行全部服务",
-      "configurations": [
-        "运行user_rpc服务",
-        "运行user_api服务",
-        "运行auth_api服务",
-        "运行file_api服务",
-        "运行im_gateway服务"
-      ]
-    }
-  ]
+        {
+            "name": "运行全部服务",
+            "configurations": [
+                "运行user_rpc服务",
+                "运行user_api服务",
+                "运行auth_api服务",
+                "运行file_api服务",
+                "运行im_gateway服务"
+            ]
+        }
+    ]
 }
