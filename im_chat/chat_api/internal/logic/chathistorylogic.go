@@ -64,6 +64,7 @@ func (l *ChatHistoryLogic) ChatHistory(req *types.ChatHistoryRequest, token stri
 		PageInfo: models.PageInfo{
 			Page:  req.Page,
 			Limit: req.Limit,
+			Sort:  "created_at desc",
 		},
 		Where: l.svcCtx.DB.Where("send_user_id = ? or rev_user_id = ?", my_id, my_id),
 	})

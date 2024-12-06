@@ -13,6 +13,7 @@ import (
 	"im_server/im_user/user_api/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"gorm.io/gorm"
 )
 
 type UserInfoUpdateLogic struct {
@@ -37,20 +38,34 @@ func (l *UserInfoUpdateLogic) UserInfoUpdate(token string, req *types.UserInfoUp
 		return nil, err
 	}
 	user_id := claims.UserID
-	logx.Debug("user_id: ", user_id)
 	userMaps := ref_map.RefToMap(*req, "user")
 	userConfMaps := ref_map.RefToMap(*req, "user_conf")
-
+	logx.Info("userMaps: ", userMaps)
+	logx.Info("userConfMaps:", userConfMaps)
 	if len(userMaps) != 0 {
 		var user user_models.UserModel
 		err = l.svcCtx.DB.Take(&user, user_id).Error
 		if err != nil {
 			return nil, errors.New("用户不存在")
 		}
+		if nick, ok := userMaps["nickname"].(string); ok && nick != user.Nickname {
+			var existingUser user_models.UserModel
+			err = l.svcCtx.DB.Where("nickname = ?", nick).First(&existingUser).Error
+			if err == nil {
+				return nil, errors.New("用户名已存在")
+			} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+				logx.Error("检查用户名是否存在时发生错误: ", err)
+				return nil, errors.New("用户信息更新失败")
+			}
+		}
+
+		if *(req.Nickname) == user.Nickname {
+			err = errors.New("已经是原来的用户名了哦")
+			return nil, err
+		}
 		err = l.svcCtx.DB.Model(&user).Updates(userMaps).Error
 		if err != nil {
-			logx.Error("要更新的用户信息： ", userMaps)
-			logx.Error(err)
+
 			return nil, errors.New("用户信息更新失败")
 		}
 	}
