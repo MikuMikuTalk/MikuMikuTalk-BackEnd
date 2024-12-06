@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+
 	"im_server/im_chat/chat_rpc/chat"
 
 	"im_server/common/ctype"
@@ -64,7 +65,7 @@ func (l *ValidStatusLogic) ValidStatus(req *types.FriendValidStatusRequest, toke
 		}
 		byteData, _ := json.Marshal(msg)
 
-		//给对方法发消息
+		// 给对方法发消息
 		_, err = l.svcCtx.ChatRpc.UserChat(context.Background(), &chat.UserChatRequest{
 			SendUserId: uint32(friendVerify.SendUserID),
 			RevUserId:  uint32(friendVerify.RevUserID),

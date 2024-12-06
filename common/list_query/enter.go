@@ -2,6 +2,7 @@ package list_query
 
 import (
 	"fmt"
+
 	"im_server/common/models"
 
 	"gorm.io/gorm"
@@ -18,7 +19,6 @@ type Option struct {
 }
 
 func ListQuery[T any](db *gorm.DB, model T, option Option) (list []T, count int64, err error) {
-
 	// 把结构体自己的查询条件查了
 	query := db.Where(model)
 

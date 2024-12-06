@@ -77,7 +77,7 @@ func (l *ChatSessionLogic) ChatSession(req *types.ChatSessionRequest, token stri
 		return nil, errors.New("用户服务错误")
 	}
 
-	var list = make([]types.ChatSession, 0)
+	list := make([]types.ChatSession, 0)
 	for _, data := range chatList {
 		s := types.ChatSession{
 			CreatedAt:  data.MaxDate,
@@ -98,5 +98,4 @@ func (l *ChatSessionLogic) ChatSession(req *types.ChatSessionRequest, token stri
 	}
 
 	return &types.ChatSessionResponse{List: list, Count: count}, nil
-
 }
