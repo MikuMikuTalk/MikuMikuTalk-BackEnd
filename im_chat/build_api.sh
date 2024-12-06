@@ -1,3 +1,3 @@
 #!/bin/bash
 
-goctl api go -api chat_api.api -dir ./chat_api --home ../template
+goctl api go -api ./chat_api/chat_api.api -dir ./chat_api --home ../template
