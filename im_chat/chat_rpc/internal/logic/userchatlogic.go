@@ -39,15 +39,16 @@ func (l *UserChatLogic) UserChat(in *chat_rpc.UserChatRequest) (*chat_rpc.UserCh
 		logx.Error(err)
 		return nil, err
 	}
-
-	err = l.svcCtx.DB.Create(&chat_models.ChatModel{
+	chat := chat_models.ChatModel{
 		SendUserID: uint(in.SendUserId),
 		RevUserID:  uint(in.RevUserId),
 		MsgType:    msg.Type,
 		MsgPreview: "",
 		Msg:        msg,
 		SystemMsg:  systemMsg,
-	}).Error
+	}
+	chat.MsgPreview = chat.MsgPreviewMethod()
+	err = l.svcCtx.DB.Create(&chat).Error
 	if err != nil {
 		logx.Error(err)
 		return nil, err
