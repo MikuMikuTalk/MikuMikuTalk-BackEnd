@@ -2,7 +2,9 @@ package logic
 
 import (
 	"context"
+	"errors"
 	"im_server/im_chat/chat_models"
+	"im_server/im_user/user_rpc/types/user_rpc"
 	"im_server/utils/jwts"
 
 	"im_server/im_chat/chat_api/internal/svc"
@@ -32,6 +34,16 @@ func (l *UserTopLogic) UserTop(req *types.UserTopRequest, token string) (resp *t
 		return nil, err
 	}
 	my_id := claims.UserID
+	res, err := l.svcCtx.UserRpc.IsFriend(context.Background(), &user_rpc.IsFriendRequest{
+		User2: uint32(my_id),
+		User1: uint32(req.FriendID),
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !res.IsFriend {
+		return nil, errors.New("你们还不是好友呢")
+	}
 	var top_user types.UserTopResponse
 	err1 := l.svcCtx.DB.Take(&top_user, "user_id = ? and top_user_id = ?", my_id, req.FriendID).Error
 	if err1 != nil {
