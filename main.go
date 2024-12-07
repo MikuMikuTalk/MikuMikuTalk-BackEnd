@@ -28,6 +28,7 @@ func main() {
 			&user_models.FriendVerifyModel{}, // 好友验证表
 			&user_models.UserConfModel{},     // 用户配置表
 			&chat_models.ChatModel{},         // 对话表
+			&chat_models.TopUserModel{},
 			&group_models.GroupModel{},       // 群组表
 			&group_models.GroupMemberModel{}, // 群成员表
 			&group_models.GroupMsgModel{},    // 群消息表

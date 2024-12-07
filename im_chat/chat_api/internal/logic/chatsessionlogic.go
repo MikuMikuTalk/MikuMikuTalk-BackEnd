@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"im_server/common/list_query"
 	"im_server/common/models"
@@ -35,6 +36,7 @@ type Data struct {
 	RU         uint   `gorm:"column:rU"`
 	MaxDate    string `gorm:"column:maxDate"`
 	MaxPreview string `gorm:"column:maxPreview"`
+	IsTop      bool   `gorm:"isTop"`
 }
 
 func (l *ChatSessionLogic) ChatSession(req *types.ChatSessionRequest, token string) (resp *types.ChatSessionResponse, err error) {
@@ -43,23 +45,27 @@ func (l *ChatSessionLogic) ChatSession(req *types.ChatSessionRequest, token stri
 		return nil, err
 	}
 	my_id := claims.UserID
+	column := fmt.Sprintf(" if((select 1 from top_user_models where user_id = %d and (top_user_id = sU or top_user_id = rU)), 1, 0)  as isTop", my_id)
+
 	chatList, count, _ := list_query.ListQuery(l.svcCtx.DB, Data{}, list_query.Option{
 		PageInfo: models.PageInfo{
 			Page:  req.Page,
 			Limit: req.Limit,
-			Sort:  "maxDate desc",
+			Sort:  "isTop desc, maxDate desc",
 		},
 		Table: func() (string, any) {
 			return "(?) as u", l.svcCtx.DB.Model(&chat_models.ChatModel{}).
 				Select("least(send_user_id, rev_user_id) as sU",
 					"greatest(send_user_id, rev_user_id) as rU",
 					"max(created_at) as maxDate",
-					"(select msg_preview from chat_models  where (send_user_id = sU and rev_user_id = rU) or (send_user_id = rU and rev_user_id = sU) order by created_at desc  limit 1) as maxPreview").
+					"(select msg_preview from chat_models  where (send_user_id = sU and rev_user_id = rU) or (send_user_id = rU and rev_user_id = sU) order by created_at desc  limit 1) as maxPreview",
+					column).
 				Where("send_user_id = ? or rev_user_id = ?", my_id, my_id).
 				Group("least(send_user_id, rev_user_id)").
 				Group("greatest(send_user_id, rev_user_id)")
 		},
 	})
+
 	var userIDList []uint32
 	for _, data := range chatList {
 		if data.RU != my_id {
@@ -83,6 +89,7 @@ func (l *ChatSessionLogic) ChatSession(req *types.ChatSessionRequest, token stri
 		s := types.ChatSession{
 			CreatedAt:  data.MaxDate,
 			MsgPreview: data.MaxPreview,
+			IsTop:      data.IsTop,
 		}
 		if data.RU != my_id {
 			s.UserID = data.RU
