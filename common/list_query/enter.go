@@ -2,7 +2,6 @@ package list_query
 
 import (
 	"fmt"
-
 	"im_server/common/models"
 
 	"gorm.io/gorm"
@@ -11,6 +10,7 @@ import (
 type Option struct {
 	PageInfo models.PageInfo
 	Where    *gorm.DB // 高级查询
+	Debug    bool     //调试
 	Joins    string
 	Likes    []string             // 模糊匹配的字段
 	Preload  []string             // 预加载字段
@@ -19,6 +19,11 @@ type Option struct {
 }
 
 func ListQuery[T any](db *gorm.DB, model T, option Option) (list []T, count int64, err error) {
+
+	if option.Debug {
+		db = db.Debug()
+	}
+
 	// 把结构体自己的查询条件查了
 	query := db.Where(model)
 

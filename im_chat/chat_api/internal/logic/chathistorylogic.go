@@ -78,8 +78,9 @@ func (l *ChatHistoryLogic) ChatHistory(req *types.ChatHistoryRequest, token stri
 			Limit: req.Limit,
 			Sort:  "created_at desc",
 		},
-		Where: l.svcCtx.DB.Where("(send_user_id = ? and rev_user_id = ?) or (send_user_id = ? and rev_user_id = ?)",
-			my_id, req.FriendID, req.FriendID, my_id),
+		//Debug: true,
+		Where: l.svcCtx.DB.Where("((send_user_id = ? and rev_user_id = ?) or (send_user_id = ? and rev_user_id = ?)) and id not in (select chat_id from user_chat_delete_models where user_id = ?)",
+			my_id, req.FriendID, req.FriendID, my_id, my_id),
 	})
 	var userIDList []uint32
 	for _, model := range chatList {

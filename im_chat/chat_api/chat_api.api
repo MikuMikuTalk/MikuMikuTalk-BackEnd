@@ -42,6 +42,12 @@ type UserTopRequest {
 
 type UserTopResponse {}
 
+type ChatDeleteRequest {
+	IdList []uint `json:"idList"`
+}
+
+type ChatDeleteResponse {}
+
 @server (
 	prefix: /api/chat
 )
@@ -66,6 +72,13 @@ service chat {
 	)
 	@handler userTop
 	post /user_top (UserTopRequest) returns (UserTopResponse) // 好友置顶
+
+	@doc (
+		summary:     "用户聊天信息删除"
+		description: "用户聊天信息删除"
+	)
+	@handler chatDelete
+	delete /api/chat/chat (ChatDeleteRequest) returns (ChatDeleteResponse) // 删除聊天记录
 }
 
 //goctl api go -api chat_api.api -dir ./chat_api --home ../template

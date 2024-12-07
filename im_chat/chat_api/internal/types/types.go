@@ -3,6 +3,13 @@
 
 package types
 
+type ChatDeleteRequest struct {
+	IdList []uint `json:"idList"`
+}
+
+type ChatDeleteResponse struct {
+}
+
 type ChatHistoryRequest struct {
 	Page     int  `form:"page,optional"`
 	Limit    int  `form:"limit,optional"`

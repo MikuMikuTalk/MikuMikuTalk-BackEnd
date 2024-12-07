@@ -15,6 +15,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// 用户聊天信息删除
+				Method:  http.MethodDelete,
+				Path:    "/api/chat/chat",
+				Handler: chatDeleteHandler(serverCtx),
+			},
+			{
 				// 聊天记录接口
 				Method:  http.MethodGet,
 				Path:    "/history",
