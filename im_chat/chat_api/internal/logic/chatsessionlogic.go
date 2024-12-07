@@ -36,7 +36,7 @@ type Data struct {
 	RU         uint   `gorm:"column:rU"`
 	MaxDate    string `gorm:"column:maxDate"`
 	MaxPreview string `gorm:"column:maxPreview"`
-	IsTop      bool   `gorm:"isTop"`
+	IsTop      bool   `gorm:"column:isTop"`
 }
 
 func (l *ChatSessionLogic) ChatSession(req *types.ChatSessionRequest, token string) (resp *types.ChatSessionResponse, err error) {

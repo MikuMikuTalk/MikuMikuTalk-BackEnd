@@ -35,6 +35,12 @@ type ChatSessionResponse {
 	Count int64         `json:"count"`
 }
 
+type UserTopRequest {
+	FriendID uint `json:"friendId"` // 好友id
+}
+
+type UserTopResponse {}
+
 @server (
 	prefix: /api/chat
 )
@@ -52,6 +58,13 @@ service chat {
 	)
 	@handler chatSession
 	get /session (ChatSessionRequest) returns (ChatSessionResponse) // 最近会话列表
+
+	@doc (
+		summary:     "好友置顶"
+		description: "好友置顶"
+	)
+	@handler userTop
+	post /user_top (UserTopRequest) returns (UserTopResponse) // 好友置顶
 }
 
 //goctl api go -api chat_api.api -dir ./chat_api --home ../template
