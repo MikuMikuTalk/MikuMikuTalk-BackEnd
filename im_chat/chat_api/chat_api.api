@@ -78,7 +78,7 @@ service chat {
 		description: "用户聊天信息删除"
 	)
 	@handler chatDelete
-	delete /api/chat/chat (ChatDeleteRequest) returns (ChatDeleteResponse) // 删除聊天记录
+	delete /chat (ChatDeleteRequest) returns (ChatDeleteResponse) // 删除聊天记录
 }
 
 //goctl api go -api chat_api.api -dir ./chat_api --home ../template

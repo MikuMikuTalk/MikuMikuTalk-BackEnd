@@ -17,7 +17,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				// 用户聊天信息删除
 				Method:  http.MethodDelete,
-				Path:    "/api/chat/chat",
+				Path:    "/chat",
 				Handler: chatDeleteHandler(serverCtx),
 			},
 			{
