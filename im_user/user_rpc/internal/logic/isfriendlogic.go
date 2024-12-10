@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+
 	"im_server/im_user/user_models"
 
 	"im_server/im_user/user_rpc/internal/svc"
@@ -25,10 +26,9 @@ func NewIsFriendLogic(ctx context.Context, svcCtx *svc.ServiceContext) *IsFriend
 }
 
 func (l *IsFriendLogic) IsFriend(in *user_rpc.IsFriendRequest) (res *user_rpc.IsFriendResponse, err error) {
-
 	res = new(user_rpc.IsFriendResponse)
 	var friend user_models.FriendModel
-	
+
 	if friend.IsFriend(l.svcCtx.DB, uint(in.User1), uint(in.User2)) {
 		res.IsFriend = true
 		return

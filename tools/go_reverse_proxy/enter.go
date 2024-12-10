@@ -28,7 +28,6 @@ func NewProxy(target string) (*Proxy, error) {
 
 // ServeHTTP 处理反向代理的请求
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
 	// 日志记录请求信息
 	log.Printf("Proxying request from %s: %s %s -> %s", r.RemoteAddr, r.Method, r.URL.Path, p.targetURL.String())
 

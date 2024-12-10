@@ -25,6 +25,5 @@ func NewChatWebsocketConnectionLogic(ctx context.Context, svcCtx *svc.ServiceCon
 }
 
 func (l *ChatWebsocketConnectionLogic) ChatWebsocketConnection(req *types.ChatRequest) (resp *types.ChatResponse, err error) {
-
 	return
 }

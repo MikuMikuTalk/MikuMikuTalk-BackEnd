@@ -29,7 +29,7 @@ func main() {
 			&user_models.UserConfModel{},       // 用户配置表
 			&chat_models.ChatModel{},           // 对话表
 			&chat_models.TopUserModel{},        // 置顶用户表
-			&chat_models.UserChatDeleteModel{}, //用户删除聊天记录表
+			&chat_models.UserChatDeleteModel{}, // 用户删除聊天记录表
 			&group_models.GroupModel{},         // 群组表
 			&group_models.GroupMemberModel{},   // 群成员表
 			&group_models.GroupMsgModel{},      // 群消息表

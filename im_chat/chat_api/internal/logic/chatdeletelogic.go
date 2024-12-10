@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"fmt"
+
 	"im_server/im_chat/chat_models"
 	"im_server/utils/jwts"
 
@@ -48,11 +49,11 @@ func (l *ChatDeleteLogic) ChatDelete(req *types.ChatDeleteRequest, token string)
 	if len(chatList) > 0 {
 		for _, model := range chatList {
 			if !(model.SendUserID == my_id || model.RevUserID == my_id) {
-				//不是自己的聊天记录
+				// 不是自己的聊天记录
 				fmt.Println("不是自己的聊天记录", model.ID)
 				continue
 			}
-			//已经删除过的记录
+			// 已经删除过的记录
 			_, ok := chatDeleteMap[model.ID]
 			if ok {
 				fmt.Println("已经删除过了", model.ID)
