@@ -38,6 +38,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/user_top",
 				Handler: userTopHandler(serverCtx),
 			},
+			{
+				// websocket连接建立接口
+				Method:  http.MethodGet,
+				Path:    "/ws/chat",
+				Handler: chatWebsocketConnectionHandler(serverCtx),
+			},
 		},
 		rest.WithPrefix("/api/chat"),
 	)

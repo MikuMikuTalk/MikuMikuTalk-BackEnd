@@ -24,6 +24,13 @@ type ChatHistoryResponse struct {
 	CreatedAt string `json:"created_at"` // 消息时间
 }
 
+type ChatRequest struct {
+	UserID uint `form:"User-ID"`
+}
+
+type ChatResponse struct {
+}
+
 type ChatSession struct {
 	UserID     uint   `json:"userId"`
 	Avatar     string `json:"avatar"`

@@ -48,6 +48,12 @@ type ChatDeleteRequest {
 
 type ChatDeleteResponse {}
 
+type ChatRequest {
+	UserID uint `form:"User-ID"`
+}
+
+type ChatResponse {}
+
 @server (
 	prefix: /api/chat
 )
@@ -79,6 +85,13 @@ service chat {
 	)
 	@handler chatDelete
 	delete /chat (ChatDeleteRequest) returns (ChatDeleteResponse) // 删除聊天记录
+
+	@doc (
+		summary:     "websocket连接建立接口"
+		description: "websocket连接建立接口"
+	)
+	@handler chatWebsocketConnectionHandler
+	get /ws/chat (ChatRequest) returns (ChatResponse) // ws的对话
 }
 
 //goctl api go -api chat_api.api -dir ./chat_api --home ../template
