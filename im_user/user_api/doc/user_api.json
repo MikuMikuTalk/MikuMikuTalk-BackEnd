@@ -116,6 +116,32 @@
       }
     },
     "/api/user/friends": {
+      "delete": {
+        "summary": "好友删除接口",
+        "description": "删除好友操作",
+        "operationId": "FriendDelete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/FriendDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FriendDeleteRequest"
+            }
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      },
       "put": {
         "summary": "好友备注修改",
         "operationId": "FriendNoticeUpdate",
@@ -154,14 +180,6 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "username",
-            "in": "query",
-            "required": true,
-            "type": "string"
-          }
-        ],
         "tags": [
           "users"
         ]
@@ -359,6 +377,22 @@
       "type": "object",
       "title": "AddFriendResponse"
     },
+    "FriendDeleteRequest": {
+      "type": "object",
+      "properties": {
+        "friend_name": {
+          "type": "string"
+        }
+      },
+      "title": "FriendDeleteRequest",
+      "required": [
+        "friend_name"
+      ]
+    },
+    "FriendDeleteResponse": {
+      "type": "object",
+      "title": "FriendDeleteResponse"
+    },
     "FriendInfoRequest": {
       "type": "object",
       "properties": {
@@ -491,6 +525,10 @@
           "type": "integer",
           "format": "uint32",
           "description": " 验证记录的id"
+        },
+        "flag": {
+          "type": "string",
+          "description": " send 我是发起方  rev 我是接收方"
         }
       },
       "title": "FriendValidInfo",
@@ -502,7 +540,8 @@
         "verificationQuestion",
         "status",
         "verification",
-        "id"
+        "id",
+        "flag"
       ]
     },
     "FriendValidRequest": {
@@ -640,15 +679,7 @@
     },
     "UserInfoRequest": {
       "type": "object",
-      "properties": {
-        "username": {
-          "type": "string"
-        }
-      },
-      "title": "UserInfoRequest",
-      "required": [
-        "username"
-      ]
+      "title": "UserInfoRequest"
     },
     "UserInfoResponse": {
       "type": "object",
@@ -673,7 +704,7 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "sound": {
+        "enableSound": {
           "type": "boolean",
           "format": "boolean"
         },
@@ -705,7 +736,7 @@
         "avatar",
         "recallMessage",
         "friendOnline",
-        "sound",
+        "enableSound",
         "secureLink",
         "savePwd",
         "searchUser",
@@ -732,7 +763,7 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "sound": {
+        "enableSound": {
           "type": "boolean",
           "format": "boolean"
         },
@@ -763,7 +794,7 @@
         "avatar",
         "recall_message",
         "friend_online",
-        "sound",
+        "enable_sound",
         "secure_link",
         "save_pwd",
         "search_user",
