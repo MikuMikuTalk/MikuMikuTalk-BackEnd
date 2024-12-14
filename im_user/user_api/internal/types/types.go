@@ -100,7 +100,6 @@ type SearchResponse struct {
 }
 
 type UserInfoRequest struct {
-	UserName string `json:"username"`
 }
 
 type UserInfoResponse struct {
@@ -110,7 +109,7 @@ type UserInfoResponse struct {
 	Avatar               string                `json:"avatar"`
 	RecallMessage        *string               `json:"recallMessage"`
 	FriendOnline         bool                  `json:"friendOnline"`
-	Sound                bool                  `json:"sound"`
+	EnableSound          bool                  `json:"enableSound"`
 	SecureLink           bool                  `json:"secureLink"`
 	SavePwd              bool                  `json:"savePwd"`
 	SearchUser           int8                  `json:"searchUser"`
@@ -124,7 +123,7 @@ type UserInfoUpdateRequest struct {
 	Avatar               *string               `json:"avatar,optional" user:"avatar"`
 	RecallMessage        *string               `json:"recallMessage,optional" user_conf:"recall_message"`
 	FriendOnline         *bool                 `json:"friendOnline,optional" user_conf:"friend_online"`
-	Sound                *bool                 `json:"sound,optional" user_conf:"sound"`
+	EnableSound          *bool                 `json:"enableSound,optional" user_conf:"enable_sound"`
 	SecureLink           *bool                 `json:"secureLink,optional" user_conf:"secure_link"`
 	SavePwd              *bool                 `json:"savePwd,optional" user_conf:"save_pwd"`
 	SearchUser           *int8                 `json:"searchUser,optional" user_conf:"search_user"`

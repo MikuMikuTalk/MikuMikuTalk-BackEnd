@@ -8,9 +8,7 @@ info (
 	version: "1.0.0"
 )
 
-type UserInfoRequest {
-	UserName string `json:"username"`
-}
+type UserInfoRequest {}
 
 type VerificationQuestion {
 	Problem1 *string `json:"problem1,optional" user_conf:"problem1"`
@@ -28,7 +26,7 @@ type UserInfoResponse {
 	Avatar               string                `json:"avatar"`
 	RecallMessage        *string               `json:"recallMessage"`
 	FriendOnline         bool                  `json:"friendOnline"`
-	Sound                bool                  `json:"sound"`
+	EnableSound          bool                  `json:"enableSound"`
 	SecureLink           bool                  `json:"secureLink"`
 	SavePwd              bool                  `json:"savePwd"`
 	SearchUser           int8                  `json:"searchUser"`
@@ -42,7 +40,7 @@ type UserInfoUpdateRequest {
 	Avatar               *string               `json:"avatar,optional" user:"avatar"`
 	RecallMessage        *string               `json:"recallMessage,optional" user_conf:"recall_message"`
 	FriendOnline         *bool                 `json:"friendOnline,optional" user_conf:"friend_online"`
-	Sound                *bool                 `json:"sound,optional" user_conf:"sound"`
+	EnableSound          *bool                 `json:"enableSound,optional" user_conf:"enable_sound"`
 	SecureLink           *bool                 `json:"secureLink,optional" user_conf:"secure_link"`
 	SavePwd              *bool                 `json:"savePwd,optional" user_conf:"save_pwd"`
 	SearchUser           *int8                 `json:"searchUser,optional" user_conf:"search_user"`
@@ -83,7 +81,7 @@ type FriendNoticeUpdateRequest {
 type FriendNoticeUpdateResponse {}
 
 type SearchRequest {
-	Key    string `form:"key"`    //用户id和昵称
+	Key    string `form:"key"` //用户id和昵称
 	Online bool   `form:"online"` //搜索在线得用户
 	Page   int    `form:"page,optional"`
 	Limit  int    `form:"limit,optional"`
@@ -106,13 +104,13 @@ type UserValidRequest {
 }
 
 type UserValidResponse {
-	Verification         int8                 `json:"verification"`         // 好友验证
+	Verification         int8                 `json:"verification"` // 好友验证
 	VerificationQuestion VerificationQuestion `json:"verificationQuestion"` // 问题和答案，但是答案不要返回
 }
 
 type AddFriendRequest {
 	FriendName           string                `json:"friend_name"`
-	Verify               string                `json:"verify,optional"`               // 验证消息
+	Verify               string                `json:"verify,optional"` // 验证消息
 	VerificationQuestion *VerificationQuestion `json:"verificationQuestion,optional"` // 问题和答案
 }
 
@@ -127,22 +125,22 @@ type FriendValidInfo {
 	UserID               uint                  `json:"userID"`
 	Nickname             string                `json:"nickname"`
 	Avatar               string                `json:"avatar"`
-	AdditionalMessages   string                `json:"additionalMessages"`   // 附加消息
+	AdditionalMessages   string                `json:"additionalMessages"` // 附加消息
 	VerificationQuestion *VerificationQuestion `json:"verificationQuestion"` // 验证问题  为3和4的时候需要
-	Status               int8                  `json:"status"`               // 状态 0 未操作 1 同意 2 拒绝 3 忽略 4 删除
-	Verification         int8                  `json:"verification"`         // 好友验证
-	ID                   uint                  `json:"id"`                   // 验证记录的id
-	Flag                 string                `json:"flag"`                 // send 我是发起方  rev 我是接收方
+	Status               int8                  `json:"status"` // 状态 0 未操作 1 同意 2 拒绝 3 忽略 4 删除
+	Verification         int8                  `json:"verification"` // 好友验证
+	ID                   uint                  `json:"id"` // 验证记录的id
+	Flag                 string                `json:"flag"` // send 我是发起方  rev 我是接收方
 }
 
 type FriendValidResponse {
-	List  []FriendValidInfo `json:"list"`  // 好友验证信息表
+	List  []FriendValidInfo `json:"list"` // 好友验证信息表
 	Count int64             `json:"count"` // 数量
 }
 
 type FriendValidStatusRequest {
 	VerifyID uint `json:"verifyId"` //验证消息的id-> 在表中能看到
-	Status   int8 `json:"status"`   // 状态
+	Status   int8 `json:"status"` // 状态
 }
 
 type FriendValidStatusResponse {}
@@ -227,3 +225,4 @@ service users {
 	@handler validStatus
 	put /valid_status (FriendValidStatusRequest) returns (FriendValidStatusResponse) // 好友验证状态操作
 }
+

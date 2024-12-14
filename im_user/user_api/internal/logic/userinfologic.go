@@ -7,8 +7,7 @@ import (
 
 	"im_server/im_user/user_models"
 	"im_server/im_user/user_rpc/types/user_rpc"
-
-	"gorm.io/gorm"
+	"im_server/utils/jwts"
 
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
@@ -31,23 +30,20 @@ func NewUserInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserInfo
 	}
 }
 
-func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserInfoResponse, err error) {
+func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest, token string) (resp *types.UserInfoResponse, err error) {
 	var user user_models.UserModel
-	err = l.svcCtx.DB.Select("id").Where("nickname = ?", req.UserName).First(&user).Error
+	// 查询用户
+	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			logx.Infof("用户不存在: %s", req.UserName)
-			return nil, errors.New("用户不存在")
-		} else {
-			logx.Errorf("查询失败: %v", err)
-			return nil, err
-		}
+		logx.Error("error: ", err)
+		return nil, err
 	}
-
-	// 提取用户信息
+	//获取请求的用户的id
+	my_id := claims.UserID
 	res, err := l.svcCtx.UserRpc.UserInfo(context.Background(), &user_rpc.UserInfoRequest{
-		UserId: uint32(user.ID),
+		UserId: uint32(my_id),
 	})
+
 	if err != nil {
 		logx.Errorf("UserRpc 调用失败: %v", err)
 		return nil, err
@@ -74,7 +70,7 @@ func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserIn
 	if user.UserConfModel != nil {
 		resp.RecallMessage = user.UserConfModel.RecallMessage
 		resp.FriendOnline = user.UserConfModel.FriendOnline
-		resp.Sound = user.UserConfModel.EnableSound
+		resp.EnableSound = user.UserConfModel.EnableSound
 		resp.SecureLink = user.UserConfModel.SecureLink
 		resp.SavePwd = user.UserConfModel.SavePwd
 		resp.SearchUser = user.UserConfModel.SearchUser
