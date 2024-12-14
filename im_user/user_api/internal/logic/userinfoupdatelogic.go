@@ -32,13 +32,13 @@ func NewUserInfoUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Us
 }
 
 func (l *UserInfoUpdateLogic) UserInfoUpdate(token string, req *types.UserInfoUpdateRequest) (resp *types.UserInfoUpdateResponse, err error) {
-	//获取claims
+	// 获取claims
 	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
 	if err != nil {
 		logx.Error("error: ", err)
 		return nil, err
 	}
-	//获取请求的用户的id
+	// 获取请求的用户的id
 	user_id := claims.UserID
 	userMaps := ref_map.RefToMap(*req, "user")
 	userConfMaps := ref_map.RefToMap(*req, "user_conf")
@@ -55,7 +55,7 @@ func (l *UserInfoUpdateLogic) UserInfoUpdate(token string, req *types.UserInfoUp
 
 		// 判断是否需要更新 `nickname`
 		if nick, ok := userMaps["nickname"].(string); ok {
-			//从发过来的信息中提取用户信息，判断是否需要更新昵称
+			// 从发过来的信息中提取用户信息，判断是否需要更新昵称
 			if nick != user.Nickname {
 				// 如果新昵称和原昵称不同，检查是否重复
 				var existingUser user_models.UserModel

@@ -38,12 +38,11 @@ func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest, token string) (resp
 		logx.Error("error: ", err)
 		return nil, err
 	}
-	//获取请求的用户的id
+	// 获取请求的用户的id
 	my_id := claims.UserID
 	res, err := l.svcCtx.UserRpc.UserInfo(context.Background(), &user_rpc.UserInfoRequest{
 		UserId: uint32(my_id),
 	})
-
 	if err != nil {
 		logx.Errorf("UserRpc 调用失败: %v", err)
 		return nil, err
