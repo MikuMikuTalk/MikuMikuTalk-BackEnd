@@ -36,8 +36,9 @@ func (l *AuthenticationLogic) Authentication(req *types.AuthenticationRequest) (
 
 	if whitelist.IsInListByRegex(l.svcCtx.Config.WhiteList, req.ValidPath) {
 		logx.Infof("%s 在白名单中", req.ValidPath)
-		return
+		return "ok", nil
 	}
+	logx.Errorf("%s 不在白名单中", req.ValidPath)
 	// 检查是否提供了 Authorization
 	if req.Authorization == "" {
 		logx.Error("Authorization 请求头为空")
