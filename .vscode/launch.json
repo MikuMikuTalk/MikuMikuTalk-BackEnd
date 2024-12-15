@@ -50,7 +50,7 @@
             "cwd": "${workspaceFolder}/im_file/file_api"
         },
         {
-            "name": "运行im_chat服务",
+            "name": "运行chat_api服务",
             "type": "go",
             "request": "launch",
             "mode": "auto",
@@ -67,7 +67,6 @@
             "env": {},
             "cwd": "${workspaceFolder}/im_gateway"
         },
-
     ],
     "compounds": [
         {
