@@ -7,6 +7,10 @@ Mysql:
 Auth:
   AuthSecret: fdsafasfdsfadsf
   AuthExpire: 10000
+Redis:
+  Addr: 127.0.0.1:6379
+  Pwd:
+  DB: 0
 Log:
   ServiceName: auth
   Encoding: plain

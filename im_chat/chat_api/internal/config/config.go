@@ -15,5 +15,10 @@ type Config struct {
 		AuthSecret string
 		AuthExpire int64
 	}
+	Redis struct {
+		Addr string
+		Pwd  string
+		DB   int
+	}
 	UserRpc zrpc.RpcClientConf
 }

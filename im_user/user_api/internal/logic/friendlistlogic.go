@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"strconv"
 
 	"im_server/common/list_query"
 	"im_server/common/models"
@@ -42,6 +43,23 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest, token string)
 		},
 		Preload: []string{"SendUserModel", "RevUserModel"},
 	})
+
+	// 查询哪些好友在线
+	onlineMap, err := l.svcCtx.Redis.HGetAll("online_user").Result()
+	if err != nil {
+		return nil, err
+	}
+	var onlineUserMap = map[uint]bool{}
+
+	for key, _ := range onlineMap {
+		val, err1 := strconv.Atoi(key)
+		if err1 != nil {
+			logx.Error(err1)
+			continue
+		}
+		onlineUserMap[uint(val)] = true
+	}
+
 	var friend_info_responses []types.FriendInfoResponse
 	for _, friend := range friend_list {
 		info := types.FriendInfoResponse{}
@@ -53,6 +71,7 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest, token string)
 				Abstract: friend.RevUserModel.Abstract,
 				Avatar:   friend.RevUserModel.Avatar,
 				Notice:   friend.SenUserNotice,
+				IsOnline: onlineUserMap[friend.RevUserID],
 			}
 		}
 		if friend.RevUserID == user_id {

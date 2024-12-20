@@ -19,15 +19,9 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-type UserInfo struct {
-	NickName string `json:"nickName"`
-	Avatar   string `json:"avatar"`
-	UserID   uint   `json:"userID"`
-}
-
 type UserWsInfo struct {
-	UserInfo UserInfo        // 用户信息
-	Conn     *websocket.Conn // 用户的ws连接对象
+	UserInfo user_models.UserModel // 用户信息
+	Conn     *websocket.Conn       // 用户的ws连接对象
 }
 
 var UserWsMap = map[uint]UserWsInfo{}
@@ -80,14 +74,13 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			return
 		}
 		var userWsInfo = UserWsInfo{
-			UserInfo: UserInfo{
-				UserID:   req.UserID,
-				Avatar:   userInfo.Avatar,
-				NickName: userInfo.Nickname,
-			},
-			Conn: conn,
+			UserInfo: userInfo,
+			Conn:     conn,
 		}
 		UserWsMap[req.UserID] = userWsInfo
+		// 把在线用户存入redis,如果在线，存入redis, key: online_user, field: 用户id, value: 用户id
+
+		svcCtx.Redis.HSet("online_user", fmt.Sprintf("%d", req.UserID), req.UserID)
 		logx.Info("UserWsMap: ", UserWsMap)
 		logx.Info("userWsInfo: ", userWsInfo)
 		/*
@@ -100,7 +93,6 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 		   		//if userInfo.UserConfModel.FriendOnline {
 		   		// 如果用户开启了好友上线提醒
 		   		// 查一下自己的好友是不是上线了
-
 		*/
 
 		friendRes, err := svcCtx.UserRpc.FriendList(context.Background(), &user_rpc.FriendListRequest{
@@ -116,9 +108,12 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			logx.Info(info)
 			friend, ok := UserWsMap[uint(info.UserId)]
 			if ok {
-				text := fmt.Sprintf("好友 %s 上线了", UserWsMap[req.UserID].UserInfo.NickName)
+				text := fmt.Sprintf("好友 %s 上线了", UserWsMap[req.UserID].UserInfo.Nickname)
 				logx.Info(text)
-				friend.Conn.WriteMessage(websocket.TextMessage, []byte("好友上线了"))
+				if friend.UserInfo.UserConfModel.FriendOnline {
+					//判断好友是否开了好友上线提醒
+					friend.Conn.WriteMessage(websocket.TextMessage, []byte("好友上线了"))
+				}
 			}
 		}
 		for {
