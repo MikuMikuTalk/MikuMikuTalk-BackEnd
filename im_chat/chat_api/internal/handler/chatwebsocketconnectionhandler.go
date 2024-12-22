@@ -127,22 +127,24 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				continue
 			}
 			//检查接收者是否是好友
-			res, err := svcCtx.UserRpc.IsFriend(context.Background(), &user_rpc.IsFriendRequest{
-				User2: uint32(myID),
-				User1: uint32(chatReq.RevUserID),
-			})
-			if err != nil {
-				// 用户乱发消息
-				logx.Error("用户服务错误: ", err)
-				conn.WriteMessage(websocket.TextMessage, []byte("用户服务错误"))
-				continue
-			}
-			//如果不是好友，返回不是好友的消息
-			if !res.GetIsFriend() {
-				errorMsg := fmt.Sprintf("%v 和 %v 还不是好友呢", myID, chatReq.RevUserID)
-				logx.Error(errorMsg)
-				conn.WriteMessage(websocket.TextMessage, []byte(errorMsg))
-				continue
+			if myID != chatReq.RevUserID {
+				res, err := svcCtx.UserRpc.IsFriend(context.Background(), &user_rpc.IsFriendRequest{
+					User2: uint32(myID),
+					User1: uint32(chatReq.RevUserID),
+				})
+				if err != nil {
+					// 用户乱发消息
+					logx.Error("用户服务错误: ", err)
+					conn.WriteMessage(websocket.TextMessage, []byte("用户服务错误"))
+					continue
+				}
+				//如果不是好友，返回不是好友的消息
+				if !res.GetIsFriend() {
+					errorMsg := fmt.Sprintf("%v 和 %v 还不是好友呢", myID, chatReq.RevUserID)
+					logx.Error(errorMsg)
+					conn.WriteMessage(websocket.TextMessage, []byte(errorMsg))
+					continue
+				}
 			}
 
 			// 检查接收者是否在线

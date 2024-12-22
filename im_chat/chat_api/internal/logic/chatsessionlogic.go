@@ -45,7 +45,7 @@ func (l *ChatSessionLogic) ChatSession(req *types.ChatSessionRequest, token stri
 		return nil, err
 	}
 	my_id := claims.UserID
-	column := fmt.Sprintf(" if((select 1 from top_user_models where user_id = %d and (top_user_id = sU or top_user_id = rU)), 1, 0)  as isTop", my_id)
+	column := fmt.Sprintf(" if((select 1 from top_user_models where user_id = %d and (top_user_id = sU or top_user_id = rU) limit 1), 1, 0)  as isTop", my_id)
 
 	chatList, count, _ := list_query.ListQuery(l.svcCtx.DB, Data{}, list_query.Option{
 		PageInfo: models.PageInfo{
@@ -67,12 +67,19 @@ func (l *ChatSessionLogic) ChatSession(req *types.ChatSessionRequest, token stri
 	})
 
 	var userIDList []uint32
+	// 获取所有用户ID
 	for _, data := range chatList {
+		// 排除自己
 		if data.RU != my_id {
 			userIDList = append(userIDList, uint32(data.RU))
 		}
+		// 排除自己
 		if data.SU != my_id {
 			userIDList = append(userIDList, uint32(data.SU))
+		}
+		if data.SU == my_id && my_id == data.RU {
+			// 自己和自己聊
+			userIDList = append(userIDList, uint32(my_id))
 		}
 	}
 
