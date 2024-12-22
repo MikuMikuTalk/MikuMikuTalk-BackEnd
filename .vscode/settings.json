@@ -1,3 +1,4 @@
 {
-    "go.toolsManagement.checkForUpdates": "proxy"
+    "go.toolsManagement.checkForUpdates": "proxy",
+    "workbench.editor.wrapTabs": true
 }
