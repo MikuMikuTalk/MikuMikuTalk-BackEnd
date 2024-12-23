@@ -58,6 +58,6 @@ func (l *UserTopLogic) UserTop(req *types.UserTopRequest, token string) (resp *t
 		return
 	}
 	// 已经有置顶了，就取消置顶
-	l.svcCtx.DB.Model(chat_models.TopUserModel{}).Delete("user_id = ? and top_user_id = ?", my_id, req.FriendID)
+	l.svcCtx.DB.Delete(&top_user)
 	return
 }
