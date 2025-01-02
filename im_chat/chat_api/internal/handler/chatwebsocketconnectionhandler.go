@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"im_server/common/ctype"
 	"im_server/common/response"
 	"im_server/im_chat/chat_api/internal/svc"
 	"im_server/im_chat/chat_models"
+	"im_server/im_file/file_rpc/types/file_rpc"
 	"im_server/im_user/user_models"
 	"im_server/im_user/user_rpc/types/user_rpc"
 	"im_server/utils/jwts"
@@ -150,6 +152,28 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					conn.WriteMessage(websocket.TextMessage, []byte(errorMsg))
 					continue
 				}
+			}
+			//检查请求的类型，如果是文件类型，就调用文件rpc服务，获取文件相关信息
+			switch chatReq.Msg.Type {
+			case ctype.FileMsgType:
+				//如果是文件类型，就要去请求文件rpc服务
+				nameList := strings.Split(chatReq.Msg.FileMsg.Src, ".")
+				if len(nameList) == 0 {
+					SendTipErrMsg(conn, "请上传文件")
+					continue
+				}
+				fileID := nameList[len(nameList)-1]
+				fileResponse, err := svcCtx.FileRpc.FileInfo(context.Background(), &file_rpc.FileInfoRequest{
+					FildId: fileID,
+				})
+				if err != nil {
+					logx.Error(err)
+					SendTipErrMsg(conn, err.Error())
+					continue
+				}
+				chatReq.Msg.FileMsg.Title = fileResponse.FileName
+				chatReq.Msg.FileMsg.Size = fileResponse.FileSize
+				chatReq.Msg.FileMsg.Type = fileResponse.FileType
 			}
 
 			// 先入库

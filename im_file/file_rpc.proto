@@ -7,12 +7,13 @@ message FileInfoRequest {
 }
 message FileInfoResponse {
     string file_name = 1;
-    string file_path = 2;
+    string file_hash = 2;
     int64 file_size = 3;
     string file_type = 4;
 }
 
 service files {
+    //查询文件信息
     rpc FileInfo(FileInfoRequest) returns (FileInfoResponse); //文件消息
 }
 // goctl rpc protoc file_rpc.proto --go_out=./types --go-grpc_out=./types --zrpc_out=.
