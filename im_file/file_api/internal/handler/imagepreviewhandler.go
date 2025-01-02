@@ -2,13 +2,11 @@ package handler
 
 import (
 	"errors"
-	"fmt"
-	"io"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"im_server/common/response"
+	"im_server/im_file/file_api/file_models"
 	"im_server/im_file/file_api/internal/logic"
 	"im_server/im_file/file_api/internal/svc"
 	"im_server/im_file/file_api/internal/types"
@@ -25,18 +23,19 @@ func ImagePreviewHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			response.Response(r, w, nil, err)
 			return
 		}
-		filePath := filepath.Join(svcCtx.Config.UploadDir, req.ImageName)
-		file, err := os.Open(filePath)
+		var fileModel file_models.FileModel
+		err := svcCtx.DB.Take(&fileModel, "uid = ?", req.ImageName).Error
 		if err != nil {
-			response.Response(r, w, nil, fmt.Errorf("unable to open file: %v", err))
+			response.Response(r, w, nil, errors.New("文件失败"))
 			return
 		}
-		defer file.Close()
-		_, err = io.Copy(w, file)
+		byteData, err := os.ReadFile(fileModel.Path)
 		if err != nil {
+			//读取文件失败
 			response.Response(r, w, nil, errors.New("读取文件失败"))
 			return
 		}
+		w.Write(byteData)
 		l := logic.NewImagePreviewLogic(r.Context(), svcCtx)
 		err = l.ImagePreview(&req)
 		if err != nil {
