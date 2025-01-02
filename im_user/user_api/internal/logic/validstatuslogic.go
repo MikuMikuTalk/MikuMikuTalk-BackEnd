@@ -58,7 +58,7 @@ func (l *ValidStatusLogic) ValidStatus(req *types.FriendValidStatusRequest, toke
 			RevUserID:  friendVerify.RevUserID,
 		})
 		msg := ctype.Msg{
-			Type: 1,
+			Type: ctype.TextMsgType,
 			TextMsg: &ctype.TextMsg{
 				Content: "我们已经是好友了，开始聊天吧！",
 			},

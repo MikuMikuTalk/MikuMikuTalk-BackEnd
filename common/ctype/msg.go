@@ -6,8 +6,25 @@ import (
 	"time"
 )
 
+// 消息类型 1 文本类型  2 图片消息  3 视频消息 4 文件消息 5 语音消息  6 语言通话  7 视频通话  8 撤回消息 9回复消息 10 引用消息
+type MsgType int8
+
+const (
+	TextMsgType MsgType = iota + 1
+	ImageMsgType
+	VideoMsgType
+	FileMsgType
+	VoiceMsgType
+	VideoCallMsgType
+	WithdrawMsgType
+	ReplyMsgType
+	QuoteMsgType
+	AtMsgType
+	TipMsgType
+)
+
 type Msg struct {
-	Type         int8          `json:"type"`         // 消息类型 和msgType一模一样
+	Type         MsgType       `json:"type"`         // 消息类型 和msgType一模一样
 	TextMsg      *TextMsg      `json:"textMsg"`      // 文本消息
 	ImageMsg     *ImageMsg     `json:"imageMsg"`     // 图片消息
 	VideoMsg     *VideoMsg     `json:"videoMsg"`     // 视频消息
@@ -19,6 +36,7 @@ type Msg struct {
 	ReplyMsg     *ReplyMsg     `json:"replyMsg"`     // 回复消息
 	QuoteMsg     *QuoteMsg     `json:"quoteMsg"`     // 引用消息
 	AtMsg        *AtMsg        `json:"atMsg"`        // @用户的消息 群聊才有
+	TipMsg       *TipMsg       `json:"tipMsg"`       // 提示消息 一般是不入库的
 }
 
 type TextMsg struct {
@@ -87,4 +105,11 @@ type AtMsg struct {
 	UserID  uint   `json:"userID"`
 	Content string `json:"content"` // 回复的文本消息
 	Msg     *Msg   `json:"msg"`
+}
+
+// TipMsg 提示消息
+type TipMsg struct {
+	Status  string `json:"status"`  // 状态 error success warning info
+	Content string `json:"content"` // 提示内容
+
 }

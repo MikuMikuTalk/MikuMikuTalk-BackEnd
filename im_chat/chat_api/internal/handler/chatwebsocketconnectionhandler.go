@@ -10,12 +10,14 @@ import (
 	"im_server/common/ctype"
 	"im_server/common/response"
 	"im_server/im_chat/chat_api/internal/svc"
+	"im_server/im_chat/chat_models"
 	"im_server/im_user/user_models"
 	"im_server/im_user/user_rpc/types/user_rpc"
 	"im_server/utils/jwts"
 
 	"github.com/gorilla/websocket"
 	"github.com/zeromicro/go-zero/core/logx"
+	"gorm.io/gorm"
 )
 
 // UserWsInfo表示已连接用户的WebSocket连接和用户信息。
@@ -122,6 +124,8 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			var chatReq ChatRequest
 			if err := json.Unmarshal(message, &chatReq); err != nil {
 				errorMsg := fmt.Sprintf("消息格式错误: %s", err.Error())
+				// 发送错误消息
+				SendTipErrMsg(conn, errorMsg)
 				logx.Error(errorMsg)
 				conn.WriteMessage(websocket.TextMessage, []byte(errorMsg))
 				continue
@@ -141,36 +145,81 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				//如果不是好友，返回不是好友的消息
 				if !res.GetIsFriend() {
 					errorMsg := fmt.Sprintf("%v 和 %v 还不是好友呢", myID, chatReq.RevUserID)
+					SendTipErrMsg(conn, errorMsg)
 					logx.Error(errorMsg)
 					conn.WriteMessage(websocket.TextMessage, []byte(errorMsg))
 					continue
 				}
 			}
 
-			// 检查接收者是否在线
-			targetWs, ok := UserWsMap[chatReq.RevUserID]
-			if ok {
-				resp := ChatResponse{
-					RevUser: ctype.UserInfo{
-						ID:       chatReq.RevUserID,
-						NickName: targetWs.UserInfo.Nickname,
-						Avatar:   targetWs.UserInfo.Avatar,
-					},
-					SendUser: ctype.UserInfo{
-						ID:       myID,
-						NickName: userInfoMine.Nickname,
-						Avatar:   userInfoMine.Avatar,
-					},
-					Msg:       chatReq.Msg,
-					CreatedAt: time.Now(),
-				}
-				responseData, _ := json.Marshal(resp)
-				targetWs.Conn.WriteMessage(websocket.TextMessage, responseData)
-				// 保存聊天记录
+			// 先入库
+			InsertMsgByChat(svcCtx.DB, chatReq.RevUserID, myID, chatReq.Msg)
+			SendMsgByUser(chatReq.RevUserID, myID, chatReq.Msg)
 
-			} else {
-				conn.WriteMessage(websocket.TextMessage, []byte("目标用户不在线"))
-			}
 		}
 	}
+}
+
+// 发送错误提示的消息
+func SendTipErrMsg(conn *websocket.Conn, msg string) {
+	resp := ChatResponse{
+		Msg: ctype.Msg{
+			Type: ctype.TipMsgType,
+			TipMsg: &ctype.TipMsg{
+				Status:  "error",
+				Content: msg,
+			},
+		},
+		CreatedAt: time.Now(),
+	}
+	byteData, _ := json.Marshal(resp)
+	conn.WriteMessage(websocket.TextMessage, byteData)
+}
+
+// InsertMsgByChat 消息入库
+func InsertMsgByChat(db *gorm.DB, revUserID uint, sendUserID uint, msg ctype.Msg) {
+	chatModel := chat_models.ChatModel{
+		SendUserID: sendUserID,
+		RevUserID:  revUserID,
+		MsgType:    msg.Type,
+		Msg:        msg,
+	}
+	chatModel.MsgPreview = chatModel.MsgPreviewMethod()
+	err := db.Create(&chatModel).Error
+	if err != nil {
+		logx.Error(err)
+		sendUser, ok := UserWsMap[sendUserID]
+		if !ok {
+			return
+		}
+		SendTipErrMsg(sendUser.Conn, "消息保存失败")
+	}
+}
+
+// SendMsgByUser 发消息，给谁发，谁发的
+func SendMsgByUser(revUserID uint, sendUserID uint, msg ctype.Msg) {
+	revUser, ok := UserWsMap[revUserID]
+	if !ok {
+		return
+	}
+	sendUser, ok := UserWsMap[sendUserID]
+	if !ok {
+		return
+	}
+	resp := ChatResponse{
+		RevUser: ctype.UserInfo{
+			ID:       revUserID,
+			NickName: revUser.UserInfo.Nickname,
+			Avatar:   revUser.UserInfo.Avatar,
+		},
+		SendUser: ctype.UserInfo{
+			ID:       sendUserID,
+			NickName: sendUser.UserInfo.Nickname,
+			Avatar:   sendUser.UserInfo.Avatar,
+		},
+		Msg:       msg,
+		CreatedAt: time.Now(),
+	}
+	byteData, _ := json.Marshal(resp)
+	revUser.Conn.WriteMessage(websocket.TextMessage, byteData)
 }
