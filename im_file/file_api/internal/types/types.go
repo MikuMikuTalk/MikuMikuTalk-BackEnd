@@ -3,6 +3,13 @@
 
 package types
 
+type FileDownloadRequest struct {
+	FileName string `path:"fileName"`
+}
+
+type FileDownloadResponse struct {
+}
+
 type FileRequest struct {
 }
 

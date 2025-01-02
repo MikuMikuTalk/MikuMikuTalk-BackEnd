@@ -22,6 +22,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				// 文件下载服务
+				Method:  http.MethodGet,
+				Path:    "/api/file/download/:fileName",
+				Handler: FileDownloadHandler(serverCtx),
+			},
+			{
+				// 文件上传服务
 				Method:  http.MethodPost,
 				Path:    "/api/file/file",
 				Handler: FileHandler(serverCtx),

@@ -16,6 +16,9 @@ type FileModel struct {
 	Hash     string    `gorm:"type:varchar(32);uniqueIndex:idx_filename_md5;not null;comment:文件md5值" json:"file_md5"`
 }
 
-func (file *FileModel) WebPath() string {
+func (file *FileModel) ImageWebPath() string {
 	return "/api/file/" + file.Uid.String()
+}
+func (file *FileModel) FileWebPath() string {
+	return "/api/file/download/" + file.Uid.String()
 }

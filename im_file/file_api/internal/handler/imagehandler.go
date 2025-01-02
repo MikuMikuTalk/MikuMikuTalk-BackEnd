@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -36,12 +37,17 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 		token := r.Header.Get("Authorization")
 		claims, err := jwts.ParseToken(token, svcCtx.Config.Auth.AuthSecret)
+		if err != nil {
+			responseError(r, w, err)
+			return
+		}
 		my_id := claims.UserID
 		file, fileHeader, err := r.FormFile("image")
 		if err != nil {
 			responseError(r, w, err)
 			return
 		}
+		// imageData, _ := io.ReadAll(file)
 		defer file.Close()
 
 		imageType := r.FormValue("imageType")
@@ -91,18 +97,20 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			imageName = renameFile(imageName)
 			imagePath = filepath.Join(dirPath, imageName)
 		}
+		buf := new(bytes.Buffer)
+		teeReader := io.TeeReader(file, buf)
 		// 保存图片
-		if err := saveFile(imagePath, file); err != nil {
+		if err := saveFile(imagePath, teeReader); err != nil {
 			responseError(r, w, errors.New("文件保存失败"))
 			return
 		}
-		imageData, _ := io.ReadAll(file)
+
 		fileModel := file_models.FileModel{
 			UserID:   my_id,
 			FileName: imageName,
 			Size:     fileHeader.Size,
 			Path:     imagePath,
-			Hash:     md5_util.MD5(imageData),
+			Hash:     md5_util.MD5(buf.Bytes()),
 			Uid:      uuid.New(),
 		}
 
@@ -110,7 +118,7 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewImageLogic(r.Context(), svcCtx)
 		resp, err := l.Image(&req)
 		if err == nil {
-			resp.Url = fileModel.WebPath()
+			resp.Url = fileModel.ImageWebPath()
 		}
 		//创建表
 		err = svcCtx.DB.Create(&fileModel).Error

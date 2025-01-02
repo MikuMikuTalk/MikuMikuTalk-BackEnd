@@ -25,6 +25,12 @@ type FileResponse {
 	Src []string `json:"src"`
 }
 
+type FileDownloadRequest {
+	FileName string `path:"fileName"`
+}
+
+type FileDownloadResponse {}
+
 service file {
 	@doc (
 		summary: "图片上传服务"
@@ -39,10 +45,16 @@ service file {
 	get /api/file/:imageName (ImagePreviewRequest) returns (ImagePreviewResponse)
 
 	@doc (
-		summary: "文件下载服务"
+		summary: "文件上传服务"
 	)
 	@handler File
 	post /api/file/file (FileRequest) returns (FileResponse)
+
+	@doc (
+		summary: "文件下载服务"
+	)
+	@handler FileDownload
+	get /api/file/download/:fileName (FileDownloadRequest) returns (FileDownloadResponse)
 }
 
 //goctl api go -api file_api.api -dir . --home ../../template

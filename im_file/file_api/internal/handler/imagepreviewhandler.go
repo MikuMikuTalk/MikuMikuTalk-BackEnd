@@ -26,15 +26,20 @@ func ImagePreviewHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		var fileModel file_models.FileModel
 		err := svcCtx.DB.Take(&fileModel, "uid = ?", req.ImageName).Error
 		if err != nil {
-			response.Response(r, w, nil, errors.New("文件失败"))
+			response.Response(r, w, nil, errors.New("图片不存在"))
 			return
 		}
 		byteData, err := os.ReadFile(fileModel.Path)
 		if err != nil {
 			//读取文件失败
-			response.Response(r, w, nil, errors.New("读取文件失败"))
+			response.Response(r, w, nil, errors.New("读取图片失败"))
 			return
 		}
+		// 设置 Content-Type
+		contentType := http.DetectContentType(byteData)
+		w.Header().Set("Content-Type", contentType)
+		w.Header().Set("Content-Length", string(len(byteData)))
+
 		w.Write(byteData)
 		l := logic.NewImagePreviewLogic(r.Context(), svcCtx)
 		err = l.ImagePreview(&req)
