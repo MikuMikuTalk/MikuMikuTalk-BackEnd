@@ -35,8 +35,7 @@ func FileHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				return
 			}
 
-			// 硬编码，存储到uploads/files目录
-			dirName = filepath.Join("uploads", "files")
+			dirName = filepath.Join(svcCtx.Config.UploadDir, "files")
 			filePath = filepath.Join(dirName, fileName)
 			if err := os.MkdirAll(dirName, os.ModePerm); err != nil {
 				responseError(r, w, errors.New("文件夹创建失败"))

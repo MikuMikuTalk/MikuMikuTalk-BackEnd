@@ -14,9 +14,10 @@ type ImageResponse {
 }
 
 type ImagePreviewRequest {
-	ImageType string `path:"imageType"`
 	ImageName string `path:"imageName"`
 }
+
+type ImagePreviewResponse {}
 
 type FileRequest {}
 
@@ -35,7 +36,7 @@ service file {
 		summary: "图片预览服务"
 	)
 	@handler ImagePreview
-	get /api/file/uploads/:imageType/:imageName (ImagePreviewRequest)
+	get /api/file/:imageName (ImagePreviewRequest) returns (ImagePreviewResponse)
 
 	@doc (
 		summary: "文件下载服务"

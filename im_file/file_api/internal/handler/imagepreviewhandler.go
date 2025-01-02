@@ -25,7 +25,7 @@ func ImagePreviewHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			response.Response(r, w, nil, err)
 			return
 		}
-		filePath := filepath.Join("uploads", req.ImageType, req.ImageName)
+		filePath := filepath.Join(svcCtx.Config.UploadDir, req.ImageName)
 		file, err := os.Open(filePath)
 		if err != nil {
 			response.Response(r, w, nil, fmt.Errorf("unable to open file: %v", err))

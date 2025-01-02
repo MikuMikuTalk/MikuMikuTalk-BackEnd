@@ -25,4 +25,4 @@ UserRpc:
 WhiteList:
   - /api/auth/login
   - /api/auth/register
-  - /api/file/uploads/.*?/.*?
+  - /api/file/.*?

@@ -9,6 +9,7 @@ Log:
   Level: debug
   Stat: false
 MaxBytes: 5368709120
+UploadDir: uploads
 FileSize: 4096 # 图片上传大小 MB
 ImageSize: 10
 WhiteList:
@@ -24,3 +25,6 @@ UserRpc:
     Hosts:
       - 127.0.0.1:2379
     Key: userrpc.rpc
+Auth:
+  AuthSecret: fdsafasfdsfadsf
+  AuthExpire: 10000

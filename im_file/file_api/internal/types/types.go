@@ -11,8 +11,10 @@ type FileResponse struct {
 }
 
 type ImagePreviewRequest struct {
-	ImageType string `path:"imageType"`
 	ImageName string `path:"imageName"`
+}
+
+type ImagePreviewResponse struct {
 }
 
 type ImageRequest struct {

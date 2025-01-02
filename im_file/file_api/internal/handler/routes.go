@@ -15,6 +15,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// 图片预览服务
+				Method:  http.MethodGet,
+				Path:    "/api/file/:imageName",
+				Handler: ImagePreviewHandler(serverCtx),
+			},
+			{
 				// 文件下载服务
 				Method:  http.MethodPost,
 				Path:    "/api/file/file",
@@ -25,12 +31,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPost,
 				Path:    "/api/file/image",
 				Handler: ImageHandler(serverCtx),
-			},
-			{
-				// 图片预览服务
-				Method:  http.MethodGet,
-				Path:    "/api/file/uploads/:imageType/:imageName",
-				Handler: ImagePreviewHandler(serverCtx),
 			},
 		},
 	)

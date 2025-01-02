@@ -14,5 +14,10 @@ type Config struct {
 	Mysql     struct {
 		DataSource string
 	}
-	UserRpc zrpc.RpcClientConf
+	UploadDir string //上传文件保存目录
+	UserRpc   zrpc.RpcClientConf
+	Auth      struct {
+		AuthSecret string
+		AuthExpire int64
+	}
 }
