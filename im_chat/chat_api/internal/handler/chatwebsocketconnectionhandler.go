@@ -10,6 +10,7 @@ import (
 
 	"im_server/common/ctype"
 	"im_server/common/response"
+	"im_server/common/service/redis_cache"
 	"im_server/im_chat/chat_api/internal/svc"
 	"im_server/im_chat/chat_models"
 	"im_server/im_file/file_rpc/types/file_rpc"
@@ -155,6 +156,11 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					continue
 				}
 			}
+			// 判断type  1 - 12 检查消息类型是否正确
+			if !(chatReq.Msg.Type >= 1 && chatReq.Msg.Type <= 12) {
+				SendTipErrMsg(conn, "消息类型错误")
+				continue
+			}
 			// 检查请求的类型，如果是文件类型，就调用文件rpc服务，获取文件相关信息
 			switch chatReq.Msg.Type {
 			case ctype.TextMsgType:
@@ -226,6 +232,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					content = *userInfoMine.UserConfModel.RecallMessage
 				}
 				svcCtx.DB.Model(&msgModel).Updates(chat_models.ChatModel{
+					MsgPreview: "[撤回消息] - " + content,
 					Msg: ctype.Msg{
 						Type: ctype.WithdrawMsgType,
 						WithdrawMsg: &ctype.WithdrawMsg{
@@ -249,9 +256,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					SendTipErrMsg(conn, "消息不存在")
 					continue
 				}
-				userBaseInfo, err := svcCtx.UserRpc.UserBaseInfo(context.Background(), &user_rpc.UserBaseInfoRequest{
-					UserId: uint32(msgModel.SendUserID),
-				})
+				userBaseInfo, err := redis_cache.GetUserBaseInfo(svcCtx.Redis, svcCtx.UserRpc, msgModel.SendUserID)
 				if err != nil {
 					logx.Error(err)
 					return
@@ -355,9 +360,7 @@ func SendMsgByUser(svcCtx *svc.ServiceContext, revUserID uint, sendUserID uint, 
 		byteData, _ := json.Marshal(resp)
 		revUser.Conn.WriteMessage(websocket.TextMessage, byteData)
 	} else {
-		userBaseInfo, err := svcCtx.UserRpc.UserBaseInfo(context.Background(), &user_rpc.UserBaseInfoRequest{
-			UserId: uint32(revUserID),
-		})
+		userBaseInfo, err := redis_cache.GetUserBaseInfo(svcCtx.Redis, svcCtx.UserRpc, revUserID)
 		if err != nil {
 			logx.Error(err)
 			return
