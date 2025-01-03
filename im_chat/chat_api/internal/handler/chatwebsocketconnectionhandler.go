@@ -280,15 +280,33 @@ func InsertMsgByChat(db *gorm.DB, revUserID uint, sendUserID uint, msg ctype.Msg
 
 // SendMsgByUser 发消息，给谁发，谁发的
 func SendMsgByUser(revUserID uint, sendUserID uint, msg ctype.Msg) {
-	revUser, ok := UserOnlineMap[revUserID]
-	if !ok {
-		return
-	}
+	revUser, ok1 := UserOnlineMap[revUserID]
+
+	sendUser, ok2 := UserOnlineMap[sendUserID]
 	resp := ChatResponse{
 		Msg:       msg,
 		CreatedAt: time.Now(),
 	}
-	if ok {
+	if ok1 && ok2 && sendUserID == revUserID {
+		// 自己给自己发消息
+		resp.RevUser = ctype.UserInfo{
+			ID:       revUserID,
+			NickName: revUser.UserInfo.Nickname,
+			Avatar:   revUser.UserInfo.Avatar,
+		}
+		resp.SendUser = ctype.UserInfo{
+			ID:       sendUserID,
+			NickName: sendUser.UserInfo.Nickname,
+			Avatar:   sendUser.UserInfo.Avatar,
+		}
+		byteData, _ := json.Marshal(resp)
+		revUser.Conn.WriteMessage(websocket.TextMessage, byteData)
+		return
+	}
+
+	//在线情况下，可以拿到对方用户信息
+	//对方不在线的情况下，只能通过调用用户信息的Rpc方法获取用户信息
+	if ok1 {
 		//接收者在线
 		resp.RevUser = ctype.UserInfo{
 			ID:       revUserID,
@@ -297,13 +315,10 @@ func SendMsgByUser(revUserID uint, sendUserID uint, msg ctype.Msg) {
 		}
 		byteData, _ := json.Marshal(resp)
 		revUser.Conn.WriteMessage(websocket.TextMessage, byteData)
-		if sendUserID == revUserID {
-			return
-		}
 	}
-	sendUser, ok := UserOnlineMap[sendUserID]
-	if ok {
-		//发送者在线
+
+	if ok2 {
+		//发送者也在线
 		resp.SendUser = ctype.UserInfo{
 			ID:       sendUserID,
 			NickName: sendUser.UserInfo.Nickname,
