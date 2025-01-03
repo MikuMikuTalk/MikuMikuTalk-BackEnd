@@ -241,6 +241,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 
 				svcCtx.DB.Model(&msgModel).Updates(chat_models.ChatModel{
 					MsgPreview: "[撤回消息] - " + content,
+					MsgType:    ctype.WithdrawMsgType,
 					Msg: ctype.Msg{
 						Type: ctype.WithdrawMsgType,
 						WithdrawMsg: &ctype.WithdrawMsg{
@@ -264,6 +265,12 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					SendTipErrMsg(conn, "消息不存在")
 					continue
 				}
+				// 不能回复撤回消息
+				if msgModel.MsgType == ctype.WithdrawMsgType {
+					SendTipErrMsg(conn, "该消息已撤回")
+					continue
+				}
+
 				userBaseInfo, err := redis_cache.GetUserBaseInfo(svcCtx.Redis, svcCtx.UserRpc, msgModel.SendUserID)
 				if err != nil {
 					logx.Error(err)
@@ -273,6 +280,35 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				chatReq.Msg.ReplyMsg.UserID = msgModel.SendUserID
 				chatReq.Msg.ReplyMsg.UserNickName = userBaseInfo.NickName
 				chatReq.Msg.ReplyMsg.OriginMsgDate = msgModel.CreatedAt
+			case ctype.QuoteMsgType:
+				//回复消息
+				//先校验
+				if chatReq.Msg.QuoteMsg == nil || chatReq.Msg.QuoteMsg.MsgID == 0 {
+					SendTipErrMsg(conn, "引用消息id必填")
+					continue
+				}
+				// 找这个原消息
+				var msgModel chat_models.ChatModel
+				err = svcCtx.DB.Take(&msgModel, chatReq.Msg.QuoteMsg.MsgID).Error
+				if err != nil {
+					SendTipErrMsg(conn, "消息不存在")
+					continue
+				}
+
+				// 不能回复撤回消息
+				if msgModel.MsgType == ctype.WithdrawMsgType {
+					SendTipErrMsg(conn, "该消息已撤回")
+					continue
+				}
+				userBaseInfo, err := redis_cache.GetUserBaseInfo(svcCtx.Redis, svcCtx.UserRpc, msgModel.SendUserID)
+				if err != nil {
+					logx.Error(err)
+					return
+				}
+				chatReq.Msg.QuoteMsg.Msg = &msgModel.Msg
+				chatReq.Msg.QuoteMsg.UserID = msgModel.SendUserID
+				chatReq.Msg.QuoteMsg.UserNickName = userBaseInfo.NickName
+				chatReq.Msg.QuoteMsg.OriginMsgDate = msgModel.CreatedAt
 			}
 
 			// 先入库
