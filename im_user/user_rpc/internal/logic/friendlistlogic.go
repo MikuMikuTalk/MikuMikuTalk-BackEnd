@@ -29,7 +29,7 @@ func NewFriendListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Friend
 func (l *FriendListLogic) FriendList(in *user_rpc.FriendListRequest) (*user_rpc.FriendListResponse, error) {
 	friends, _, _ := list_query.ListQuery(l.svcCtx.DB, user_models.FriendModel{}, list_query.Option{
 		PageInfo: models.PageInfo{
-			Limit: -1, //查看全部
+			Limit: -1, // 查看全部
 		},
 		Preload: []string{"SendUserModel", "RevUserModel"},
 	})
@@ -37,14 +37,14 @@ func (l *FriendListLogic) FriendList(in *user_rpc.FriendListRequest) (*user_rpc.
 	for _, friend := range friends {
 		info := user_rpc.FriendInfo{}
 		if friend.SendUserID == uint(in.User) {
-			//我是发起方
+			// 我是发起方
 			info.UserId = uint32(friend.RevUserID)
 			info.NickName = friend.RevUserModel.Nickname
 			info.Avatar = friend.RevUserModel.Avatar
 		}
 
 		if friend.RevUserID == uint(in.User) {
-			//如果我是接收方
+			// 如果我是接收方
 			info.UserId = uint32(friend.SendUserID)
 			info.NickName = friend.SendUserModel.Nickname
 			info.Avatar = friend.SendUserModel.Avatar

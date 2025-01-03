@@ -31,7 +31,7 @@ func ImagePreviewHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 		byteData, err := os.ReadFile(fileModel.Path)
 		if err != nil {
-			//读取文件失败
+			// 读取文件失败
 			response.Response(r, w, nil, errors.New("读取图片失败"))
 			return
 		}

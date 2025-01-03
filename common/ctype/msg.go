@@ -111,5 +111,4 @@ type AtMsg struct {
 type TipMsg struct {
 	Status  string `json:"status"`  // 状态 error success warning info
 	Content string `json:"content"` // 提示内容
-
 }

@@ -63,7 +63,7 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		//文件后缀白名单
+		// 文件后缀白名单
 		imageName := fileHeader.Filename
 		imageExtName := file_utils.GetFileExtName(imageName)
 		if !validateFileExtension(imageExtName, svcCtx.Config.WhiteList) {
@@ -120,7 +120,7 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		if err == nil {
 			resp.Url = fileModel.ImageWebPath()
 		}
-		//创建表
+		// 创建表
 		err = svcCtx.DB.Create(&fileModel).Error
 		if err != nil {
 			logx.Error(err)

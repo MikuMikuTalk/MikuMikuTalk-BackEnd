@@ -19,6 +19,7 @@ type FileModel struct {
 func (file *FileModel) ImageWebPath() string {
 	return "/api/file/" + file.Uid.String()
 }
+
 func (file *FileModel) FileWebPath() string {
 	return "/api/file/download/" + file.Uid.String()
 }

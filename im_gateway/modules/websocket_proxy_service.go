@@ -33,12 +33,11 @@ func SingleJoiningSlash(a, b string) string {
 // 处理 WebSocket 请求
 
 func (g *GatewayService) handleWebSocket(addr string, res http.ResponseWriter, req *http.Request) error {
-
 	targetURL := fmt.Sprintf("http://%s", addr)
 	logx.Info("targetUrl: ", targetURL)
 	logx.Info("WebSocket Proxy to: ", targetURL)
 
-	//parsedUrl
+	// parsedUrl
 
 	parsedURL, err := url.Parse(targetURL)
 	if err != nil {

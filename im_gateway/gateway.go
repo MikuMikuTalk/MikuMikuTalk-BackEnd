@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"im_server/im_gateway/modules"
 	"net/http"
+
+	"im_server/im_gateway/modules"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"

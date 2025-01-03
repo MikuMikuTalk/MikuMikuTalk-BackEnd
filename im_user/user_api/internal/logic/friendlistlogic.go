@@ -49,9 +49,9 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest, token string)
 	if err != nil {
 		return nil, err
 	}
-	var onlineUserMap = map[uint]bool{}
+	onlineUserMap := map[uint]bool{}
 
-	for key, _ := range onlineMap {
+	for key := range onlineMap {
 		val, err1 := strconv.Atoi(key)
 		if err1 != nil {
 			logx.Error(err1)

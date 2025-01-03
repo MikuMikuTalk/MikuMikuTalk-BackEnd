@@ -73,7 +73,7 @@ func FileHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				fileName = renameFile(fileName)
 				filePath = filepath.Join(dirName, fileName)
 			}
-			//解决因为文件指针问题导致的存储文件占用空间大小为0且hash值一样的问题
+			// 解决因为文件指针问题导致的存储文件占用空间大小为0且hash值一样的问题
 			buf := new(bytes.Buffer)
 			teeReader := io.TeeReader(file, buf)
 			// 保存文件
@@ -94,7 +94,7 @@ func FileHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				Hash:     hash,
 				Uid:      uuid.New(),
 			}
-			//创建数据库记录
+			// 创建数据库记录
 			err = svcCtx.DB.Create(&fileModel).Error
 			if err != nil {
 				response.Response(r, w, nil, errors.New("创建数据库记录失败"))

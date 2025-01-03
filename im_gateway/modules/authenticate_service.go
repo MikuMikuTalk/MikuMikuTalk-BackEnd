@@ -3,9 +3,10 @@ package modules
 import (
 	"encoding/json"
 	"fmt"
-	"im_server/common/etcd"
 	"net/http"
 	"strings"
+
+	"im_server/common/etcd"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
