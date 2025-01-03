@@ -42,7 +42,7 @@ type ChatResponse struct {
 	CreatedAt time.Time      `json:"createdAt"`
 }
 
-var UserWsMap = make(map[uint]UserWsInfo) // 全局映射以存储用户WebSocket连接。
+var UserOnlineMap = make(map[uint]UserWsInfo) // 全局映射以存储用户WebSocket连接。
 
 func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +69,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			// 关闭连接时删除用户的WebSocket连接
 			conn.Close()
 			// 删除用户的WebSocket连接
-			delete(UserWsMap, myID)
+			delete(UserOnlineMap, myID)
 			// 删除在线用户
 			svcCtx.Redis.HDel("online_user", fmt.Sprintf("%d", myID))
 		}()
@@ -91,7 +91,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 		}
 
 		// 存储我的WebSocket连接
-		UserWsMap[myID] = UserWsInfo{
+		UserOnlineMap[myID] = UserWsInfo{
 			UserInfo: userInfoMine,
 			Conn:     conn,
 		}
@@ -108,7 +108,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			return
 		}
 		for _, friend := range friendRes.FriendList {
-			friendWs, ok := UserWsMap[uint(friend.UserId)]
+			friendWs, ok := UserOnlineMap[uint(friend.UserId)]
 			if ok && friendWs.UserInfo.UserConfModel.FriendOnline {
 				text := fmt.Sprintf("好友 %s 上线了", userInfoMine.Nickname)
 				friendWs.Conn.WriteMessage(websocket.TextMessage, []byte(text))
@@ -132,7 +132,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				conn.WriteMessage(websocket.TextMessage, []byte(errorMsg))
 				continue
 			}
-			//检查接收者是否是好友
+			// 检查接收者是否是好友
 			if myID != chatReq.RevUserID {
 				res, err := svcCtx.UserRpc.IsFriend(context.Background(), &user_rpc.IsFriendRequest{
 					User2: uint32(myID),
@@ -144,7 +144,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					conn.WriteMessage(websocket.TextMessage, []byte("用户服务错误"))
 					continue
 				}
-				//如果不是好友，返回不是好友的消息
+				// 如果不是好友，返回不是好友的消息
 				if !res.GetIsFriend() {
 					errorMsg := fmt.Sprintf("%v 和 %v 还不是好友呢", myID, chatReq.RevUserID)
 					SendTipErrMsg(conn, errorMsg)
@@ -153,10 +153,20 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					continue
 				}
 			}
-			//检查请求的类型，如果是文件类型，就调用文件rpc服务，获取文件相关信息
+			// 检查请求的类型，如果是文件类型，就调用文件rpc服务，获取文件相关信息
 			switch chatReq.Msg.Type {
+			case ctype.TextMsgType:
+				if chatReq.Msg.TextMsg == nil {
+					SendTipErrMsg(conn, "请输入内容")
+					continue
+				}
+				if chatReq.Msg.TextMsg.Content == "" {
+					SendTipErrMsg(conn, "请输入内容")
+					logx.Error("请输入内容")
+					continue
+				}
 			case ctype.FileMsgType:
-				//如果是文件类型，就要去请求文件rpc服务
+				// 如果是文件类型，就要去请求文件rpc服务
 				nameList := strings.Split(chatReq.Msg.FileMsg.Src, ".")
 				if len(nameList) == 0 {
 					SendTipErrMsg(conn, "请上传文件")
@@ -174,10 +184,53 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				chatReq.Msg.FileMsg.Title = fileResponse.FileName
 				chatReq.Msg.FileMsg.Size = fileResponse.FileSize
 				chatReq.Msg.FileMsg.Type = fileResponse.FileType
+			case ctype.WithdrawMsgType:
+				//撤回消息id必填
+				if chatReq.Msg.WithdrawMsg.MsgID == 0 {
+					SendTipErrMsg(conn, "撤回消息id必填")
+					continue
+				}
+				//自己只能撤回自己的消息
+				var msgModel chat_models.ChatModel
+				//查看消息是否存在
+				if err = svcCtx.DB.Take(&msgModel, chatReq.Msg.WithdrawMsg.MsgID).Error; err != nil {
+					SendTipErrMsg(conn, "消息不存在，无法撤回")
+					continue
+				}
+				// 判断是不是自己发的
+				if msgModel.SendUserID != myID {
+					//如果不是，提醒用户只能撤回自己的消息
+					SendTipErrMsg(conn, "只能撤回自己的消息")
+					continue
+				}
+				//判断消息时间，如果超过三分钟，就提示不能撤回了
+				now := time.Now()
+				subTime := now.Sub(msgModel.CreatedAt)
+				if subTime >= time.Minute*3 {
+					SendTipErrMsg(conn, "超过三分钟的消息不能被撤回")
+					continue
+				}
+				//撤回逻辑
+				var content string = fmt.Sprintf("%s 撤回了一条消息", userInfoMine.Nickname)
+				if userInfoMine.UserConfModel.RecallMessage != nil {
+					content = *userInfoMine.UserConfModel.RecallMessage
+				}
+				svcCtx.DB.Model(&msgModel).Updates(chat_models.ChatModel{
+					Msg: ctype.Msg{
+						Type: ctype.WithdrawMsgType,
+						WithdrawMsg: &ctype.WithdrawMsg{
+							Content:   content,
+							MsgID:     chatReq.Msg.WithdrawMsg.MsgID,
+							OriginMsg: &msgModel.Msg,
+						},
+					},
+				})
+
 			}
 
 			// 先入库
 			InsertMsgByChat(svcCtx.DB, chatReq.RevUserID, myID, chatReq.Msg)
+			// 发送消息给好友
 			SendMsgByUser(chatReq.RevUserID, myID, chatReq.Msg)
 
 		}
@@ -202,6 +255,11 @@ func SendTipErrMsg(conn *websocket.Conn, msg string) {
 
 // InsertMsgByChat 消息入库
 func InsertMsgByChat(db *gorm.DB, revUserID uint, sendUserID uint, msg ctype.Msg) {
+	switch msg.Type {
+	case ctype.WithdrawMsgType:
+		logx.Info("撤回消息不入库")
+		return
+	}
 	chatModel := chat_models.ChatModel{
 		SendUserID: sendUserID,
 		RevUserID:  revUserID,
@@ -212,7 +270,7 @@ func InsertMsgByChat(db *gorm.DB, revUserID uint, sendUserID uint, msg ctype.Msg
 	err := db.Create(&chatModel).Error
 	if err != nil {
 		logx.Error(err)
-		sendUser, ok := UserWsMap[sendUserID]
+		sendUser, ok := UserOnlineMap[sendUserID]
 		if !ok {
 			return
 		}
@@ -222,28 +280,37 @@ func InsertMsgByChat(db *gorm.DB, revUserID uint, sendUserID uint, msg ctype.Msg
 
 // SendMsgByUser 发消息，给谁发，谁发的
 func SendMsgByUser(revUserID uint, sendUserID uint, msg ctype.Msg) {
-	revUser, ok := UserWsMap[revUserID]
-	if !ok {
-		return
-	}
-	sendUser, ok := UserWsMap[sendUserID]
+	revUser, ok := UserOnlineMap[revUserID]
 	if !ok {
 		return
 	}
 	resp := ChatResponse{
-		RevUser: ctype.UserInfo{
-			ID:       revUserID,
-			NickName: revUser.UserInfo.Nickname,
-			Avatar:   revUser.UserInfo.Avatar,
-		},
-		SendUser: ctype.UserInfo{
-			ID:       sendUserID,
-			NickName: sendUser.UserInfo.Nickname,
-			Avatar:   sendUser.UserInfo.Avatar,
-		},
 		Msg:       msg,
 		CreatedAt: time.Now(),
 	}
-	byteData, _ := json.Marshal(resp)
-	revUser.Conn.WriteMessage(websocket.TextMessage, byteData)
+	if ok {
+		//接收者在线
+		resp.RevUser = ctype.UserInfo{
+			ID:       revUserID,
+			NickName: revUser.UserInfo.Nickname,
+			Avatar:   revUser.UserInfo.Avatar,
+		}
+		byteData, _ := json.Marshal(resp)
+		revUser.Conn.WriteMessage(websocket.TextMessage, byteData)
+		if sendUserID == revUserID {
+			return
+		}
+	}
+	sendUser, ok := UserOnlineMap[sendUserID]
+	if ok {
+		//发送者在线
+		resp.SendUser = ctype.UserInfo{
+			ID:       sendUserID,
+			NickName: sendUser.UserInfo.Nickname,
+			Avatar:   sendUser.UserInfo.Avatar,
+		}
+		byteData, _ := json.Marshal(resp)
+		sendUser.Conn.WriteMessage(websocket.TextMessage, byteData)
+	}
+
 }
