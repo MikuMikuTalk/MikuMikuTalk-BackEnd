@@ -168,6 +168,10 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					continue
 				}
 			case ctype.FileMsgType:
+				if chatReq.Msg.FileMsg == nil {
+					SendTipErrMsg(conn, "请上传文件")
+					return
+				}
 				// 如果是文件类型，就要去请求文件rpc服务
 				nameList := strings.Split(chatReq.Msg.FileMsg.Src, ".")
 				if len(nameList) == 0 {
@@ -187,6 +191,10 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				chatReq.Msg.FileMsg.Size = fileResponse.FileSize
 				chatReq.Msg.FileMsg.Type = fileResponse.FileType
 			case ctype.WithdrawMsgType:
+				if chatReq.Msg.WithdrawMsg == nil {
+					SendTipErrMsg(conn, "撤回消息id必填")
+					continue
+				}
 				//撤回消息id必填
 				if chatReq.Msg.WithdrawMsg.MsgID == 0 {
 					SendTipErrMsg(conn, "撤回消息id必填")
@@ -227,7 +235,31 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 						},
 					},
 				})
-
+			case ctype.ReplyMsgType:
+				//回复消息
+				//先校验
+				if chatReq.Msg.ReplyMsg == nil || chatReq.Msg.ReplyMsg.MsgID == 0 {
+					SendTipErrMsg(conn, "回复消息id必填")
+					continue
+				}
+				//找到回复的原消息
+				var msgModel chat_models.ChatModel
+				err = svcCtx.DB.Take(&msgModel, chatReq.Msg.ReplyMsg).Error
+				if err != nil {
+					SendTipErrMsg(conn, "消息不存在")
+					continue
+				}
+				userBaseInfo, err := svcCtx.UserRpc.UserBaseInfo(context.Background(), &user_rpc.UserBaseInfoRequest{
+					UserId: uint32(msgModel.SendUserID),
+				})
+				if err != nil {
+					logx.Error(err)
+					return
+				}
+				chatReq.Msg.ReplyMsg.Msg = &msgModel.Msg
+				chatReq.Msg.ReplyMsg.UserID = msgModel.SendUserID
+				chatReq.Msg.ReplyMsg.UserNickName = userBaseInfo.NickName
+				chatReq.Msg.ReplyMsg.OriginMsgDate = msgModel.CreatedAt
 			}
 
 			// 先入库
