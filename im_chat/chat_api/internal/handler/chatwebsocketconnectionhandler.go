@@ -231,7 +231,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			// 先入库
 			InsertMsgByChat(svcCtx.DB, chatReq.RevUserID, myID, chatReq.Msg)
 			// 发送消息给好友
-			SendMsgByUser(chatReq.RevUserID, myID, chatReq.Msg)
+			SendMsgByUser(svcCtx, chatReq.RevUserID, myID, chatReq.Msg)
 
 		}
 	}
@@ -279,14 +279,15 @@ func InsertMsgByChat(db *gorm.DB, revUserID uint, sendUserID uint, msg ctype.Msg
 }
 
 // SendMsgByUser 发消息，给谁发，谁发的
-func SendMsgByUser(revUserID uint, sendUserID uint, msg ctype.Msg) {
-	revUser, ok1 := UserOnlineMap[revUserID]
+func SendMsgByUser(svcCtx *svc.ServiceContext, revUserID uint, sendUserID uint, msg ctype.Msg) {
 
+	revUser, ok1 := UserOnlineMap[revUserID]
 	sendUser, ok2 := UserOnlineMap[sendUserID]
 	resp := ChatResponse{
 		Msg:       msg,
 		CreatedAt: time.Now(),
 	}
+
 	if ok1 && ok2 && sendUserID == revUserID {
 		// 自己给自己发消息
 		resp.RevUser = ctype.UserInfo{
@@ -315,8 +316,20 @@ func SendMsgByUser(revUserID uint, sendUserID uint, msg ctype.Msg) {
 		}
 		byteData, _ := json.Marshal(resp)
 		revUser.Conn.WriteMessage(websocket.TextMessage, byteData)
+	} else {
+		userBaseInfo, err := svcCtx.UserRpc.UserBaseInfo(context.Background(), &user_rpc.UserBaseInfoRequest{
+			UserId: uint32(revUserID),
+		})
+		if err != nil {
+			logx.Error(err)
+			return
+		}
+		resp.RevUser = ctype.UserInfo{
+			ID:       revUserID,
+			NickName: userBaseInfo.NickName,
+			Avatar:   userBaseInfo.Avatar,
+		}
 	}
-
 	if ok2 {
 		//发送者也在线
 		resp.SendUser = ctype.UserInfo{
