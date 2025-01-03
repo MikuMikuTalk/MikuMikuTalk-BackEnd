@@ -45,7 +45,17 @@ type TextMsg struct {
 
 // Scan 取出来的时候的数据
 func (c *Msg) Scan(val interface{}) error {
-	return json.Unmarshal(val.([]byte), c)
+	err := json.Unmarshal(val.([]byte), c)
+	if err != nil {
+		return err
+	}
+	if c.Type == WithdrawMsgType {
+		// 如果这个消息是撤回消息，那就不要把原消息带出去
+		if c.WithdrawMsg != nil {
+			c.WithdrawMsg.OriginMsg = nil
+		}
+	}
+	return nil
 }
 
 // Value 入库的数据
@@ -86,14 +96,14 @@ type VideoCallMsg struct {
 
 // WithdrawMsg 撤回消息
 type WithdrawMsg struct {
-	Content   string `json:"content"`   // 撤回的提示词
-	MsgID     uint   `json:"msgID"`     //需要撤回的消息的id 入参填这个
-	OriginMsg *Msg   `json:"originMsg"` // 原消息
+	Content   string `json:"content"`             // 撤回的提示词
+	MsgID     uint   `json:"msgID"`               //需要撤回的消息的id 入参填这个
+	OriginMsg *Msg   `json:"originMsg,omitempty"` // 原消息
 }
 type ReplyMsg struct {
 	MsgID         uint      `json:"msgID"`   // 消息id
 	Content       string    `json:"content"` // 回复的文本消息，目前只能限制回复文本
-	Msg           *Msg      `json:"msg"`
+	Msg           *Msg      `json:"msg,omitempty"`
 	UserID        uint      `json:"userID"`        // 被回复人的用户id
 	UserNickName  string    `json:"userNickName"`  // 被回复人的昵称
 	OriginMsgDate time.Time `json:"originMsgDate"` // 原消息的时间
