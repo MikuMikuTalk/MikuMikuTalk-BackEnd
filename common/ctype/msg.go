@@ -24,19 +24,19 @@ const (
 )
 
 type Msg struct {
-	Type         MsgType       `json:"type"`         // 消息类型 和msgType一模一样
-	TextMsg      *TextMsg      `json:"textMsg"`      // 文本消息
-	ImageMsg     *ImageMsg     `json:"imageMsg"`     // 图片消息
-	VideoMsg     *VideoMsg     `json:"videoMsg"`     // 视频消息
-	FileMsg      *FileMsg      `json:"fileMsg"`      // 文件消息
-	VoiceMsg     *VoiceMsg     `json:"voiceMsg"`     // 语音消息
-	VoiceCallMsg *VoiceCallMsg `json:"voiceCallMsg"` // 语言通话
-	VideoCallMsg *VideoCallMsg `json:"videoCallMsg"` // 视频通话
-	WithdrawMsg  *WithdrawMsg  `json:"withdrawMsg"`  // 撤回消息
-	ReplyMsg     *ReplyMsg     `json:"replyMsg"`     // 回复消息
-	QuoteMsg     *QuoteMsg     `json:"quoteMsg"`     // 引用消息
-	AtMsg        *AtMsg        `json:"atMsg"`        // @用户的消息 群聊才有
-	TipMsg       *TipMsg       `json:"tipMsg"`       // 提示消息 一般是不入库的
+	Type         MsgType       `json:"type"`                   // 消息类型 和msgType一模一样
+	TextMsg      *TextMsg      `json:"textMsg,omitempty"`      // 文本消息
+	ImageMsg     *ImageMsg     `json:"imageMsg,omitempty"`     // 图片消息
+	VideoMsg     *VideoMsg     `json:"videoMsg,omitempty"`     // 视频消息
+	FileMsg      *FileMsg      `json:"fileMsg,omitempty"`      // 文件消息
+	VoiceMsg     *VoiceMsg     `json:"voiceMsg,omitempty"`     // 语音消息
+	VoiceCallMsg *VoiceCallMsg `json:"voiceCallMsg,omitempty"` // 语言通话
+	VideoCallMsg *VideoCallMsg `json:"videoCallMsg,omitempty"` // 视频通话
+	WithdrawMsg  *WithdrawMsg  `json:"withdrawMsg,omitempty"`  // 撤回消息
+	ReplyMsg     *ReplyMsg     `json:"replyMsg,omitempty"`     // 回复消息
+	QuoteMsg     *QuoteMsg     `json:"quoteMsg,omitempty"`     // 引用消息
+	AtMsg        *AtMsg        `json:"atMsg,omitempty"`        // @用户的消息 群聊才有
+	TipMsg       *TipMsg       `json:"tipMsg,omitempty"`       // 提示消息 一般是不入库的
 }
 
 type TextMsg struct {
@@ -86,9 +86,9 @@ type VideoCallMsg struct {
 
 // WithdrawMsg 撤回消息
 type WithdrawMsg struct {
-	Content   string `json:"content"` // 撤回的提示词
-	MsgID     uint   `json:"msgID"`   //需要撤回的消息的id 入参填这个
-	OriginMsg *Msg   `json:"-"`       // 原消息
+	Content   string `json:"content"`   // 撤回的提示词
+	MsgID     uint   `json:"msgID"`     //需要撤回的消息的id 入参填这个
+	OriginMsg *Msg   `json:"originMsg"` // 原消息
 }
 type ReplyMsg struct {
 	MsgID         uint      `json:"msgID"`   // 消息id

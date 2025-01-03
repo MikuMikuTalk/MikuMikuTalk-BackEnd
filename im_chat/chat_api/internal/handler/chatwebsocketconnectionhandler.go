@@ -213,6 +213,11 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					SendTipErrMsg(conn, "消息不存在，无法撤回")
 					continue
 				}
+				// 如果已经是撤回消息就不能再撤回了
+				if msgModel.Msg.Type == ctype.WithdrawMsgType {
+					SendTipErrMsg(conn, "不能撤回已经撤回的消息")
+					continue
+				}
 				// 判断是不是自己发的
 				if msgModel.SendUserID != myID {
 					//如果不是，提醒用户只能撤回自己的消息
@@ -231,6 +236,9 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				if userInfoMine.UserConfModel.RecallMessage != nil {
 					content = *userInfoMine.UserConfModel.RecallMessage
 				}
+				originMsg := msgModel.Msg
+				originMsg.WithdrawMsg = nil // 这里可能会出现循环引用，所以拷贝了这个值，并且把撤回消息置空
+
 				svcCtx.DB.Model(&msgModel).Updates(chat_models.ChatModel{
 					MsgPreview: "[撤回消息] - " + content,
 					Msg: ctype.Msg{
@@ -238,7 +246,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 						WithdrawMsg: &ctype.WithdrawMsg{
 							Content:   content,
 							MsgID:     chatReq.Msg.WithdrawMsg.MsgID,
-							OriginMsg: &msgModel.Msg,
+							OriginMsg: &originMsg,
 						},
 					},
 				})
