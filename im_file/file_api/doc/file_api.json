@@ -18,9 +18,34 @@
     "application/json"
   ],
   "paths": {
+    "/api/file/download/{fileName}": {
+      "get": {
+        "summary": "文件下载服务",
+        "operationId": "FileDownload",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/FileDownloadResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "fileName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "file"
+        ]
+      }
+    },
     "/api/file/file": {
       "post": {
-        "summary": "文件下载服务",
+        "summary": "文件上传服务",
         "operationId": "File",
         "responses": {
           "200": {
@@ -72,23 +97,19 @@
         ]
       }
     },
-    "/api/file/uploads/{imageType}/{imageName}": {
+    "/api/file/{imageName}": {
       "get": {
         "summary": "图片预览服务",
         "operationId": "ImagePreview",
         "responses": {
           "200": {
             "description": "A successful response.",
-            "schema": {}
+            "schema": {
+              "$ref": "#/definitions/ImagePreviewResponse"
+            }
           }
         },
         "parameters": [
-          {
-            "name": "imageType",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "imageName",
             "in": "path",
@@ -103,6 +124,14 @@
     }
   },
   "definitions": {
+    "FileDownloadRequest": {
+      "type": "object",
+      "title": "FileDownloadRequest"
+    },
+    "FileDownloadResponse": {
+      "type": "object",
+      "title": "FileDownloadResponse"
+    },
     "FileRequest": {
       "type": "object",
       "title": "FileRequest"
@@ -125,6 +154,10 @@
     "ImagePreviewRequest": {
       "type": "object",
       "title": "ImagePreviewRequest"
+    },
+    "ImagePreviewResponse": {
+      "type": "object",
+      "title": "ImagePreviewResponse"
     },
     "ImageRequest": {
       "type": "object",
