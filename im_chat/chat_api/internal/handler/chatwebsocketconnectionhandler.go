@@ -319,6 +319,7 @@ func SendMsgByUser(svcCtx *svc.ServiceContext, revUserID uint, sendUserID uint, 
 			NickName: revUser.UserInfo.Nickname,
 			Avatar:   revUser.UserInfo.Avatar,
 		}
+		resp.IsMe = true
 		byteData, _ := json.Marshal(resp)
 		revUser.Conn.WriteMessage(websocket.TextMessage, byteData)
 	} else {
@@ -342,6 +343,7 @@ func SendMsgByUser(svcCtx *svc.ServiceContext, revUserID uint, sendUserID uint, 
 			NickName: sendUser.UserInfo.Nickname,
 			Avatar:   sendUser.UserInfo.Avatar,
 		}
+		resp.IsMe = false
 		byteData, _ := json.Marshal(resp)
 		sendUser.Conn.WriteMessage(websocket.TextMessage, byteData)
 	}
