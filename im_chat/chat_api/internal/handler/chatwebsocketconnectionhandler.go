@@ -36,10 +36,12 @@ type ChatRequest struct {
 
 // ChatResponse表示对聊天消息的响应。
 type ChatResponse struct {
+	ID        uint           `json:"id"`
+	IsMe      bool           `json:"isMe"`
 	RevUser   ctype.UserInfo `json:"revUser"`
 	SendUser  ctype.UserInfo `json:"sendUser"`
 	Msg       ctype.Msg      `json:"msg"`
-	CreatedAt time.Time      `json:"createdAt"`
+	CreatedAt time.Time      `json:"created_at"`
 }
 
 var UserOnlineMap = make(map[uint]UserWsInfo) // 全局映射以存储用户WebSocket连接。
@@ -229,9 +231,9 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			}
 
 			// 先入库
-			InsertMsgByChat(svcCtx.DB, chatReq.RevUserID, myID, chatReq.Msg)
+			msgID := InsertMsgByChat(svcCtx.DB, chatReq.RevUserID, myID, chatReq.Msg)
 			// 发送消息给好友
-			SendMsgByUser(svcCtx, chatReq.RevUserID, myID, chatReq.Msg)
+			SendMsgByUser(svcCtx, chatReq.RevUserID, myID, chatReq.Msg, msgID)
 
 		}
 	}
@@ -254,7 +256,7 @@ func SendTipErrMsg(conn *websocket.Conn, msg string) {
 }
 
 // InsertMsgByChat 消息入库
-func InsertMsgByChat(db *gorm.DB, revUserID uint, sendUserID uint, msg ctype.Msg) {
+func InsertMsgByChat(db *gorm.DB, revUserID uint, sendUserID uint, msg ctype.Msg) (msgID uint) {
 	switch msg.Type {
 	case ctype.WithdrawMsgType:
 		logx.Info("撤回消息不入库")
@@ -276,14 +278,17 @@ func InsertMsgByChat(db *gorm.DB, revUserID uint, sendUserID uint, msg ctype.Msg
 		}
 		SendTipErrMsg(sendUser.Conn, "消息保存失败")
 	}
+
+	return chatModel.ID
 }
 
 // SendMsgByUser 发消息，给谁发，谁发的
-func SendMsgByUser(svcCtx *svc.ServiceContext, revUserID uint, sendUserID uint, msg ctype.Msg) {
+func SendMsgByUser(svcCtx *svc.ServiceContext, revUserID uint, sendUserID uint, msg ctype.Msg, msgID uint) {
 
 	revUser, ok1 := UserOnlineMap[revUserID]
 	sendUser, ok2 := UserOnlineMap[sendUserID]
 	resp := ChatResponse{
+		ID:        msgID,
 		Msg:       msg,
 		CreatedAt: time.Now(),
 	}
