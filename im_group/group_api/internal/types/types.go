@@ -7,9 +7,9 @@ type GroupCreateRequest struct {
 	Token      string `header:"Authorization"`
 	Mode       int8   `json:"mode"` // 模式  1 直接创建模式 2 选人创建模式
 	Name       string `json:"name"`
-	IsSearch   bool   `json:"isSearch"`   // 是否可以搜到
-	Size       int    `json:"size"`       // 群规模
-	UserIDList []uint `json:"userIdList"` // 用户id列表
+	IsSearch   bool   `json:"isSearch"`             // 是否可以搜到
+	Size       int    `json:"size"`                 // 群规模
+	UserIDList []uint `json:"userIdList,omitempty"` // 用户id列表
 }
 
 type GroupCreateResponse struct {
