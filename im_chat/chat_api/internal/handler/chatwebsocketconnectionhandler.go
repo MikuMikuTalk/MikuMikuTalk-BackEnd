@@ -69,13 +69,21 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			response.Response(r, w, nil, err)
 			return
 		}
+		addr := conn.RemoteAddr().String()
 		defer func() {
 			// 关闭连接时删除用户的WebSocket连接
 			conn.Close()
-			// 删除用户的WebSocket连接
-			delete(UserOnlineWsMap, myID)
-			// 删除在线用户
-			svcCtx.Redis.HDel("online_user", fmt.Sprintf("%d", myID))
+			UserWsInfo, ok := UserOnlineWsMap[myID]
+			if ok {
+				//删除退出的ws连接
+				delete(UserWsInfo.WsClientMap, addr)
+			}
+			if UserWsInfo != nil && len(UserWsInfo.WsClientMap) == 0 {
+				// 代表这个用户最后一个连接断开了
+				delete(UserOnlineWsMap, myID)
+				svcCtx.Redis.HDel("online_user", fmt.Sprintf("%d", myID))
+			}
+
 		}()
 
 		// 获取我的用户信息
@@ -94,7 +102,6 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			return
 		}
 
-		var addr string = conn.RemoteAddr().String()
 		userWsInfo, ok := UserOnlineWsMap[myID]
 		if !ok {
 			userWsInfo = &UserWsInfo{
