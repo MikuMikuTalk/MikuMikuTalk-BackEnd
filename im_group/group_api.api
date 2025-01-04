@@ -2,11 +2,11 @@ syntax = "v1"
 
 type groupCreateRequest {
 	Token      string `header:"Authorization"`
-	Mode       int8   `json:"mode"` // 模式  1 直接创建模式 2 选人创建模式
-	Name       string `json:"name"`
-	IsSearch   bool   `json:"isSearch"` // 是否可以搜到
-	Size       int    `json:"size"` // 群规模
-	UserIDList []uint `json:"userIdList"` // 用户id列表
+	Mode       int8   `json:"mode,optional"` // 模式  1 直接创建模式 2 选人创建模式
+	Name       string `json:"name,optional"`
+	IsSearch   bool   `json:"isSearch,optional"` // 是否可以搜到
+	Size       int    `json:"size,optional"` // 群规模
+	UserIDList []uint `json:"userIdList,optional"` // 用户id列表
 }
 
 type groupCreateResponse {}
