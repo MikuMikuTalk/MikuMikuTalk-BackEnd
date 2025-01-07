@@ -12,6 +12,7 @@ import (
 	"im_server/im_group/group_models"
 	"im_server/im_user/user_rpc/types/user_rpc"
 	"im_server/utils/jwts"
+	"im_server/utils/set"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -64,6 +65,18 @@ func (l *GroupCreateLogic) GroupCreate(req *types.GroupCreateRequest) (resp *typ
 		for _, u := range req.UserIDList {
 			UserIDList = append(UserIDList, uint32(u))
 			groupUserList = append(groupUserList, u)
+		}
+		userFriendResponse, err := l.svcCtx.UserRpc.FriendList(context.Background(), &user_rpc.FriendListRequest{
+			User: uint32(my_id),
+		})
+		var friendIDList []uint
+		for _, i := range userFriendResponse.FriendList {
+			friendIDList = append(friendIDList, uint(i.UserId))
+		}
+		// 判断它们两个是不是一致的,邀请人进群必须是自己的好友才行，不是自己的好友不能把人家拉入群
+		slice := set.Difference(set.NewSet(req.UserIDList), set.NewSet(friendIDList))
+		if slice.Size() != 0 {
+			return nil, errors.New("选择的好友列表中有人不是你的好友")
 		}
 		userListResponse, err1 := l.svcCtx.UserRpc.UserListInfo(context.Background(), &user_rpc.UserListInfoRequest{
 			UserIdList: UserIDList,
