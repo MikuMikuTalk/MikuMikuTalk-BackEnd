@@ -7,7 +7,9 @@ import (
 	"im_server/im_group/group_api/internal/svc"
 	"im_server/im_group/group_api/internal/types"
 	"im_server/im_group/group_models"
+	"im_server/im_group/group_rpc/types/group_rpc"
 	"im_server/im_user/user_rpc/types/user_rpc"
+	"im_server/utils/jwts"
 	"im_server/utils/set"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -28,16 +30,29 @@ func NewGroupInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GroupIn
 }
 
 func (l *GroupInfoLogic) GroupInfo(req *types.GroupInfoRequest) (resp *types.GroupInfoResponse, err error) {
-	// claims, err := jwts.ParseToken(req.Token, l.svcCtx.Config.Auth.AuthSecret)
+	claims, err1 := jwts.ParseToken(req.Token, l.svcCtx.Config.Auth.AuthSecret)
+	if err1 != nil {
+		err = err1
+		return
+	}
+	my_id := claims.UserID
+	// 谁能调这个接口 必须得是这个群的成员
+	isInGroup, err := l.svcCtx.GroupRpc.IsInGroup(context.Background(), &group_rpc.IsInGroupRequest{
+		UserId:  uint32(my_id),
+		GroupId: uint32(req.ID),
+	})
+	if err != nil {
+		logx.Error(err)
+		return nil, errors.New("改用户不是群成员")
+	}
+	if isInGroup.IsInGroup == false {
+		return nil, errors.New("改用户不是群成员")
+	}
 	var groupModel group_models.GroupModel
-	err = l.svcCtx.DB.Take(&groupModel, "id = ?", req.ID).Error
+	err = l.svcCtx.DB.Preload("MemberList").Take(&groupModel, "id = ?", req.ID).Error
 	if err != nil {
 		return nil, errors.New("群不存在")
 	}
-	// err = l.svcCtx.DB.Preload("MemberList").Take(&groupModel,my_id).Error
-	// if err != nil {
-	// 	return nil,errors.New("群不存在")
-	// }
 
 	resp = &types.GroupInfoResponse{
 		GroupID:     req.ID,

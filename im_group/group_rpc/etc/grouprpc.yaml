@@ -1,0 +1,18 @@
+Name: grouprpc.rpc
+ListenOn: 0.0.0.0:30025
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: grouprpc.rpc
+Mysql:
+  DataSource: root:123456@tcp(127.0.0.1:3306)/im_server_db?charset=utf8mb4&parseTime=True&loc=Local
+Redis:
+  Addr: 127.0.0.1:6379
+  Pwd:
+  DB: 0
+Log:
+  ServiceName: user_rpc
+  Encoding: plain
+  Timeout: 2006-01-02 15:04:05
+  Level: debug
+  Stat: false
