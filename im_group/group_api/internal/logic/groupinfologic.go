@@ -61,29 +61,28 @@ func (l *GroupInfoLogic) GroupInfo(req *types.GroupInfoRequest) (resp *types.Gro
 		MemberCount: len(groupModel.MemberList),
 		Avatar:      groupModel.Avatar,
 	}
-	//查询用户列表信息
+	// 查询用户列表信息
 
 	var userAllIDList []uint32
 	for _, model := range groupModel.MemberList {
-		//1 群主 2 管理员  3 普通成员
+		// 1 群主 2 管理员  3 普通成员
 		userAllIDList = append(userAllIDList, uint32(model.UserID))
 	}
 	// 获取这些用户的基本信息 NickName Avatar
 	userListResponse, err := l.svcCtx.UserRpc.UserListInfo(context.Background(), &user_rpc.UserListInfoRequest{
 		UserIdList: userAllIDList,
 	})
-
 	if err != nil {
 		return
 	}
 	// 计算在线人数总数
 	userOnlineResponse, err := l.svcCtx.UserRpc.UserOnlineList(context.Background(), &user_rpc.UserOnlineListRequest{})
 	if err != nil {
-		//所有的在线人数
+		// 所有的在线人数
 		allOnlineUsersIDList := set.NewSet(userOnlineResponse.UserIdList)
 		// 群里面所有的群成员id
 		allUserIDList := set.NewSet(userAllIDList)
-		//两个求交集，就能拿到群里面在线的人数了
+		// 两个求交集，就能拿到群里面在线的人数了
 		groupOnlineIDList := set.InterSet(allOnlineUsersIDList, allUserIDList)
 		resp.MemberOnlineCount = groupOnlineIDList.Size()
 	}

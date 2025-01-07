@@ -38,16 +38,16 @@ func (l *GroupCreateLogic) GroupCreate(req *types.GroupCreateRequest) (resp *typ
 		return
 	}
 	my_id := claims.UserID
-	var groupModel = group_models.GroupModel{
+	groupModel := group_models.GroupModel{
 		Creator:      my_id,
 		Abstract:     fmt.Sprintf("本群创建于%s:  群主很懒,什么都没有留下", time.Now().Format("2006-01-02")),
 		IsSearch:     false,
 		Verification: 2,
 		Size:         50,
 	}
-	var groupUserList = []uint{my_id}
+	groupUserList := []uint{my_id}
 	switch req.Mode {
-	case 1: //直接创建模式
+	case 1: // 直接创建模式
 		if req.Name == "" {
 			return nil, errors.New("群名不可以为空")
 		}
@@ -57,11 +57,11 @@ func (l *GroupCreateLogic) GroupCreate(req *types.GroupCreateRequest) (resp *typ
 		groupModel.Title = req.Name
 		groupModel.Size = req.Size
 		groupModel.IsSearch = req.IsSearch
-	case 2: //选人创建模式
+	case 2: // 选人创建模式
 		if len(req.UserIDList) == 0 {
 			return nil, errors.New("用户列表不可以为空")
 		}
-		var UserIDList = []uint32{uint32(my_id)} //把自己放进去
+		UserIDList := []uint32{uint32(my_id)} // 把自己放进去
 		for _, u := range req.UserIDList {
 			UserIDList = append(UserIDList, uint32(u))
 			groupUserList = append(groupUserList, u)
@@ -97,7 +97,7 @@ func (l *GroupCreateLogic) GroupCreate(req *types.GroupCreateRequest) (resp *typ
 	default:
 		return nil, errors.New("不支持的模式")
 	}
-	//群头像
+	// 群头像
 	// 1.默认头像 2.文字头像
 	groupModel.Avatar = string([]rune(groupModel.Title)[0])
 	err = l.svcCtx.DB.Create(&groupModel).Error
@@ -113,7 +113,7 @@ func (l *GroupCreateLogic) GroupCreate(req *types.GroupCreateRequest) (resp *typ
 			Role:    3,
 		}
 		if i == 0 {
-			//设置为群主
+			// 设置为群主
 			memberModel.Role = 1
 		}
 		memebers = append(memebers, memberModel)

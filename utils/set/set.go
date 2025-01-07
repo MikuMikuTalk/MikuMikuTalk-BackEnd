@@ -2,10 +2,12 @@ package set
 
 import "fmt"
 
-type void struct{}
-type Set struct {
-	m map[any]void
-}
+type (
+	void struct{}
+	Set  struct {
+		m map[any]void
+	}
+)
 
 // 创建一个新的集合
 func NewSet(items ...any) *Set {
@@ -106,7 +108,7 @@ func Difference(set1, set2 *Set) *Set {
 
 func (s *Set) String() string {
 	str := ""
-	for key, _ := range s.m {
+	for key := range s.m {
 		str += fmt.Sprintf("%v,", key)
 	}
 	if len(s.m) > 0 {

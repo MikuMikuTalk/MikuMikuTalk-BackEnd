@@ -28,7 +28,7 @@ func NewUserOnlineListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Us
 func (l *UserOnlineListLogic) UserOnlineList(in *user_rpc.UserOnlineListRequest) (resp *user_rpc.UserOnlineListResponse, err error) {
 	resp = new(user_rpc.UserOnlineListResponse)
 	onlineMap := l.svcCtx.Redis.HGetAll("online").Val()
-	for key, _ := range onlineMap {
+	for key := range onlineMap {
 		val, err := strconv.Atoi(key)
 		if err != nil {
 			logx.Error(err)

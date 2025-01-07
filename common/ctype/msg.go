@@ -97,7 +97,7 @@ type VideoCallMsg struct {
 // WithdrawMsg 撤回消息
 type WithdrawMsg struct {
 	Content   string `json:"content"`             // 撤回的提示词
-	MsgID     uint   `json:"msgID"`               //需要撤回的消息的id 入参填这个
+	MsgID     uint   `json:"msgID"`               // 需要撤回的消息的id 入参填这个
 	OriginMsg *Msg   `json:"originMsg,omitempty"` // 原消息
 }
 type ReplyMsg struct {

@@ -75,7 +75,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			conn.Close()
 			UserWsInfo, ok := UserOnlineWsMap[myID]
 			if ok {
-				//删除退出的ws连接
+				// 删除退出的ws连接
 				delete(UserWsInfo.WsClientMap, addr)
 			}
 			if UserWsInfo != nil && len(UserWsInfo.WsClientMap) == 0 {
@@ -83,7 +83,6 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				delete(UserOnlineWsMap, myID)
 				svcCtx.Redis.HDel("online_user", fmt.Sprintf("%d", myID))
 			}
-
 		}()
 
 		// 获取我的用户信息
@@ -107,11 +106,11 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			userWsInfo = &UserWsInfo{
 				UserInfo: userInfoMine,
 				WsClientMap: map[string]*websocket.Conn{
-					addr: conn, //当前的连接对象
+					addr: conn, // 当前的连接对象
 				},
 				CurrentConn: conn,
 			}
-			//代表这个用户第一次连接服务器
+			// 代表这个用户第一次连接服务器
 			UserOnlineWsMap[myID] = userWsInfo
 			// 存储在线用户
 			svcCtx.Redis.HSet("online_user", fmt.Sprintf("%d", myID), myID)
@@ -228,14 +227,14 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					SendTipErrMsg(conn, "撤回消息id必填")
 					continue
 				}
-				//撤回消息id必填
+				// 撤回消息id必填
 				if chatReq.Msg.WithdrawMsg.MsgID == 0 {
 					SendTipErrMsg(conn, "撤回消息id必填")
 					continue
 				}
-				//自己只能撤回自己的消息
+				// 自己只能撤回自己的消息
 				var msgModel chat_models.ChatModel
-				//查看消息是否存在
+				// 查看消息是否存在
 				if err = svcCtx.DB.Take(&msgModel, chatReq.Msg.WithdrawMsg.MsgID).Error; err != nil {
 					SendTipErrMsg(conn, "消息不存在，无法撤回")
 					continue
@@ -247,18 +246,18 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				}
 				// 判断是不是自己发的
 				if msgModel.SendUserID != myID {
-					//如果不是，提醒用户只能撤回自己的消息
+					// 如果不是，提醒用户只能撤回自己的消息
 					SendTipErrMsg(conn, "只能撤回自己的消息")
 					continue
 				}
-				//判断消息时间，如果超过三分钟，就提示不能撤回了
+				// 判断消息时间，如果超过三分钟，就提示不能撤回了
 				now := time.Now()
 				subTime := now.Sub(msgModel.CreatedAt)
 				if subTime >= time.Minute*3 {
 					SendTipErrMsg(conn, "超过三分钟的消息不能被撤回")
 					continue
 				}
-				//撤回逻辑
+				// 撤回逻辑
 				var content string = fmt.Sprintf("%s 撤回了一条消息", userInfoMine.Nickname)
 				if userInfoMine.UserConfModel.RecallMessage != nil {
 					content = *userInfoMine.UserConfModel.RecallMessage
@@ -279,13 +278,13 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					},
 				})
 			case ctype.ReplyMsgType:
-				//回复消息
-				//先校验
+				// 回复消息
+				// 先校验
 				if chatReq.Msg.ReplyMsg == nil || chatReq.Msg.ReplyMsg.MsgID == 0 {
 					SendTipErrMsg(conn, "回复消息id必填")
 					continue
 				}
-				//找到回复的原消息
+				// 找到回复的原消息
 				var msgModel chat_models.ChatModel
 				err = svcCtx.DB.Take(&msgModel, chatReq.Msg.ReplyMsg).Error
 				if err != nil {
@@ -308,8 +307,8 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				chatReq.Msg.ReplyMsg.UserNickName = userBaseInfo.NickName
 				chatReq.Msg.ReplyMsg.OriginMsgDate = msgModel.CreatedAt
 			case ctype.QuoteMsgType:
-				//回复消息
-				//先校验
+				// 回复消息
+				// 先校验
 				if chatReq.Msg.QuoteMsg == nil || chatReq.Msg.QuoteMsg.MsgID == 0 {
 					SendTipErrMsg(conn, "引用消息id必填")
 					continue
@@ -404,7 +403,6 @@ func InsertMsgByChat(db *gorm.DB, revUserID uint, sendUserID uint, msg ctype.Msg
 
 // SendMsgByUser 发消息，给谁发，谁发的
 func SendMsgByUser(svcCtx *svc.ServiceContext, revUserID uint, sendUserID uint, msg ctype.Msg, msgID uint) {
-
 	revUser, ok1 := UserOnlineWsMap[revUserID]
 	sendUser, ok2 := UserOnlineWsMap[sendUserID]
 	resp := ChatResponse{
@@ -431,10 +429,10 @@ func SendMsgByUser(svcCtx *svc.ServiceContext, revUserID uint, sendUserID uint, 
 		return
 	}
 
-	//在线情况下，可以拿到对方用户信息
-	//对方不在线的情况下，只能通过调用用户信息的Rpc方法获取用户信息
+	// 在线情况下，可以拿到对方用户信息
+	// 对方不在线的情况下，只能通过调用用户信息的Rpc方法获取用户信息
 	if ok1 {
-		//接收者在线
+		// 接收者在线
 		resp.RevUser = ctype.UserInfo{
 			ID:       revUserID,
 			NickName: revUser.UserInfo.Nickname,
@@ -457,7 +455,7 @@ func SendMsgByUser(svcCtx *svc.ServiceContext, revUserID uint, sendUserID uint, 
 		}
 	}
 	if ok2 {
-		//发送者也在线
+		// 发送者也在线
 		resp.SendUser = ctype.UserInfo{
 			ID:       sendUserID,
 			NickName: sendUser.UserInfo.Nickname,
@@ -468,5 +466,4 @@ func SendMsgByUser(svcCtx *svc.ServiceContext, revUserID uint, sendUserID uint, 
 		sendWsMapMsg(sendUser.WsClientMap, byteData)
 		// sendUser.CurrentConn.WriteMessage(websocket.TextMessage, byteData)
 	}
-
 }
