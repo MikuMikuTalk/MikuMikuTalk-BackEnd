@@ -9,6 +9,15 @@ type UserInfo struct {
 	Nickname string `json:"nickname"`
 }
 
+type VerificationQuestion struct {
+	Problem1 *string `json:"problem1,optional" conf:"problem1"`
+	Problem2 *string `json:"problem2,optional" conf:"problem2"`
+	Problem3 *string `json:"problem3,optional" conf:"problem3"`
+	Answer1  *string `json:"answer1,optional" conf:"answer1"`
+	Answer2  *string `json:"answer2,optional" conf:"answer2"`
+	Answer3  *string `json:"answer3,optional" conf:"answer3"`
+}
+
 type GroupCreateRequest struct {
 	Token      string `header:"Authorization"`
 	Mode       int8   `json:"mode,optional"` // 模式  1 直接创建模式 2 选人创建模式
@@ -35,4 +44,21 @@ type GroupInfoResponse struct {
 	Avatar            string     `json:"avatar"`
 	Creator           UserInfo   `json:"creator"`
 	AdminList         []UserInfo `json:"adminList"`
+}
+
+type GroupUpdateRequest struct {
+	Token                string                `header:"Authorization"`
+	ID                   uint                  `json:"id"`                                                       // 群id
+	IsSearch             *bool                 `json:"isSearch,optional"  conf:"is_search"`                      // 是否可以被搜索
+	Avatar               *string               `json:"avatar,optional"  conf:"avatar"`                           // 群头像
+	Abstract             *string               `json:"abstract,optional"  conf:"abstract"`                       // 群简介
+	Title                *string               `json:"title,optional"  conf:"title"`                             // 群名
+	Verification         *int8                 `json:"verification,optional"  conf:"verification"`               // 群验证
+	IsInvite             *bool                 `json:"isInvite,optional"  conf:"is_invite"`                      // 是否可邀请好友
+	IsTemporarySession   *bool                 `json:"isTemporarySession,optional"  conf:"is_temporary_session"` // 是否开启临时会话
+	IsProhibition        *bool                 `json:"isProhibition,optional" conf:"is_prohibition"`             // 是否开启全员禁言
+	VerificationQuestion *VerificationQuestion `json:"verificationQuestion,optional" conf:"verification_question"`
+}
+
+type GroupUpdateResponse struct {
 }
