@@ -58,6 +58,13 @@ type groupUpdateRequest {
 
 type groupUpdateResponse {}
 
+type groupRemoveRequest {
+	Token string `header:"Authorization"`
+	ID    uint   `path:"id"` // 群id
+}
+
+type groupRemoveResponse {}
+
 service group {
 	@handler groupCreate
 	post /api/group/group (groupCreateRequest) returns (groupCreateResponse) // 创建群
@@ -67,6 +74,9 @@ service group {
 
 	@handler groupUpdate
 	put /api/group/group (groupUpdateRequest) returns (groupUpdateResponse)
+
+	@handler groupRemove
+	delete /api/group/group/:id (groupRemoveRequest) returns (groupRemoveResponse) // 群解散
 }
 
 // goctl api go -api group_api.api -dir . --home ../../template

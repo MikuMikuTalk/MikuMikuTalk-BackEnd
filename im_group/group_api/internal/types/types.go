@@ -46,6 +46,14 @@ type GroupInfoResponse struct {
 	AdminList         []UserInfo `json:"adminList"`
 }
 
+type GroupRemoveRequest struct {
+	Token string `header:"Authorization"`
+	ID    uint   `path:"id"` // 群id
+}
+
+type GroupRemoveResponse struct {
+}
+
 type GroupUpdateRequest struct {
 	Token                string                `header:"Authorization"`
 	ID                   uint                  `json:"id"`                                                       // 群id
