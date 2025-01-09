@@ -1,4 +1,16 @@
 {
-    "go.toolsManagement.checkForUpdates": "proxy",
-    "workbench.editor.wrapTabs": true
+  "go.toolsManagement.checkForUpdates": "proxy",
+  "workbench.editor.wrapTabs": true,
+  "go.useLanguageServer": true,
+  "go.languageServerFlags": ["-remote=auto", "-rpc.trace"],
+  "[go]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "gopls": {
+    "usePlaceholders": true // add parameter placeholders when completing a function
+  },
+  "files.eol": "\n" // formatting only supports LF line endings
 }
