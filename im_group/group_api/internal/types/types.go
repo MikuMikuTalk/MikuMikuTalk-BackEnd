@@ -3,6 +3,17 @@
 
 package types
 
+type GroupMemberInfo struct {
+	UserID         uint   `json:"userId"`
+	UserNickname   string `json:"userNickname"`
+	Avatar         string `json:"avatar"`
+	IsOnline       bool   `json:"isOnline"`
+	Role           int8   `json:"role"`
+	MemberNickname string `json:"memberNickname"`
+	CreatedAt      string `json:"createdAt"`
+	NewMsgDate     string `json:"newMsgDate"`
+}
+
 type UserInfo struct {
 	UserID   uint   `json:"userId"`
 	Avatar   string `json:"avatar"`
@@ -44,7 +55,20 @@ type GroupInfoResponse struct {
 	Avatar            string     `json:"avatar"`
 	Creator           UserInfo   `json:"creator"`
 	AdminList         []UserInfo `json:"adminList"`
-	Role              int8       `json:"role"` // 角色	 1 群主 2 群管理员 3 群成员
+	Role              int8       `json:"role"` // 角色  1 群主 2 群管理员 3 群成员
+}
+
+type GroupMemberRequest struct {
+	Token string `header:"Authorization"`
+	ID    uint   `form:"id"`
+	Page  int    `form:"page,optional"`
+	Limit int    `form:"limit,optional"`
+	Sort  string `form:"sort,optional"`
+}
+
+type GroupMemberResponse struct {
+	List  []GroupMemberInfo `json:"list"`
+	Count int               `json:"count"`
 }
 
 type GroupRemoveRequest struct {
