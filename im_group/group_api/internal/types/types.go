@@ -58,6 +58,15 @@ type GroupInfoResponse struct {
 	Role              int8       `json:"role"` // 角色  1 群主 2 群管理员 3 群成员
 }
 
+type GroupMemberRemoveRequest struct {
+	Token    string `header:"Authorization"`
+	ID       uint   `form:"id"`       // 群id
+	MemberID uint   `form:"memberId"` // 成员id
+}
+
+type GroupMemberRemoveResponse struct {
+}
+
 type GroupMemberRequest struct {
 	Token string `header:"Authorization"`
 	ID    uint   `form:"id"`

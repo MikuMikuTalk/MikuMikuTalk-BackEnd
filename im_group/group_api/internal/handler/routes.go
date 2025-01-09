@@ -39,6 +39,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/api/group/member",
 				Handler: groupMemberHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/group/member",
+				Handler: groupMemberRemoveHandler(serverCtx),
+			},
 		},
 	)
 }
