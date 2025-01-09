@@ -31,6 +31,7 @@ func (l *FriendListLogic) FriendList(in *user_rpc.FriendListRequest) (*user_rpc.
 		PageInfo: models.PageInfo{
 			Limit: -1, // 查看全部
 		},
+		Where:   l.svcCtx.DB.Where("send_user_id = ? or rev_user_id = ?", in.User, in.User),
 		Preload: []string{"SendUserModel", "RevUserModel"},
 	})
 	var list []*user_rpc.FriendInfo

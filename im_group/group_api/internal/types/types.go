@@ -14,6 +14,13 @@ type GroupMemberInfo struct {
 	NewMsgDate     string `json:"newMsgDate"`
 }
 
+type GroupfriendsResponse struct {
+	UserId    uint   `json:"userId"`
+	Avatar    string `json:"avatar"`
+	Nickname  string `json:"nickname"`
+	IsInGroup bool   `json:"isInGroup"` // 是否在群里面
+}
+
 type UserInfo struct {
 	UserID   uint   `json:"userId"`
 	Avatar   string `json:"avatar"`
@@ -132,4 +139,14 @@ type GroupUpdateRequest struct {
 }
 
 type GroupUpdateResponse struct {
+}
+
+type GroupfriendsListRequest struct {
+	Token string `header:"Authorization"`
+	ID    uint   `form:"id"` // 群id
+}
+
+type GroupfriendsListResponse struct {
+	List  []GroupfriendsResponse `json:"list"`
+	Count int                    `json:"count"`
 }

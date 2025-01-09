@@ -41,6 +41,7 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest, token string)
 			Page:  req.Page,
 			Limit: req.Limit,
 		},
+		Where:   l.svcCtx.DB.Where("send_user_id = ? or rev_user_id = ?", user_id, user_id),
 		Preload: []string{"SendUserModel", "RevUserModel"},
 	})
 

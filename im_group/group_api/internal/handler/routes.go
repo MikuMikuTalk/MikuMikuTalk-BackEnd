@@ -15,6 +15,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				Method:  http.MethodGet,
+				Path:    "/api/group/friends",
+				Handler: groupfriendsListHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodPost,
 				Path:    "/api/group/group",
 				Handler: groupCreateHandler(serverCtx),
