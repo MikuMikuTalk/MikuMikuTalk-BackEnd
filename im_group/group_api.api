@@ -106,6 +106,15 @@ type groupMemberAddRequest {
 
 type groupMemberAddResponse {}
 
+type groupMemberNicknameUpdateRequest {
+	Token    string `header:"Authorization"`
+	ID       uint   `json:"id"` // 群id
+	MemberID uint   `json:"memberId"` // 成员id
+	Nickname string `json:"nickname"` // 昵称
+}
+
+type groupMemberNicknameUpdateResponse {}
+
 service group {
 	@handler groupCreate
 	post /api/group/group (groupCreateRequest) returns (groupCreateResponse) // 创建群
@@ -127,6 +136,9 @@ service group {
 
 	@handler groupMemberAdd
 	post /api/group/member (groupMemberAddRequest) returns (groupMemberAddResponse) // 邀请用户进入群聊
+
+	@handler groupMemberNicknameUpdate
+	put /api/group/member/nickname (groupMemberNicknameUpdateRequest) returns (groupMemberNicknameUpdateResponse) // 修改群成员昵称
 }
 
 // goctl api go -api group_api.api -dir . --home ../../template
