@@ -141,6 +141,28 @@ type groupfriendsListResponse {
 	Count int                    `json:"count"`
 }
 
+type groupSearchRequest {
+	Token string `header:"Authorization"`
+	Key   string `form:"key,optional"` // 用户id和昵称
+	Page  int    `form:"page,optional"`
+	Limit int    `form:"limit,optional"`
+}
+
+type GroupSearchResponse {
+	GroupID         uint   `json:"groupId"`
+	Title           string `json:"title"`
+	Abstract        string `json:"abstract"`
+	Avatar          string `json:"avatar"`
+	IsInGroup       bool   `json:"isInGroup"` // 我是否在群里面
+	UserCount       int    `json:"userCount"` // 群用户总数
+	UserOnlineCount int    `json:"userOnlineCount"` // 群用户在线总数
+}
+
+type groupSearchListResponse {
+	List  []GroupSearchResponse `json:"list"`
+	Count int                   `json:"count"`
+}
+
 service group {
 	@handler groupCreate
 	post /api/group/group (groupCreateRequest) returns (groupCreateResponse) // 创建群
@@ -171,6 +193,9 @@ service group {
 
 	@handler groupfriendsList
 	get /api/group/friends (groupfriendsListRequest) returns (groupfriendsListResponse) // 我的好友哪些在这个群里面
+
+	@handler groupSearch
+	get /api/group/search (groupSearchRequest) returns (groupSearchListResponse) // 群搜索
 }
 
 // goctl api go -api group_api.api -dir . --home ../../template

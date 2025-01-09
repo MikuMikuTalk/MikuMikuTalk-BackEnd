@@ -14,6 +14,16 @@ type GroupMemberInfo struct {
 	NewMsgDate     string `json:"newMsgDate"`
 }
 
+type GroupSearchResponse struct {
+	GroupID         uint   `json:"groupId"`
+	Title           string `json:"title"`
+	Abstract        string `json:"abstract"`
+	Avatar          string `json:"avatar"`
+	IsInGroup       bool   `json:"isInGroup"`       // 我是否在群里面
+	UserCount       int    `json:"userCount"`       // 群用户总数
+	UserOnlineCount int    `json:"userOnlineCount"` // 群用户在线总数
+}
+
 type GroupfriendsResponse struct {
 	UserId    uint   `json:"userId"`
 	Avatar    string `json:"avatar"`
@@ -122,6 +132,18 @@ type GroupRemoveRequest struct {
 }
 
 type GroupRemoveResponse struct {
+}
+
+type GroupSearchListResponse struct {
+	List  []GroupSearchResponse `json:"list"`
+	Count int                   `json:"count"`
+}
+
+type GroupSearchRequest struct {
+	Token string `header:"Authorization"`
+	Key   string `form:"key,optional"` // 用户id和昵称
+	Page  int    `form:"page,optional"`
+	Limit int    `form:"limit,optional"`
 }
 
 type GroupUpdateRequest struct {
