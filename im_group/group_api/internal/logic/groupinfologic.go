@@ -7,7 +7,6 @@ import (
 	"im_server/im_group/group_api/internal/svc"
 	"im_server/im_group/group_api/internal/types"
 	"im_server/im_group/group_models"
-	"im_server/im_group/group_rpc/types/group_rpc"
 	"im_server/im_user/user_rpc/types/user_rpc"
 	"im_server/utils/jwts"
 	"im_server/utils/set"
@@ -36,30 +35,25 @@ func (l *GroupInfoLogic) GroupInfo(req *types.GroupInfoRequest) (resp *types.Gro
 		return
 	}
 	my_id := claims.UserID
-	// 谁能调这个接口 必须得是这个群的成员
-	isInGroup, err := l.svcCtx.GroupRpc.IsInGroup(context.Background(), &group_rpc.IsInGroupRequest{
-		UserId:  uint32(my_id),
-		GroupId: uint32(req.ID),
-	})
-	if err != nil {
-		logx.Error(err)
-		return nil, errors.New("改用户不是群成员")
-	}
-	if isInGroup.IsInGroup == false {
-		return nil, errors.New("改用户不是群成员")
-	}
+
 	var groupModel group_models.GroupModel
 	err = l.svcCtx.DB.Preload("MemberList").Take(&groupModel, "id = ?", req.ID).Error
 	if err != nil {
 		return nil, errors.New("群不存在")
 	}
-
+	// 谁能调这个接口 必须得是这个群的成员
+	var member group_models.GroupMemberModel
+	err = l.svcCtx.DB.Take(&member, "group_id = ? and user_id = ?", req.ID, my_id).Error
+	if err != nil {
+		return nil, errors.New("该用户不是群成员")
+	}
 	resp = &types.GroupInfoResponse{
 		GroupID:     req.ID,
 		Title:       groupModel.Title,
 		Abstract:    groupModel.Abstract,
 		MemberCount: len(groupModel.MemberList),
 		Avatar:      groupModel.Avatar,
+		Role:        member.Role,
 	}
 	// 查询用户列表信息
 

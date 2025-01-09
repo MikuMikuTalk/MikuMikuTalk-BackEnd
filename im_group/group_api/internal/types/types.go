@@ -44,6 +44,7 @@ type GroupInfoResponse struct {
 	Avatar            string     `json:"avatar"`
 	Creator           UserInfo   `json:"creator"`
 	AdminList         []UserInfo `json:"adminList"`
+	Role              int8       `json:"role"` // 角色	 1 群主 2 群管理员 3 群成员
 }
 
 type GroupRemoveRequest struct {
