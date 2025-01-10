@@ -163,6 +163,16 @@ type groupSearchListResponse {
 	Count int                   `json:"count"`
 }
 
+type GroupValidRequest {
+	Token   string `header:"Authorization"`
+	GroupID uint   `json:"groupID"`
+}
+
+type GroupValidResponse {
+	Verification         int8                 `json:"verification"` // 好友验证
+	VerificationQuestion VerificationQuestion `json:"verificationQuestion"` // 问题和答案，但是答案不要返回
+}
+
 service group {
 	@handler groupCreate
 	post /api/group/group (groupCreateRequest) returns (groupCreateResponse) // 创建群
@@ -196,6 +206,9 @@ service group {
 
 	@handler groupSearch
 	get /api/group/search (groupSearchRequest) returns (groupSearchListResponse) // 群搜索
+
+	@handler groupValid
+	post /api/group/valid (GroupValidRequest) returns (GroupValidResponse) // 群验证
 }
 
 // goctl api go -api group_api.api -dir . --home ../../template

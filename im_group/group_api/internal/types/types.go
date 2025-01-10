@@ -24,6 +24,16 @@ type GroupSearchResponse struct {
 	UserOnlineCount int    `json:"userOnlineCount"` // 群用户在线总数
 }
 
+type GroupValidRequest struct {
+	Token   string `header:"Authorization"`
+	GroupID uint   `json:"groupID"`
+}
+
+type GroupValidResponse struct {
+	Verification         int8                 `json:"verification"`         // 好友验证
+	VerificationQuestion VerificationQuestion `json:"verificationQuestion"` // 问题和答案，但是答案不要返回
+}
+
 type GroupfriendsResponse struct {
 	UserId    uint   `json:"userId"`
 	Avatar    string `json:"avatar"`
