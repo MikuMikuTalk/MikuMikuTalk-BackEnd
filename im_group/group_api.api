@@ -189,6 +189,7 @@ type groupValidListRequest {
 }
 
 type GroupValidInfoResponse {
+	ID                   uint                  `json:"id"` // 验证id
 	GrouID               uint                  `json:"grouId"`
 	UserID               uint                  `json:"userId"`
 	UserNickname         string                `json:"userNickname"`
@@ -205,6 +206,14 @@ type groupValidListResponse {
 	List  []GroupValidInfoResponse `json:"list"`
 	Count int                      `json:"count"`
 }
+
+type groupValidStatusRequest {
+	Token   string `header:"Authorization"`
+	ValidID uint   `json:"validId"` // 验证id
+	Status  int8   `json:"status"` // 状态
+}
+
+type groupValidStatusResponse {}
 
 service group {
 	@handler groupCreate
@@ -248,6 +257,9 @@ service group {
 
 	@handler groupValidList
 	get /api/group/valid (groupValidListRequest) returns (groupValidListResponse) // 群验证列表
+
+	@handler groupValidStatus
+	put /api/group/valid/status (groupValidStatusRequest) returns (groupValidStatusResponse) // 群验证状态更新
 }
 
 // goctl api go -api group_api.api -dir . --home ../../template

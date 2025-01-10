@@ -84,6 +84,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/api/group/valid/:id",
 				Handler: groupValidHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/api/group/valid/status",
+				Handler: groupValidStatusHandler(serverCtx),
+			},
 		},
 	)
 }

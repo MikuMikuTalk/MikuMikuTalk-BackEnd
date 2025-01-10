@@ -35,6 +35,7 @@ type GroupSearchResponse struct {
 }
 
 type GroupValidInfoResponse struct {
+	ID                   uint                  `json:"id"` // 验证id
 	GrouID               uint                  `json:"grouId"`
 	UserID               uint                  `json:"userId"`
 	UserNickname         string                `json:"userNickname"`
@@ -205,6 +206,15 @@ type GroupValidListRequest struct {
 type GroupValidListResponse struct {
 	List  []GroupValidInfoResponse `json:"list"`
 	Count int                      `json:"count"`
+}
+
+type GroupValidStatusRequest struct {
+	Token   string `header:"Authorization"`
+	ValidID uint   `json:"validId"` // 验证id
+	Status  int8   `json:"status"`  // 状态
+}
+
+type GroupValidStatusResponse struct {
 }
 
 type GroupfriendsListRequest struct {

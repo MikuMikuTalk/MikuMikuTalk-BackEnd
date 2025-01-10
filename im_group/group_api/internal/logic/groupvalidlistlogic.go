@@ -64,6 +64,7 @@ func (l *GroupValidListLogic) GroupValidList(req *types.GroupValidListRequest) (
 	resp.Count = int(count)
 	for _, group := range groups {
 		info := types.GroupValidInfoResponse{
+			ID:                 group.ID,
 			GrouID:             group.GroupID,
 			UserID:             group.UserID,
 			Status:             group.Status,
