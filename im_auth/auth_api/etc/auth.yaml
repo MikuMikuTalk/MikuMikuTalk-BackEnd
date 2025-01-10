@@ -5,9 +5,11 @@ Etcd: 127.0.0.1:2379
 Mysql:
   DataSource: root:123456@tcp(127.0.0.1:3306)/im_server_db?charset=utf8mb4&parseTime=True&loc=Local
 Redis:
-  Addr: 127.0.0.1:6379
-  Password:
-  DB: 0
+  Host: 127.0.0.1:6379
+  Type: node
+  Pass:
+  Tls: false
+  Key:
 Auth:
   AuthSecret: fdsafasfdsfadsf
   AuthExpire: 10000

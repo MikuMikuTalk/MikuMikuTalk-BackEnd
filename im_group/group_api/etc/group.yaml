@@ -1,6 +1,6 @@
 Name: group
 Host: 0.0.0.0
-Port: 30025
+Port: 20024
 Etcd: 127.0.0.1:2379
 Auth:
   AuthSecret: fdsafasfdsfadsf
