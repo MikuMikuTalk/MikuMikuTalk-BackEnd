@@ -20,3 +20,19 @@ type GroupModel struct {
 	Size                 int                         `json:"size"`                        // 群规模  20  100 200 1000 2000
 	MemberList           []GroupMemberModel          `gorm:"foreignKey:GroupID" json:"-"` // 群成员列表
 }
+
+// ProblemCount 问题的个数
+func (uc GroupModel) ProblemCount() (c int) {
+	if uc.VerificationQuestion != nil {
+		if uc.VerificationQuestion.Problem1 != nil {
+			c += 1
+		}
+		if uc.VerificationQuestion.Problem2 != nil {
+			c += 1
+		}
+		if uc.VerificationQuestion.Problem3 != nil {
+			c += 1
+		}
+	}
+	return
+}

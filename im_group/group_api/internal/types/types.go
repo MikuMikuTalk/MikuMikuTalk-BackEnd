@@ -3,6 +3,16 @@
 
 package types
 
+type AddGroupRequest struct {
+	Token                string                `header:"Authorization"`
+	GroupID              uint                  `json:"groupID"`
+	Verify               string                `json:"verify,optional"`               // 验证消息
+	VerificationQuestion *VerificationQuestion `json:"verificationQuestion,optional"` // 问题和答案
+}
+
+type AddGroupResponse struct {
+}
+
 type GroupMemberInfo struct {
 	UserID         uint   `json:"userId"`
 	UserNickname   string `json:"userNickname"`
