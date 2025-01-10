@@ -44,7 +44,7 @@ func (l *LogoutLogic) Logout(token string) (string, error) {
 	// 将 JTI 存入 Redis，设置为注销状态
 	key := fmt.Sprintf("logout_%s", jti)
 	// 设置redis中数据过期时间
-	_, err = l.svcCtx.RDB.SetNX(key, "invalid", expiration).Result()
+	_, err = l.svcCtx.RDB.SetnxEx(key, "invalid", int(expiration.Seconds()))
 	if err != nil {
 		l.Logger.Error("Redis 错误: ", err)
 		return "", errors.New("注销失败，请稍后重试")

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
 )
@@ -11,12 +12,8 @@ type Config struct {
 	Mysql struct {
 		DataSource string
 	}
-	Redis struct {
-		Addr     string
-		Password string
-		DB       int
-	}
-	Auth struct {
+	Redis redis.RedisKeyConf
+	Auth  struct {
 		AuthSecret string
 		AuthExpire int64
 	}

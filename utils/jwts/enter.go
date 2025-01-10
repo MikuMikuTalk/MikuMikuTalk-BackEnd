@@ -4,9 +4,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/go-redis/redis"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 )
 
 type JwtPayload struct {
@@ -54,7 +54,7 @@ func ParseToken(jwtToken string, accessSecret string) (*CustomClaims, error) {
 	return nil, errors.New("非法jwt token")
 }
 
-func ValidateToken(jwtToken string, accessSecret string, redisClient *redis.Client) (bool, error) {
+func ValidateToken(jwtToken string, accessSecret string, redisClient *redis.Redis) (bool, error) {
 	claims, err := ParseToken(jwtToken, accessSecret)
 	if err != nil {
 		return false, err // Token 无效
@@ -63,12 +63,12 @@ func ValidateToken(jwtToken string, accessSecret string, redisClient *redis.Clie
 	jti := ExtractJTI(claims)
 	key := "logout_" + jti
 	// 如果已经存在在redis中，那么说明这个jwt token已经是被注销了，不能再用了
-	exists, err := redisClient.Exists(key).Result()
+	exists, err := redisClient.Exists(key)
 	if err != nil {
 		return false, errors.New("Redis 校验失败")
 	}
 	// 如果 Redis 中存在 JTI 标记，则认为 Token 已注销
-	if exists > 0 {
+	if exists {
 		return false, errors.New("Token 已被注销")
 	}
 	// 校验通过

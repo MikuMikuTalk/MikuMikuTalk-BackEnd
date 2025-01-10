@@ -9,12 +9,12 @@ import (
 	"im_server/common/ctype"
 	"im_server/im_user/user_rpc/types/user_rpc"
 
-	"github.com/go-redis/redis"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 )
 
-func GetUserBaseInfo(client *redis.Client, userRpc user_rpc.UsersClient, userID uint) (userInfo ctype.UserInfo, err error) {
+func GetUserBaseInfo(client *redis.Redis, userRpc user_rpc.UsersClient, userID uint) (userInfo ctype.UserInfo, err error) {
 	key := fmt.Sprintf("im_server_user_%d", userID)
-	str, err := client.Get(key).Result()
+	str, err := client.Get(key)
 	if err != nil {
 		// 没找到
 		userBaseResponse, err1 := userRpc.UserBaseInfo(context.Background(), &user_rpc.UserBaseInfoRequest{
@@ -30,7 +30,7 @@ func GetUserBaseInfo(client *redis.Client, userRpc user_rpc.UsersClient, userID 
 		userInfo.NickName = userBaseResponse.NickName
 		byteData, _ := json.Marshal(userInfo)
 		// 设置进缓存
-		client.Set(key, string(byteData), time.Hour) // 1小时过期
+		client.Setex(key, string(byteData), int(time.Hour.Seconds())) // 1小时过期
 		return
 	}
 	err = json.Unmarshal([]byte(str), &userInfo)

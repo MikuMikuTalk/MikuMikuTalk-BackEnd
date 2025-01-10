@@ -46,7 +46,7 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest, token string)
 	})
 
 	// 查询哪些好友在线
-	onlineMap, err := l.svcCtx.Redis.HGetAll("online_user").Result()
+	onlineMap, err := l.svcCtx.Redis.Hgetall("online_user")
 	if err != nil {
 		return nil, err
 	}

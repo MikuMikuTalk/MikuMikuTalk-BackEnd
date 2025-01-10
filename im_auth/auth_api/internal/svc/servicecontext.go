@@ -6,7 +6,7 @@ import (
 	"im_server/im_user/user_rpc/types/user_rpc"
 	"im_server/im_user/user_rpc/users"
 
-	"github.com/go-redis/redis"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/zrpc"
 	"gorm.io/gorm"
 )
@@ -14,13 +14,13 @@ import (
 type ServiceContext struct {
 	Config  config.Config
 	DB      *gorm.DB
-	RDB     *redis.Client
+	RDB     *redis.Redis
 	UserRpc user_rpc.UsersClient
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	mysqlDb := core.InitGorm(c.Mysql.DataSource)
-	rdb := core.InitRedis(c.Redis.Addr, c.Redis.Password, c.Redis.DB)
+	rdb := redis.MustNewRedis(c.Redis.RedisConf)
 	return &ServiceContext{
 		Config:  c,
 		DB:      mysqlDb,

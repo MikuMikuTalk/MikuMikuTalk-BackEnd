@@ -81,7 +81,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			if UserWsInfo != nil && len(UserWsInfo.WsClientMap) == 0 {
 				// 代表这个用户最后一个连接断开了
 				delete(UserOnlineWsMap, myID)
-				svcCtx.Redis.HDel("online_user", fmt.Sprintf("%d", myID))
+				svcCtx.Redis.Hdel("online_user", fmt.Sprintf("%d", myID))
 			}
 		}()
 
@@ -113,7 +113,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			// 代表这个用户第一次连接服务器
 			UserOnlineWsMap[myID] = userWsInfo
 			// 存储在线用户
-			svcCtx.Redis.HSet("online_user", fmt.Sprintf("%d", myID), myID)
+			svcCtx.Redis.Hset("online_user", fmt.Sprintf("%d", myID), fmt.Sprintf("%d", myID))
 		}
 		// 检查是否已经存在相同的连接
 		if userWsInfo.WsClientMap[addr] == nil {

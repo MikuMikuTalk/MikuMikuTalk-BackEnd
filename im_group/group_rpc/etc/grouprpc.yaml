@@ -7,9 +7,11 @@ Etcd:
 Mysql:
   DataSource: root:123456@tcp(127.0.0.1:3306)/im_server_db?charset=utf8mb4&parseTime=True&loc=Local
 Redis:
-  Addr: 127.0.0.1:6379
-  Pwd:
-  DB: 0
+  Host: 127.0.0.1:6379
+  Type: node
+  Pass:
+  Tls: false
+  Key:
 Log:
   ServiceName: user_rpc
   Encoding: plain
