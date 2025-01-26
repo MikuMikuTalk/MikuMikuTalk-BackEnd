@@ -132,6 +132,74 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				SendTipErrMsg(conn, "你还不是这个群的群成员")
 				continue
 			}
+			switch request.Msg.Type {
+			case ctype.WithdrawMsgType: //撤回消息
+				withdrawMsg := request.Msg.WithdrawMsg
+				if withdrawMsg == nil {
+					SendTipErrMsg(conn, "撤回消息的格式错误")
+					continue
+				}
+				if withdrawMsg.MsgID == 0 {
+					SendTipErrMsg(conn, "撤回消息id为空")
+					continue
+				}
+				// 去找消息
+				var groupMsg group_models.GroupMsgModel
+				err = svcCtx.DB.Take(&groupMsg, withdrawMsg.MsgID).Error
+				if err != nil {
+					SendTipErrMsg(conn, "原消息不存在")
+					continue
+				}
+				// 原消息不能是撤回消息
+				if groupMsg.MsgType == ctype.WithdrawMsgType {
+					SendTipErrMsg(conn, "该消息已撤回")
+					continue
+				}
+				// 要去拿我在这个群的角色
+				// 如果是自己撤自己的 并且自己是普通用户
+				if userID == groupMsg.SendUserID && member.Role == 3 {
+					// 要判断时间是不是大于了2分钟
+					now := time.Now()
+					if now.Sub(groupMsg.CreatedAt) > 2*time.Minute {
+						SendTipErrMsg(conn, "只能撤回两分钟以内的消息")
+						continue
+					}
+				}
+				// 查这个消息的用户在这个群的角色
+				var msgUserRole int8 = 3
+				err = svcCtx.DB.Model(group_models.GroupMemberModel{}).
+					Where("group_id = ? and user_id = ?", request.GroupID, groupMsg.SendUserID).
+					Select("role").
+					Scan(&msgUserRole).Error
+				// 这里有可能查不到  原因是这个消息的用户退群了，那么也是可以撤回的
+				// 如果是管理员撤回  它能撤自己和用户的，没有时间限制
+				if member.Role == 2 {
+					// 不能撤群主和别的管理员
+					if msgUserRole == 1 || (msgUserRole == 2 && groupMsg.SendUserID != userID) {
+						SendTipErrMsg(conn, "管理员只能撤回自己或者普通用户的消息")
+						continue
+					}
+				}
+
+				// 如果是群主，那就能撤管理员和用户的
+				var content = "撤回了一条消息"
+				content = "你" + content
+				// 前端可以判断，这个消息如果不是isMe，可以把你替换成对方的名称
+				originMsg := groupMsg.Msg
+				originMsg.WithdrawMsg = nil
+				svcCtx.DB.Model(&groupMsg).Updates(group_models.GroupMsgModel{
+					MsgPreview: "[撤回消息] - " + content,
+					MsgType:    ctype.WithdrawMsgType,
+					Msg: ctype.Msg{
+						Type: ctype.WithdrawMsgType,
+						WithdrawMsg: &ctype.WithdrawMsg{
+							Content:   content,
+							MsgID:     request.Msg.WithdrawMsg.MsgID,
+							OriginMsg: &originMsg,
+						},
+					},
+				})
+			}
 			// 群聊消息入库
 			msgID := insertMsg(svcCtx.DB, conn, request.GroupID, userID, request.Msg)
 			// 遍历这个用户列表，去找ws的客户端
@@ -196,6 +264,7 @@ func sendGroupOnlineUserMsg(db *gorm.DB, groupID uint, userID uint, msg ctype.Ms
 		if !ok2 {
 			continue
 		}
+		chatResponse.IsMe = false
 		// 判断isMe
 		if wsUserInfo.UserInfo.ID == userID {
 			chatResponse.IsMe = true
