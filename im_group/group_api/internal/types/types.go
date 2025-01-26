@@ -24,6 +24,15 @@ type GroupMemberInfo struct {
 	NewMsgDate     string `json:"newMsgDate"`
 }
 
+type GroupMyResponse struct {
+	GroupID          uint   `json:"groupId"`
+	GroupTitle       string `json:"groupTitle"`
+	GroupAvatar      string `json:"groupAvatar"`
+	GroupMemberCount int    `json:"groupMemberCount"`
+	Role             int8   `json:"role"` // 角色
+	Mode             int8   `json:"mode"` // 模式  1 我创建的群聊 2 我加入的群聊
+}
+
 type GroupSearchResponse struct {
 	GroupID         uint   `json:"groupId"`
 	Title           string `json:"title"`
@@ -195,6 +204,18 @@ type GroupMemberRoleUpdateRequest struct {
 }
 
 type GroupMemberRoleUpdateResponse struct {
+}
+
+type GroupMyListResponse struct {
+	List  []GroupMyResponse `json:"list"`
+	Count int               `json:"count"`
+}
+
+type GroupMyRequest struct {
+	Token string `header:"Authorization"`
+	Mode  int8   `json:"mode"` // 1 我创建的群聊 2 我加入的群聊
+	Page  int    `form:"page,optional"`
+	Limit int    `form:"limit,optional"`
 }
 
 type GroupProhibitionUpdateRequest struct {
