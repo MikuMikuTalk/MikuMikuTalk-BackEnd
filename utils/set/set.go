@@ -1,118 +1,52 @@
 package set
 
-import "fmt"
-
-type (
-	void struct{}
-	Set  struct {
-		m map[any]void
+// Union 求并集
+func Union[T uint | int | string](slice1, slice2 []T) []T {
+	m := make(map[T]int)
+	for _, v := range slice1 {
+		m[v]++
 	}
-)
 
-// 创建一个新的集合
-func NewSet(items ...any) *Set {
-	s := &Set{}
-	s.m = make(map[any]void)
-	s.Add(items...)
-	return s
-}
-
-// 向集合中添加元素
-func (s *Set) Add(items ...any) {
-	for _, item := range items {
-		s.m[item] = void{}
-	}
-}
-
-// 判断集合中是否包含item
-func (s *Set) Contains(item any) bool {
-	_, ok := s.m[item]
-	return ok
-}
-
-// 返回集合大小
-func (s *Set) Size() int {
-	return len(s.m)
-}
-
-// 移除集合元素
-func (s *Set) Remove(item any) {
-	delete(s.m, item)
-}
-
-// 清空集合
-func (s *Set) Clear() {
-	s.m = make(map[any]void)
-}
-
-// 判断两个集合是否相等
-func (s *Set) Equal(other *Set) bool {
-	if s.Size() != other.Size() {
-		return false
-	}
-	for key := range s.m {
-		// 只要有一个不相等，就返回false
-		if !other.Contains(key) {
-			return false
+	for _, v := range slice2 {
+		times, _ := m[v]
+		if times == 0 {
+			slice1 = append(slice1, v)
 		}
 	}
-	return true
+	return slice1
 }
 
-func (s *Set) IsSubSet(other *Set) bool {
-	if s.Size() > other.Size() {
-		return false
+// Intersect 求交集
+func Intersect[T uint | int | string | uint32](slice1, slice2 []T) []T {
+	m := make(map[T]int)
+	nn := make([]T, 0)
+	for _, v := range slice1 {
+		m[v]++
 	}
-	for key := range s.m {
-		if !other.Contains(key) {
-			return false
+
+	for _, v := range slice2 {
+		times, _ := m[v]
+		if times == 1 {
+			nn = append(nn, v)
 		}
 	}
-	return true
+	return nn
 }
 
-// 求并集
-func Union(set1 *Set, set2 *Set) *Set {
-	newSet := NewSet()
-	for key := range set1.m {
-		newSet.Add(key)
+// Difference 求差集
+func Difference[T uint | int | string](slice1, slice2 []T) []T {
+	m := make(map[T]int)
+	nn := make([]T, 0)
+	inter := Intersect(slice1, slice2)
+	for _, v := range inter {
+		m[v]++
 	}
-	for key := range set2.m {
-		newSet.Add(key)
-	}
-	return newSet
-}
 
-// 求交集
-func InterSet(set1, set2 *Set) *Set {
-	newSet := NewSet()
-	for key := range set1.m {
-		if set2.Contains(key) {
-			newSet.Add(key)
+	for _, value := range slice1 {
+		times, _ := m[value]
+		if times == 0 {
+			nn = append(nn, value)
 		}
 	}
-	return newSet
-}
-
-// 求差集
-// 差集（A - B）：所有属于集合 A 但不属于集合 B 的元素。
-func Difference(set1, set2 *Set) *Set {
-	newSet := NewSet()
-	for key := range set1.m {
-		if !set2.Contains(key) {
-			newSet.Add(key)
-		}
-	}
-	return newSet
-}
-
-func (s *Set) String() string {
-	str := ""
-	for key := range s.m {
-		str += fmt.Sprintf("%v,", key)
-	}
-	if len(s.m) > 0 {
-		str = str[:len(str)-1] // 去掉最后的逗号和空格
-	}
-	return str
+	return nn
 }

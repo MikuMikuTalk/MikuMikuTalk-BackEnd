@@ -75,12 +75,12 @@ func (l *GroupInfoLogic) GroupInfo(req *types.GroupInfoRequest) (resp *types.Gro
 	userOnlineResponse, err := l.svcCtx.UserRpc.UserOnlineList(context.Background(), &user_rpc.UserOnlineListRequest{})
 	if err != nil {
 		// 所有的在线人数
-		allOnlineUsersIDList := set.NewSet(userOnlineResponse.UserIdList)
+		allOnlineUsersIDList := userOnlineResponse.UserIdList
 		// 群里面所有的群成员id
-		allUserIDList := set.NewSet(userAllIDList)
+		allUserIDList := userAllIDList
 		// 两个求交集，就能拿到群里面在线的人数了
-		groupOnlineIDList := set.InterSet(allOnlineUsersIDList, allUserIDList)
-		resp.MemberOnlineCount = groupOnlineIDList.Size()
+		groupOnlineIDList := set.Intersect(allOnlineUsersIDList, allUserIDList)
+		resp.MemberOnlineCount = len(groupOnlineIDList)
 	}
 
 	/*

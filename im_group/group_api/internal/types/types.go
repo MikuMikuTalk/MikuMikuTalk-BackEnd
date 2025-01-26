@@ -92,6 +92,17 @@ type GroupCreateRequest struct {
 type GroupCreateResponse struct {
 }
 
+type GroupHistoryDeleteRequest struct {
+	Token     string `header:"Authorization"`
+	ID        uint   `path:"id"`
+	Page      int    `form:"page,optional"`
+	Limit     int    `form:"limit,optional"`
+	MsgIDList []uint `json:"msgIdList"`
+}
+
+type GroupHistoryDeleteResponse struct {
+}
+
 type GroupHistoryListResponse struct {
 }
 

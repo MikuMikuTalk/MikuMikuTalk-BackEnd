@@ -69,7 +69,7 @@ func (l *GroupSearchLogic) GroupSearch(req *types.GroupSearchRequest) (resp *typ
 				isInGroup = true
 			}
 		}
-		userOnlineCount := set.InterSet(set.NewSet(groupMemberIdList), set.NewSet(userOnlineIDList)).Size()
+		userOnlineCount := len(set.Intersect(groupMemberIdList, userOnlineIDList))
 		resp.List = append(resp.List, types.GroupSearchResponse{
 			GroupID:         group.ID,
 			Title:           group.Title,
