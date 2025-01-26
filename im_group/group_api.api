@@ -4,8 +4,8 @@ type groupCreateRequest {
 	Token      string `header:"Authorization"`
 	Mode       int8   `json:"mode,optional"` // 模式  1 直接创建模式 2 选人创建模式
 	Name       string `json:"name,optional"`
-	IsSearch   bool   `json:"isSearch,optional"` // 是否可以搜到
-	Size       int    `json:"size,optional"` // 群规模
+	IsSearch   bool   `json:"isSearch,optional"`   // 是否可以搜到
+	Size       int    `json:"size,optional"`       // 群规模
 	UserIDList []uint `json:"userIdList,optional"` // 用户id列表
 }
 
@@ -31,8 +31,8 @@ type groupInfoResponse {
 	Avatar            string     `json:"avatar"`
 	Creator           UserInfo   `json:"creator"`
 	AdminList         []UserInfo `json:"adminList"`
-	Role              int8       `json:"role"` // 角色  1 群主 2 群管理员 3 群成员
-	IsProhibition     bool       `json:"isProhibition"` // 是否开启了全员禁言
+	Role              int8       `json:"role"`            // 角色  1 群主 2 群管理员 3 群成员
+	IsProhibition     bool       `json:"isProhibition"`   // 是否开启了全员禁言
 	ProhibitionTime   *int       `json:"prohibitionTime"` // 自己的禁言时间
 }
 
@@ -47,15 +47,15 @@ type VerificationQuestion {
 
 type groupUpdateRequest {
 	Token                string                `header:"Authorization"`
-	ID                   uint                  `json:"id"` // 群id
-	IsSearch             *bool                 `json:"isSearch,optional"  conf:"is_search"` // 是否可以被搜索
-	Avatar               *string               `json:"avatar,optional"  conf:"avatar"` // 群头像
-	Abstract             *string               `json:"abstract,optional"  conf:"abstract"` // 群简介
-	Title                *string               `json:"title,optional"  conf:"title"` // 群名
-	Verification         *int8                 `json:"verification,optional"  conf:"verification"` // 群验证
-	IsInvite             *bool                 `json:"isInvite,optional"  conf:"is_invite"` // 是否可邀请好友
+	ID                   uint                  `json:"id"`                                                       // 群id
+	IsSearch             *bool                 `json:"isSearch,optional"  conf:"is_search"`                      // 是否可以被搜索
+	Avatar               *string               `json:"avatar,optional"  conf:"avatar"`                           // 群头像
+	Abstract             *string               `json:"abstract,optional"  conf:"abstract"`                       // 群简介
+	Title                *string               `json:"title,optional"  conf:"title"`                             // 群名
+	Verification         *int8                 `json:"verification,optional"  conf:"verification"`               // 群验证
+	IsInvite             *bool                 `json:"isInvite,optional"  conf:"is_invite"`                      // 是否可邀请好友
 	IsTemporarySession   *bool                 `json:"isTemporarySession,optional"  conf:"is_temporary_session"` // 是否开启临时会话
-	IsProhibition        *bool                 `json:"isProhibition,optional" conf:"is_prohibition"` // 是否开启全员禁言
+	IsProhibition        *bool                 `json:"isProhibition,optional" conf:"is_prohibition"`             // 是否开启全员禁言
 	VerificationQuestion *VerificationQuestion `json:"verificationQuestion,optional" conf:"verification_question"`
 }
 
@@ -94,7 +94,7 @@ type groupMemberResponse {
 
 type groupMemberRemoveRequest {
 	Token    string `header:"Authorization"`
-	ID       uint   `form:"id"` // 群id
+	ID       uint   `form:"id"`       // 群id
 	MemberID uint   `form:"memberId"` // 成员id
 }
 
@@ -102,7 +102,7 @@ type groupMemberRemoveResponse {}
 
 type groupMemberAddRequest {
 	Token        string `header:"Authorization"`
-	ID           uint   `json:"id"` // 群id
+	ID           uint   `json:"id"`           // 群id
 	MemberIDList []uint `json:"memberIdList"` // 成员id列表
 }
 
@@ -110,7 +110,7 @@ type groupMemberAddResponse {}
 
 type groupMemberNicknameUpdateRequest {
 	Token    string `header:"Authorization"`
-	ID       uint   `json:"id"` // 群id
+	ID       uint   `json:"id"`       // 群id
 	MemberID uint   `json:"memberId"` // 成员id
 	Nickname string `json:"nickname"` // 昵称
 }
@@ -119,7 +119,7 @@ type groupMemberNicknameUpdateResponse {}
 
 type groupMemberRoleUpdateRequest {
 	Token    string `header:"Authorization"`
-	ID       uint   `json:"id"` // 群id
+	ID       uint   `json:"id"`       // 群id
 	MemberID uint   `json:"memberId"` // 成员id
 	Role     int8   `json:"role"`
 }
@@ -155,8 +155,8 @@ type GroupSearchResponse {
 	Title           string `json:"title"`
 	Abstract        string `json:"abstract"`
 	Avatar          string `json:"avatar"`
-	IsInGroup       bool   `json:"isInGroup"` // 我是否在群里面
-	UserCount       int    `json:"userCount"` // 群用户总数
+	IsInGroup       bool   `json:"isInGroup"`       // 我是否在群里面
+	UserCount       int    `json:"userCount"`       // 群用户总数
 	UserOnlineCount int    `json:"userOnlineCount"` // 群用户在线总数
 }
 
@@ -171,14 +171,14 @@ type GroupValidRequest {
 }
 
 type GroupValidResponse {
-	Verification         int8                 `json:"verification"` // 好友验证
+	Verification         int8                 `json:"verification"`         // 好友验证
 	VerificationQuestion VerificationQuestion `json:"verificationQuestion"` // 问题和答案，但是答案不要返回
 }
 
 type AddGroupRequest {
 	Token                string                `header:"Authorization"`
 	GroupID              uint                  `json:"groupID"`
-	Verify               string                `json:"verify,optional"` // 验证消息
+	Verify               string                `json:"verify,optional"`               // 验证消息
 	VerificationQuestion *VerificationQuestion `json:"verificationQuestion,optional"` // 问题和答案
 }
 
@@ -196,8 +196,8 @@ type GroupValidInfoResponse {
 	UserID               uint                  `json:"userId"`
 	UserNickname         string                `json:"userNickname"`
 	UserAvatar           string                `json:"userAvatar"`
-	Status               int8                  `json:"status"` // 状态
-	AdditionalMessages   string                `json:"additionalMessages"` // 附加消息
+	Status               int8                  `json:"status"`               // 状态
+	AdditionalMessages   string                `json:"additionalMessages"`   // 附加消息
 	VerificationQuestion *VerificationQuestion `json:"verificationQuestion"` // 验证问题
 	Title                string                `json:"title"`
 	CreatedAt            string                `json:"createdAt"`
@@ -212,7 +212,7 @@ type groupValidListResponse {
 type groupValidStatusRequest {
 	Token   string `header:"Authorization"`
 	ValidID uint   `json:"validId"` // 验证id
-	Status  int8   `json:"status"` // 状态
+	Status  int8   `json:"status"`  // 状态
 }
 
 type groupValidStatusResponse {}
@@ -225,6 +225,14 @@ type groupProhibitionUpdateRequest {
 }
 
 type groupProhibitionUpdateResponse {}
+
+type groupHistoryRequest {
+	Token string `header:"Authorization"`
+	ID    uint   `path:"id"`
+	Page  int    `form:"page,optional"`
+	Limit int    `form:"limit,optional"`
+}
+type groupHistoryListResponse {}
 
 service group {
 	@handler groupCreate
@@ -274,6 +282,9 @@ service group {
 
 	@handler groupProhibitionUpdate
 	put /api/group/member/prohibition (groupProhibitionUpdateRequest) returns (groupProhibitionUpdateResponse) // 禁言时间更新
+
+	@handler groupHistory
+	get /api/group/history/:id (groupHistoryRequest) returns (groupHistoryListResponse) // 聊天记录 不用groupHistoryListResponse
 }
 
 // goctl api go -api group_api.api -dir . --home ../../template

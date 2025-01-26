@@ -92,6 +92,16 @@ type GroupCreateRequest struct {
 type GroupCreateResponse struct {
 }
 
+type GroupHistoryListResponse struct {
+}
+
+type GroupHistoryRequest struct {
+	Token string `header:"Authorization"`
+	ID    uint   `path:"id"`
+	Page  int    `form:"page,optional"`
+	Limit int    `form:"limit,optional"`
+}
+
 type GroupInfoRequest struct {
 	Token string `header:"Authorization"`
 	ID    uint   `path:"id"` //群id
