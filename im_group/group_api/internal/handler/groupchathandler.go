@@ -16,6 +16,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
+	"gorm.io/gorm"
 )
 
 type UserWsInfo struct {
@@ -31,14 +32,14 @@ type ChatRequest struct {
 }
 
 type ChatResponse struct {
-	UserID       uint      `json:"userID"`
-	UserNickname string    `json:"userNickname"`
-	UserAvatar   string    `json:"userAvatar"`
-	Msg          ctype.Msg `json:"msg"`
-	ID           uint      `json:"id"`
-	MsgType      int8      `json:"msgType"`
-	CreatedAt    time.Time `json:"createdAt"`
-	IsMe         bool      `json:"isMe"`
+	UserID       uint          `json:"userID"`
+	UserNickname string        `json:"userNickname"`
+	UserAvatar   string        `json:"userAvatar"`
+	Msg          ctype.Msg     `json:"msg"`
+	ID           uint          `json:"id"`
+	MsgType      ctype.MsgType `json:"msgType"`
+	CreatedAt    time.Time     `json:"createdAt"`
+	IsMe         bool          `json:"isMe"`
 }
 
 func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -131,22 +132,10 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				SendTipErrMsg(conn, "你还不是这个群的群成员")
 				continue
 			}
-			//查在线的用户列表
-			userOnlineIDList := getOnlineUserIDList()
-
-			//查这个群的成员 并且这个成员在线
-			var groupMemberOnlineIDList []uint
-			svcCtx.DB.Model(group_models.GroupMemberModel{}).Where("group_id = ? and user_id in ?", request.GroupID, userOnlineIDList).Select("user_id").Scan(&groupMemberOnlineIDList)
-			// 遍历这个用户列表，找ws客户单
-			for _, u := range groupMemberOnlineIDList {
-				wsUserInfo, ok2 := UserOnlineWsMap[u]
-				if !ok2 {
-					continue
-				}
-				for _, w2 := range wsUserInfo.WsClientMap {
-					w2.WriteMessage(websocket.TextMessage, []byte(""))
-				}
-			}
+			// 群聊消息入库
+			msgID := insertMsg(svcCtx.DB, conn, request.GroupID, userID, request.Msg)
+			// 遍历这个用户列表，去找ws的客户端
+			sendGroupOnlineUserMsg(svcCtx.DB, request.GroupID, userID, request.Msg, msgID)
 			logx.Info("message: ", string(p))
 		}
 		// l := logic.NewGroupChatLogic(r.Context(), svcCtx)
@@ -178,4 +167,64 @@ func SendTipErrMsg(conn *websocket.Conn, msg string) {
 	}
 	byteData, _ := json.Marshal(resp)
 	conn.WriteMessage(websocket.TextMessage, byteData)
+}
+
+// 给这个群的用户发送消息
+func sendGroupOnlineUserMsg(db *gorm.DB, groupID uint, userID uint, msg ctype.Msg, msgID uint) {
+	// 查在线的用户列表
+	userOnlineIDList := getOnlineUserIDList()
+	//查这个群的成员并且在线
+	var groupMemberOnlineIDList []uint
+	db.Model(group_models.GroupMemberModel{}).
+		Where("group_id = ? and user_id in ?", groupID, userOnlineIDList).
+		Select("user_id").Scan(&groupMemberOnlineIDList)
+	// 构造响应
+	var chatResponse ChatResponse = ChatResponse{
+		UserID:    userID,
+		Msg:       msg,
+		ID:        msgID,
+		MsgType:   msg.Type,
+		CreatedAt: time.Now(),
+	}
+	wsInfo, ok := UserOnlineWsMap[userID]
+	if ok {
+		chatResponse.UserNickname = wsInfo.UserInfo.NickName
+		chatResponse.UserAvatar = wsInfo.UserInfo.Avatar
+	}
+	for _, u := range groupMemberOnlineIDList {
+		wsUserInfo, ok2 := UserOnlineWsMap[u]
+		if !ok2 {
+			continue
+		}
+		// 判断isMe
+		if wsUserInfo.UserInfo.ID == userID {
+			chatResponse.IsMe = true
+		}
+		byteData, _ := json.Marshal(chatResponse)
+		for _, w2 := range wsUserInfo.WsClientMap {
+			w2.WriteMessage(websocket.TextMessage, byteData)
+		}
+	}
+}
+
+func insertMsg(db *gorm.DB, conn *websocket.Conn, groupID uint, userID uint, msg ctype.Msg) uint {
+	switch msg.Type {
+	case ctype.WithdrawMsgType:
+		logx.Info("撤回消息自己不入库")
+		return 0
+	}
+	groupMsg := group_models.GroupMsgModel{
+		GroupID:    groupID,
+		SendUserID: userID,
+		MsgType:    msg.Type,
+		Msg:        msg,
+	}
+	groupMsg.MsgPreview = groupMsg.MsgPreviewMethod()
+	err := db.Create(&groupMsg).Error
+	if err != nil {
+		logx.Error(err)
+		SendTipErrMsg(conn, "消息保存失败")
+		return 0
+	}
+	return groupMsg.ID
 }

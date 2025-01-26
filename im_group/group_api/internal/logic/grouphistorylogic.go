@@ -33,14 +33,14 @@ func NewGroupHistoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Grou
 }
 
 type HistoryResponse struct {
-	UserID       uint      `json:"userID"`
-	UserNickname string    `json:"userNickname"`
-	UserAvatar   string    `json:"userAvatar"`
-	Msg          ctype.Msg `json:"msg"`
-	ID           uint      `json:"id"`
-	MsgType      int8      `json:"msgType"`
-	CreatedAt    time.Time `json:"createdAt"`
-	IsMe         bool      `json:"isMe"`
+	UserID       uint          `json:"userID"`
+	UserNickname string        `json:"userNickname"`
+	UserAvatar   string        `json:"userAvatar"`
+	Msg          ctype.Msg     `json:"msg"`
+	ID           uint          `json:"id"`
+	MsgType      ctype.MsgType `json:"msgType"`
+	CreatedAt    time.Time     `json:"createdAt"`
+	IsMe         bool          `json:"isMe"`
 }
 
 type HistoryListResponse struct {
