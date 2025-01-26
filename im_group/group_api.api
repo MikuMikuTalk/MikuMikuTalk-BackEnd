@@ -294,6 +294,12 @@ type groupMyListResponse {
 	Count int               `json:"count"`
 }
 
+type groupChatRequest {
+	Token string `header:"Authorization"`
+}
+
+type groupChatResponse {}
+
 service group {
 	@handler groupCreate
 	post /api/group/group (groupCreateRequest) returns (groupCreateResponse) // 创建群
@@ -357,6 +363,9 @@ service group {
 
 	@handler groupMy
 	get /api/group/my (groupMyRequest) returns (groupMyListResponse) // 我创建的群聊和我加入的群聊
+
+	@handler groupChat
+	get /api/group/ws/chat (groupChatRequest) returns (groupChatResponse) // 群聊
 }
 
 // goctl api go -api group_api.api -dir . --home ../../template
