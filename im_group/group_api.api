@@ -217,6 +217,15 @@ type groupValidStatusRequest {
 
 type groupValidStatusResponse {}
 
+type groupProhibitionUpdateRequest {
+	Token           string `header:"Authorization"`
+	GroupID         uint   `json:"groupId"` // 群id
+	MemberID        uint   `json:"memberId"`
+	ProhibitionTime *int   `json:"prohibitionTime,optional"` // 禁言时间 单位分钟
+}
+
+type groupProhibitionUpdateResponse {}
+
 service group {
 	@handler groupCreate
 	post /api/group/group (groupCreateRequest) returns (groupCreateResponse) // 创建群
@@ -262,6 +271,9 @@ service group {
 
 	@handler groupValidStatus
 	put /api/group/valid/status (groupValidStatusRequest) returns (groupValidStatusResponse) // 群验证状态更新
+
+	@handler groupProhibitionUpdate
+	put /api/group/member/prohibition (groupProhibitionUpdateRequest) returns (groupProhibitionUpdateResponse) // 禁言时间更新
 }
 
 // goctl api go -api group_api.api -dir . --home ../../template

@@ -162,6 +162,16 @@ type GroupMemberRoleUpdateRequest struct {
 type GroupMemberRoleUpdateResponse struct {
 }
 
+type GroupProhibitionUpdateRequest struct {
+	Token           string `header:"Authorization"`
+	GroupID         uint   `json:"groupId"` // 群id
+	MemberID        uint   `json:"memberId"`
+	ProhibitionTime *int   `json:"prohibitionTime,optional"` // 禁言时间 单位分钟
+}
+
+type GroupProhibitionUpdateResponse struct {
+}
+
 type GroupRemoveRequest struct {
 	Token string `header:"Authorization"`
 	ID    uint   `path:"id"` // 群id
