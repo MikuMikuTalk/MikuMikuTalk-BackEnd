@@ -233,6 +233,15 @@ type GroupSessionRequest struct {
 	Limit int    `form:"limit,optional"`
 }
 
+type GroupTopRequest struct {
+	Token   string `header:"Authorization"`
+	GroupID uint   `json:"groupId"` // 需要置顶的群id
+	IsTop   bool   `json:"isTop"`   // true 置顶  false取消置顶
+}
+
+type GroupTopResponse struct {
+}
+
 type GroupUpdateRequest struct {
 	Token                string                `header:"Authorization"`
 	ID                   uint                  `json:"id"`                                                       // 群id

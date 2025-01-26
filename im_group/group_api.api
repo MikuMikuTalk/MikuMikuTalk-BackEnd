@@ -265,6 +265,14 @@ type GroupSessionListResponse {
 	Count int                    `json:"count"`
 }
 
+type groupTopRequest {
+	Token   string `header:"Authorization"`
+	GroupID uint   `json:"groupId"` // 需要置顶的群id
+	IsTop   bool   `json:"isTop"` // true 置顶  false取消置顶
+}
+
+type groupTopResponse {}
+
 service group {
 	@handler groupCreate
 	post /api/group/group (groupCreateRequest) returns (groupCreateResponse) // 创建群
@@ -322,6 +330,9 @@ service group {
 
 	@handler groupSession
 	get /api/group/session (groupSessionRequest) returns (GroupSessionListResponse) // 群会话列表
+
+	@handler groupTop
+	put /api/group/top (groupTopRequest) returns (groupTopResponse) // 置顶或取消置顶群聊
 }
 
 // goctl api go -api group_api.api -dir . --home ../../template
