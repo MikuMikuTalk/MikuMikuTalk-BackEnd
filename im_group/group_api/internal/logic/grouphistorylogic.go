@@ -62,13 +62,7 @@ func (l *GroupHistoryLogic) GroupHistory(req *types.GroupHistoryRequest) (resp *
 	if err != nil {
 		return nil, errors.New("该用户不是群成员")
 	}
-	// 查一下所有的群成员
-	var memberList []group_models.GroupMemberModel
-	l.svcCtx.DB.Find(&memberList, "group_id = ?", req.ID)
-	var memberMap = map[uint]group_models.GroupMemberModel{}
-	for _, model := range memberList {
-		memberMap[model.UserID] = model
-	}
+
 	// 去查我删除了哪些聊天记录
 	var msgIDList []uint
 	l.svcCtx.DB.Model(group_models.GroupUserMsgDeleteModel{}).
@@ -83,8 +77,10 @@ func (l *GroupHistoryLogic) GroupHistory(req *types.GroupHistoryRequest) (resp *
 		PageInfo: models.PageInfo{
 			Page:  req.Page,
 			Limit: req.Limit,
+			Sort:  "created_at desc",
 		},
-		Where: query,
+		Where:   query,
+		Preload: []string{"GroupMemberModel"},
 	})
 	var userIDList []uint32
 	for _, model := range groupMsgList {
@@ -99,12 +95,14 @@ func (l *GroupHistoryLogic) GroupHistory(req *types.GroupHistoryRequest) (resp *
 	var list = make([]HistoryResponse, 0)
 	for _, model := range groupMsgList {
 		info := HistoryResponse{
-			UserID:         model.SendUserID,
-			Msg:            model.Msg,
-			ID:             model.ID,
-			MsgType:        model.MsgType,
-			CreatedAt:      model.CreatedAt,
-			MemberNickname: memberMap[model.SendUserID].MemberNickname,
+			UserID:    model.SendUserID,
+			Msg:       model.Msg,
+			ID:        model.ID,
+			MsgType:   model.MsgType,
+			CreatedAt: model.CreatedAt,
+		}
+		if model.GroupMemberModel != nil {
+			info.MemberNickname = model.GroupMemberModel.MemberNickname
 		}
 		if err1 == nil {
 			info.UserNickname = userListResponse.UserInfo[uint32(info.UserID)].NickName

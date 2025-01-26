@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"im_server/common/ctype"
 	"im_server/common/response"
 	"im_server/im_group/group_api/internal/svc"
@@ -32,14 +33,15 @@ type ChatRequest struct {
 }
 
 type ChatResponse struct {
-	UserID       uint          `json:"userID"`
-	UserNickname string        `json:"userNickname"`
-	UserAvatar   string        `json:"userAvatar"`
-	Msg          ctype.Msg     `json:"msg"`
-	ID           uint          `json:"id"`
-	MsgType      ctype.MsgType `json:"msgType"`
-	CreatedAt    time.Time     `json:"createdAt"`
-	IsMe         bool          `json:"isMe"`
+	UserID         uint          `json:"userID"`
+	UserNickname   string        `json:"userNickname"`
+	UserAvatar     string        `json:"userAvatar"`
+	Msg            ctype.Msg     `json:"msg"`
+	ID             uint          `json:"id"`
+	MsgType        ctype.MsgType `json:"msgType"`
+	CreatedAt      time.Time     `json:"createdAt"`
+	IsMe           bool          `json:"isMe"`
+	MemberNickname string        `json:"memberNickname"` // 群好友备注
 }
 
 func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -201,9 +203,9 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				})
 			}
 			// 群聊消息入库
-			msgID := insertMsg(svcCtx.DB, conn, request.GroupID, userID, request.Msg)
+			msgID := insertMsg(svcCtx.DB, conn, member, request.Msg)
 			// 遍历这个用户列表，去找ws的客户端
-			sendGroupOnlineUserMsg(svcCtx.DB, request.GroupID, userID, request.Msg, msgID)
+			sendGroupOnlineUserMsg(svcCtx.DB, member, request.Msg, msgID)
 			logx.Info("message: ", string(p))
 		}
 		// l := logic.NewGroupChatLogic(r.Context(), svcCtx)
@@ -237,28 +239,33 @@ func SendTipErrMsg(conn *websocket.Conn, msg string) {
 	conn.WriteMessage(websocket.TextMessage, byteData)
 }
 
-// 给这个群的用户发送消息
-func sendGroupOnlineUserMsg(db *gorm.DB, groupID uint, userID uint, msg ctype.Msg, msgID uint) {
+// 给这个群的用户发消息
+func sendGroupOnlineUserMsg(db *gorm.DB, member group_models.GroupMemberModel, msg ctype.Msg, msgID uint) {
+
 	// 查在线的用户列表
 	userOnlineIDList := getOnlineUserIDList()
-	//查这个群的成员并且在线
+	// 查这个群的成员 并且在线
 	var groupMemberOnlineIDList []uint
 	db.Model(group_models.GroupMemberModel{}).
-		Where("group_id = ? and user_id in ?", groupID, userOnlineIDList).
+		Where("group_id = ? and user_id in ?", member.GroupID, userOnlineIDList).
 		Select("user_id").Scan(&groupMemberOnlineIDList)
+
 	// 构造响应
-	var chatResponse ChatResponse = ChatResponse{
-		UserID:    userID,
-		Msg:       msg,
-		ID:        msgID,
-		MsgType:   msg.Type,
-		CreatedAt: time.Now(),
+	var chatResponse = ChatResponse{
+		UserID:         member.UserID,
+		Msg:            msg,
+		ID:             msgID,
+		MsgType:        msg.Type,
+		CreatedAt:      time.Now(),
+		MemberNickname: member.MemberNickname,
 	}
-	wsInfo, ok := UserOnlineWsMap[userID]
+
+	wsInfo, ok := UserOnlineWsMap[member.UserID]
 	if ok {
 		chatResponse.UserNickname = wsInfo.UserInfo.NickName
 		chatResponse.UserAvatar = wsInfo.UserInfo.Avatar
 	}
+
 	for _, u := range groupMemberOnlineIDList {
 		wsUserInfo, ok2 := UserOnlineWsMap[u]
 		if !ok2 {
@@ -266,9 +273,10 @@ func sendGroupOnlineUserMsg(db *gorm.DB, groupID uint, userID uint, msg ctype.Ms
 		}
 		chatResponse.IsMe = false
 		// 判断isMe
-		if wsUserInfo.UserInfo.ID == userID {
+		if wsUserInfo.UserInfo.ID == member.UserID {
 			chatResponse.IsMe = true
 		}
+
 		byteData, _ := json.Marshal(chatResponse)
 		for _, w2 := range wsUserInfo.WsClientMap {
 			w2.WriteMessage(websocket.TextMessage, byteData)
@@ -276,17 +284,18 @@ func sendGroupOnlineUserMsg(db *gorm.DB, groupID uint, userID uint, msg ctype.Ms
 	}
 }
 
-func insertMsg(db *gorm.DB, conn *websocket.Conn, groupID uint, userID uint, msg ctype.Msg) uint {
+func insertMsg(db *gorm.DB, conn *websocket.Conn, member group_models.GroupMemberModel, msg ctype.Msg) uint {
 	switch msg.Type {
 	case ctype.WithdrawMsgType:
-		logx.Info("撤回消息自己不入库")
+		fmt.Println("撤回消息自己是不入库的")
 		return 0
 	}
 	groupMsg := group_models.GroupMsgModel{
-		GroupID:    groupID,
-		SendUserID: userID,
-		MsgType:    msg.Type,
-		Msg:        msg,
+		GroupID:       member.GroupID,
+		SendUserID:    member.UserID,
+		GroupMemberID: member.ID,
+		MsgType:       msg.Type,
+		Msg:           msg,
 	}
 	groupMsg.MsgPreview = groupMsg.MsgPreviewMethod()
 	err := db.Create(&groupMsg).Error
