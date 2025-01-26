@@ -257,6 +257,7 @@ type GroupSessionResponse {
 	Avatar        string `json:"avatar"`
 	NewMsgDate    string `json:"newMsgDate"` // 最新的消息
 	NewMsgPreview string `json:"newMsgPreview"` // 最新的消息内容
+	IsTop         bool   `json:"isTop"` // 是否置顶
 }
 
 type GroupSessionListResponse {
