@@ -157,7 +157,7 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				}
 				// 要去拿我在这个群的角色
 				// 如果是自己撤自己的 并且自己是普通用户
-				if userID == groupMsg.SendUserID && member.Role == 3 {
+				if member.Role == 3 {
 					// 要判断时间是不是大于了2分钟
 					now := time.Now()
 					if now.Sub(groupMsg.CreatedAt) > 2*time.Minute {
