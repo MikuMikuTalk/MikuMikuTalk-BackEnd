@@ -40,7 +40,21 @@ func (l *GroupMemberRemoveLogic) GroupMemberRemove(req *types.GroupMemberRemoveR
 	if err != nil {
 		return nil, errors.New("当前用户不是群成员")
 	}
-
+	// 用户自己退群
+	if myID == req.MemberID {
+		// 不能我是群主，我是群主不能退群
+		if currentMember.Role == 1 {
+			return nil, errors.New("群主不能退群，只能解散群聊")
+		}
+		// 把member中和这个用户相关的行删了
+		l.svcCtx.DB.Delete(&currentMember)
+		// 给群验证表中加一条记录
+		l.svcCtx.DB.Create(&group_models.GroupVerifyModel{
+			GroupID: currentMember.GroupID,
+			UserID:  myID,
+			Type:    2, //退群验证消息
+		})
+	}
 	// 验证当前用户是否有权限（群主或管理员）
 	if currentMember.Role != 1 && currentMember.Role != 2 {
 		return nil, errors.New("当前用户没有踢人权限")
