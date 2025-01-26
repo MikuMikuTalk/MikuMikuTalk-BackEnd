@@ -52,7 +52,10 @@ func (l *GroupSessionLogic) GroupSession(req *types.GroupSessionRequest) (resp *
 	// 查哪些聊天记录是被删掉的
 	var msgDeleteIDList []uint
 	l.svcCtx.DB.Model(group_models.GroupUserMsgDeleteModel{}).Where("group_id in ?", userGroupIDList).Select("msg_id").Scan(&msgDeleteIDList)
-
+	query := l.svcCtx.DB.Where("group_id in (?)", userGroupIDList)
+	if len(msgDeleteIDList) > 0 {
+		query.Where("id not in ?", msgDeleteIDList)
+	}
 	sessionList, count, _ := list_query.ListQuery(l.svcCtx.DB, SessionData{}, list_query.Option{
 		PageInfo: models.PageInfo{
 			Page:  req.Page,
@@ -65,7 +68,7 @@ func (l *GroupSessionLogic) GroupSession(req *types.GroupSessionRequest) (resp *
 					"max(created_at) as newMsgDate",
 					column,
 					"(select msg_preview from group_msg_models as g where g.group_id = group_id order by g.created_at desc limit 1)  as newMsgPreview").
-				Where("group_id in (?) and id not in ?", userGroupIDList, msgDeleteIDList).
+				Where(query).
 				Group("group_id")
 		},
 	})
