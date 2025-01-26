@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"im_server/common/ctype"
 	"im_server/common/response"
+	"im_server/common/service/redis_cache"
 	"im_server/im_group/group_api/internal/svc"
 	"im_server/im_group/group_api/internal/types"
 	"im_server/im_group/group_models"
@@ -123,6 +124,7 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			var request ChatRequest
 			err = json.Unmarshal(p, &request)
 			if err != nil {
+				logx.Error(err)
 				SendTipErrMsg(conn, "参数解析失败")
 				continue
 			}
@@ -201,6 +203,68 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 						},
 					},
 				})
+			case ctype.ReplyMsgType:
+				// 回复消息，先校验
+				if request.Msg.ReplyMsg == nil || request.Msg.ReplyMsg.MsgID == 0 {
+					SendTipErrMsg(conn, "回复消息id必填")
+					continue
+				}
+				//找到这个原消息
+				var msgModel group_models.GroupMsgModel
+				err = svcCtx.DB.Take(&msgModel, "group_id = ? and id = ?", request.GroupID, request.Msg.ReplyMsg.MsgID).Error
+				if err != nil {
+					SendTipErrMsg(conn, "消息不存在")
+					continue
+				}
+				// 不能回复撤回消息
+				if msgModel.MsgType == ctype.WithdrawMsgType {
+					SendTipErrMsg(conn, "该消息已撤回")
+					continue
+				}
+				userBaseInfo, err := redis_cache.GetUserBaseInfo(svcCtx.Redis, svcCtx.UserRpc, msgModel.SendUserID)
+				if err != nil {
+					logx.Error(err)
+					SendTipErrMsg(conn, err.Error())
+					continue
+				}
+				request.Msg.ReplyMsg.Msg = &msgModel.Msg
+				request.Msg.ReplyMsg.UserID = msgModel.SendUserID
+				request.Msg.ReplyMsg.UserNickName = userBaseInfo.NickName
+				request.Msg.ReplyMsg.OriginMsgDate = msgModel.CreatedAt
+			case ctype.QuoteMsgType:
+				// 回复消息
+				// 先校验
+				if request.Msg.QuoteMsg == nil || request.Msg.QuoteMsg.MsgID == 0 {
+					SendTipErrMsg(conn, "引用消息id必填")
+					continue
+				}
+
+				// 找这个原消息
+				var msgModel group_models.GroupMsgModel
+				err = svcCtx.DB.Take(&msgModel, "group_id = ? and id = ?", request.GroupID, request.Msg.QuoteMsg.MsgID).Error
+				if err != nil {
+					SendTipErrMsg(conn, "消息不存在")
+					continue
+				}
+
+				// 不能回复撤回消息
+				if msgModel.MsgType == ctype.WithdrawMsgType {
+					SendTipErrMsg(conn, "该消息已撤回")
+					continue
+				}
+
+				userBaseInfo, err5 := redis_cache.GetUserBaseInfo(svcCtx.Redis, svcCtx.UserRpc, msgModel.SendUserID)
+				if err5 != nil {
+					logx.Error(err5)
+					SendTipErrMsg(conn, err5.Error())
+					continue
+				}
+
+				request.Msg.QuoteMsg.Msg = &msgModel.Msg
+				request.Msg.QuoteMsg.UserID = msgModel.SendUserID
+				request.Msg.QuoteMsg.UserNickName = userBaseInfo.NickName
+				request.Msg.QuoteMsg.OriginMsgDate = msgModel.CreatedAt
+
 			}
 			// 群聊消息入库
 			msgID := insertMsg(svcCtx.DB, conn, member, request.Msg)
