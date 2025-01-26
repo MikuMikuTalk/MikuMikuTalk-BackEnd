@@ -33,14 +33,15 @@ func NewGroupHistoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Grou
 }
 
 type HistoryResponse struct {
-	UserID       uint          `json:"userID"`
-	UserNickname string        `json:"userNickname"`
-	UserAvatar   string        `json:"userAvatar"`
-	Msg          ctype.Msg     `json:"msg"`
-	ID           uint          `json:"id"`
-	MsgType      ctype.MsgType `json:"msgType"`
-	CreatedAt    time.Time     `json:"createdAt"`
-	IsMe         bool          `json:"isMe"`
+	UserID         uint          `json:"userID"`
+	UserNickname   string        `json:"userNickname"`
+	UserAvatar     string        `json:"userAvatar"`
+	Msg            ctype.Msg     `json:"msg"`
+	ID             uint          `json:"id"`
+	MsgType        ctype.MsgType `json:"msgType"`
+	CreatedAt      time.Time     `json:"createdAt"`
+	IsMe           bool          `json:"isMe"`
+	MemberNickname string        `json:"memberNickname"` // 群好友备注
 }
 
 type HistoryListResponse struct {
@@ -55,12 +56,19 @@ func (l *GroupHistoryLogic) GroupHistory(req *types.GroupHistoryRequest) (resp *
 		return nil, errors.New("无效的 Token")
 	}
 	myID := claims.UserID
+
 	var member group_models.GroupMemberModel
 	err = l.svcCtx.DB.Take(&member, "group_id = ? and user_id = ?", req.ID, myID).Error
 	if err != nil {
 		return nil, errors.New("该用户不是群成员")
 	}
-
+	// 查一下所有的群成员
+	var memberList []group_models.GroupMemberModel
+	l.svcCtx.DB.Find(&memberList, "group_id = ?", req.ID)
+	var memberMap = map[uint]group_models.GroupMemberModel{}
+	for _, model := range memberList {
+		memberMap[model.UserID] = model
+	}
 	// 去查我删除了哪些聊天记录
 	var msgIDList []uint
 	l.svcCtx.DB.Model(group_models.GroupUserMsgDeleteModel{}).
@@ -91,11 +99,12 @@ func (l *GroupHistoryLogic) GroupHistory(req *types.GroupHistoryRequest) (resp *
 	var list = make([]HistoryResponse, 0)
 	for _, model := range groupMsgList {
 		info := HistoryResponse{
-			UserID:    model.SendUserID,
-			Msg:       model.Msg,
-			ID:        model.ID,
-			MsgType:   model.MsgType,
-			CreatedAt: model.CreatedAt,
+			UserID:         model.SendUserID,
+			Msg:            model.Msg,
+			ID:             model.ID,
+			MsgType:        model.MsgType,
+			CreatedAt:      model.CreatedAt,
+			MemberNickname: memberMap[model.SendUserID].MemberNickname,
 		}
 		if err1 == nil {
 			info.UserNickname = userListResponse.UserInfo[uint32(info.UserID)].NickName
