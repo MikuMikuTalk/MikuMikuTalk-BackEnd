@@ -48,12 +48,14 @@ func (l *GroupInfoLogic) GroupInfo(req *types.GroupInfoRequest) (resp *types.Gro
 		return nil, errors.New("该用户不是群成员")
 	}
 	resp = &types.GroupInfoResponse{
-		GroupID:     req.ID,
-		Title:       groupModel.Title,
-		Abstract:    groupModel.Abstract,
-		MemberCount: len(groupModel.MemberList),
-		Avatar:      groupModel.Avatar,
-		Role:        member.Role,
+		GroupID:         req.ID,
+		Title:           groupModel.Title,
+		Abstract:        groupModel.Abstract,
+		MemberCount:     len(groupModel.MemberList),
+		Avatar:          groupModel.Avatar,
+		Role:            member.Role,
+		IsProhibition:   groupModel.IsProhibition,
+		ProhibitionTime: member.ProhibitionTime,
 	}
 	// 查询用户列表信息
 

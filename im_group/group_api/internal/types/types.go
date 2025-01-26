@@ -106,7 +106,9 @@ type GroupInfoResponse struct {
 	Avatar            string     `json:"avatar"`
 	Creator           UserInfo   `json:"creator"`
 	AdminList         []UserInfo `json:"adminList"`
-	Role              int8       `json:"role"` // 角色  1 群主 2 群管理员 3 群成员
+	Role              int8       `json:"role"`            // 角色  1 群主 2 群管理员 3 群成员
+	IsProhibition     bool       `json:"isProhibition"`   // 是否开启了全员禁言
+	ProhibitionTime   *int       `json:"prohibitionTime"` // 自己的禁言时间
 }
 
 type GroupMemberAddRequest struct {
