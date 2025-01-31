@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 
+	"im_server/common/contexts"
 	"im_server/common/ctype"
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
 	"im_server/im_user/user_models"
-	"im_server/utils/jwts"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,12 +28,8 @@ func NewAddUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddUserLo
 	}
 }
 
-func (l *AddUserLogic) AddUser(req *types.AddFriendRequest, token string) (resp *types.AddFriendResponse, err error) {
-	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		return
-	}
-	my_id := claims.UserID
+func (l *AddUserLogic) AddUser(req *types.AddFriendRequest) (resp *types.AddFriendResponse, err error) {
+	my_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 	friend_nickname := req.FriendName
 	var user user_models.UserModel
 	err = l.svcCtx.DB.Take(&user, "nickname = ?", friend_nickname).Error

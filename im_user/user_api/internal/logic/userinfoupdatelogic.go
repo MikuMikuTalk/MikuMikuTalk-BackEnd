@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"im_server/common/contexts"
 	"im_server/common/ctype"
 	"im_server/im_user/user_models"
-	"im_server/utils/jwts"
 	"im_server/utils/ref_map"
 
 	"im_server/im_user/user_api/internal/svc"
@@ -31,15 +31,9 @@ func NewUserInfoUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Us
 	}
 }
 
-func (l *UserInfoUpdateLogic) UserInfoUpdate(token string, req *types.UserInfoUpdateRequest) (resp *types.UserInfoUpdateResponse, err error) {
-	// 获取claims
-	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		logx.Error("error: ", err)
-		return nil, err
-	}
-	// 获取请求的用户的id
-	user_id := claims.UserID
+func (l *UserInfoUpdateLogic) UserInfoUpdate(req *types.UserInfoUpdateRequest) (resp *types.UserInfoUpdateResponse, err error) {
+	user_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
+
 	userMaps := ref_map.RefToMap(*req, "user")
 	userConfMaps := ref_map.RefToMap(*req, "user_conf")
 	logx.Info("userMaps: ", userMaps)

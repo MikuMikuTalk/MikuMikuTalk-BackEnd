@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"im_server/common/contexts"
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
 	"im_server/im_user/user_models"
-	"im_server/utils/jwts"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,12 +27,9 @@ func NewFriendNoticeUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 	}
 }
 
-func (l *FriendNoticeUpdateLogic) FriendNoticeUpdate(req *types.FriendNoticeUpdateRequest, token string) (resp *types.FriendNoticeUpdateResponse, err error) {
-	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		return nil, err
-	}
-	user_id := claims.UserID
+func (l *FriendNoticeUpdateLogic) FriendNoticeUpdate(req *types.FriendNoticeUpdateRequest) (resp *types.FriendNoticeUpdateResponse, err error) {
+
+	user_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 	var friend user_models.FriendModel
 
 	if !friend.IsFriend(l.svcCtx.DB, user_id, req.FriendID) {

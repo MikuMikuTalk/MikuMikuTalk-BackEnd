@@ -3,12 +3,12 @@ package logic
 import (
 	"context"
 
+	"im_server/common/contexts"
 	"im_server/common/list_query"
 	"im_server/common/models"
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
 	"im_server/im_user/user_models"
-	"im_server/utils/jwts"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,12 +28,8 @@ func NewUserValidListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Use
 	}
 }
 
-func (l *UserValidListLogic) UserValidList(req *types.FriendValidRequest, token string) (resp *types.FriendValidResponse, err error) {
-	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		return
-	}
-	my_id := claims.UserID
+func (l *UserValidListLogic) UserValidList(req *types.FriendValidRequest) (resp *types.FriendValidResponse, err error) {
+	my_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 	fvs, count, _ := list_query.ListQuery(l.svcCtx.DB, user_models.FriendVerifyModel{}, list_query.Option{
 		PageInfo: models.PageInfo{
 			Page:  req.Page,

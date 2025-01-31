@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"im_server/common/contexts"
 	"im_server/im_auth/auth_api/internal/svc"
 	"im_server/utils/jwts"
 
@@ -27,7 +28,8 @@ func NewLogoutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LogoutLogi
 	}
 }
 
-func (l *LogoutLogic) Logout(token string) (string, error) {
+func (l *LogoutLogic) Logout() (string, error) {
+	token := l.ctx.Value(contexts.ContextKeyToken).(string)
 	if token == "" {
 		return "", errors.New("登陆后才可以注销哦")
 	}

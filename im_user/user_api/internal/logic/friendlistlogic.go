@@ -4,12 +4,12 @@ import (
 	"context"
 	"strconv"
 
+	"im_server/common/contexts"
 	"im_server/common/list_query"
 	"im_server/common/models"
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
 	"im_server/im_user/user_models"
-	"im_server/utils/jwts"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,12 +29,9 @@ func NewFriendListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Friend
 	}
 }
 
-func (l *FriendListLogic) FriendList(req *types.FriendListRequest, token string) (resp *types.FriendListResponse, err error) {
-	clamis, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		return nil, err
-	}
-	user_id := clamis.UserID
+func (l *FriendListLogic) FriendList(req *types.FriendListRequest) (resp *types.FriendListResponse, err error) {
+	user_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
+
 	// 使用通用列表查询
 	friend_list, count, _ := list_query.ListQuery(l.svcCtx.DB, user_models.FriendModel{}, list_query.Option{
 		PageInfo: models.PageInfo{

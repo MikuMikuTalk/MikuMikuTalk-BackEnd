@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"im_server/common/contexts"
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
 	"im_server/im_user/user_models"
-	"im_server/utils/jwts"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,12 +27,9 @@ func NewUserValidLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserVal
 	}
 }
 
-func (l *UserValidLogic) UserValid(req *types.UserValidRequest, token string) (resp *types.UserValidResponse, err error) {
-	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		return
-	}
-	my_id := claims.UserID
+func (l *UserValidLogic) UserValid(req *types.UserValidRequest) (resp *types.UserValidResponse, err error) {
+
+	my_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 	friend_nickname := req.FriendName
 	var user_conf user_models.UserConfModel
 	var user user_models.UserModel

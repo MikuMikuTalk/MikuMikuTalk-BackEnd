@@ -2,25 +2,45 @@ package middleware
 
 import (
 	"context"
+	"encoding/json"
+	"im_server/common/contexts"
+	"im_server/common/etcd"
+	"im_server/im_settings/config"
+	"im_server/utils/jwts"
 	"net/http"
 
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
-)
-
-// 定义自己的类型
-type contextKey string
-
-const (
-	clientIPKey contextKey = "clientIP"
-	tokenKey    contextKey = "token"
 )
 
 func LogMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		clientIP := httpx.GetRemoteAddr(r)
-		ctx := context.WithValue(r.Context(), clientIPKey, clientIP)
+		ctx := context.WithValue(r.Context(), contexts.ContextKeyClientIP, clientIP)
+		// header中取出authorization 中的jwt字段值
 		token := r.Header.Get("Authorization")
-		ctx = context.WithValue(ctx, tokenKey, token)
+		etcdStorage := etcd.NewEtcdStorage("127.0.0.1:2379")
+		appConfiguration, _ := etcdStorage.Get("config")
+
+		var appConfig config.Config
+
+		err := json.Unmarshal([]byte(appConfiguration), &appConfig)
+
+		if err != nil {
+			http.Error(w, "json解析失败", http.StatusBadRequest)
+		}
+
+		claims, err := jwts.ParseToken(token, appConfig.Auth.AuthSecret)
+		if err != nil {
+			http.Error(w, "jwt解析失败", http.StatusBadRequest)
+		}
+
+		ctx = context.WithValue(ctx, contexts.ContextKeyToken, token)
+		if claims != nil {
+			logx.Info(claims)
+			userID := claims.UserID
+			ctx = context.WithValue(ctx, contexts.ContextKeyUserID, userID)
+		}
 		r = r.WithContext(ctx)
 		next(w, r)
 	}

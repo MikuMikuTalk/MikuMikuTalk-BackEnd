@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 
+	"im_server/common/contexts"
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
 	"im_server/im_user/user_models"
 	"im_server/im_user/user_rpc/types/user_rpc"
-	"im_server/utils/jwts"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,21 +28,18 @@ func NewFriendInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Friend
 	}
 }
 
-func (l *FriendInfoLogic) FriendInfo(req *types.FriendInfoRequest, token string) (resp *types.FriendInfoResponse, err error) {
+func (l *FriendInfoLogic) FriendInfo(req *types.FriendInfoRequest) (resp *types.FriendInfoResponse, err error) {
 	// 确定查的用户是自己的好友
 	var user user_models.UserModel
-	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		logx.Error(err)
-		return
-	}
+
 	err = l.svcCtx.DB.Take(&user, "nickname = ?", req.FriendName).Error
 	if err != nil {
 		logx.Error("查找的好友不存在！")
 		return
 	}
 
-	my_id := claims.UserID
+	my_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
+
 	var friend user_models.FriendModel
 
 	err = l.svcCtx.DB.Take(&friend, "(send_user_id = ? and rev_user_id = ?) or (send_user_id = ? and rev_user_id = ?)", my_id, user.ID, user.ID, my_id).Error

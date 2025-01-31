@@ -21,8 +21,7 @@ func FriendNoticeUpdateHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := logic.NewFriendNoticeUpdateLogic(r.Context(), svcCtx)
-		token := r.Header.Get("Authorization")
-		resp, err := l.FriendNoticeUpdate(&req, token)
+		resp, err := l.FriendNoticeUpdate(&req)
 		response.Response(r, w, resp, err)
 	}
 }

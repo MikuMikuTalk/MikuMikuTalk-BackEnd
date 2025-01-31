@@ -19,9 +19,8 @@ func FriendListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			response.Response(r, w, nil, err)
 			return
 		}
-		token := r.Header.Get("Authorization")
 		l := logic.NewFriendListLogic(r.Context(), svcCtx)
-		resp, err := l.FriendList(&req, token)
+		resp, err := l.FriendList(&req)
 		response.Response(r, w, resp, err)
 	}
 }

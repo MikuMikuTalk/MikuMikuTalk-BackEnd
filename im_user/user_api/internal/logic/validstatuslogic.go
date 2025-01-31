@@ -7,11 +7,11 @@ import (
 
 	"im_server/im_chat/chat_rpc/chat"
 
+	"im_server/common/contexts"
 	"im_server/common/ctype"
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
 	"im_server/im_user/user_models"
-	"im_server/utils/jwts"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -31,12 +31,8 @@ func NewValidStatusLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Valid
 	}
 }
 
-func (l *ValidStatusLogic) ValidStatus(req *types.FriendValidStatusRequest, token string) (resp *types.FriendValidStatusResponse, err error) {
-	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		return
-	}
-	my_id := claims.UserID
+func (l *ValidStatusLogic) ValidStatus(req *types.FriendValidStatusRequest) (resp *types.FriendValidStatusResponse, err error) {
+	my_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 
 	// 别人给我发好友请求，在请求的验证表里找到了接受用户是我的验证
 	var friendVerify user_models.FriendVerifyModel

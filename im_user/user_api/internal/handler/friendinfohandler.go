@@ -19,9 +19,8 @@ func FriendInfoHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			response.Response(r, w, nil, err)
 			return
 		}
-		token := r.Header.Get("Authorization")
 		l := logic.NewFriendInfoLogic(r.Context(), svcCtx)
-		resp, err := l.FriendInfo(&req, token)
+		resp, err := l.FriendInfo(&req)
 		response.Response(r, w, resp, err)
 	}
 }

@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 
+	"im_server/common/contexts"
 	"im_server/im_user/user_models"
 	"im_server/im_user/user_rpc/types/user_rpc"
-	"im_server/utils/jwts"
 
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
@@ -30,16 +30,12 @@ func NewUserInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserInfo
 	}
 }
 
-func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest, token string) (resp *types.UserInfoResponse, err error) {
+func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserInfoResponse, err error) {
 	var user user_models.UserModel
 	// 查询用户
-	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		logx.Error("error: ", err)
-		return nil, err
-	}
 	// 获取请求的用户的id
-	my_id := claims.UserID
+	my_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
+
 	res, err := l.svcCtx.UserRpc.UserInfo(context.Background(), &user_rpc.UserInfoRequest{
 		UserId: uint32(my_id),
 	})

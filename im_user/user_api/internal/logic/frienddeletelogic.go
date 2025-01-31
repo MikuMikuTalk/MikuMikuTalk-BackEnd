@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"im_server/common/contexts"
 	"im_server/im_user/user_api/internal/svc"
 	"im_server/im_user/user_api/internal/types"
 	"im_server/im_user/user_models"
-	"im_server/utils/jwts"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,12 +27,8 @@ func NewFriendDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Frie
 	}
 }
 
-func (l *FriendDeleteLogic) FriendDelete(req *types.FriendDeleteRequest, token string) (resp *types.FriendDeleteResponse, err error) {
-	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
-	if err != nil {
-		return
-	}
-	my_id := claims.UserID
+func (l *FriendDeleteLogic) FriendDelete(req *types.FriendDeleteRequest) (resp *types.FriendDeleteResponse, err error) {
+	my_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 	friend_name := req.FriendName
 	var user user_models.UserModel
 	err = l.svcCtx.DB.Take(&user, "nickname = ?", friend_name).Error
