@@ -55,7 +55,7 @@ func (l *GroupInfoLogic) GroupInfo(req *types.GroupInfoRequest) (resp *types.Gro
 		Avatar:          groupModel.Avatar,
 		Role:            member.Role,
 		IsProhibition:   groupModel.IsProhibition,
-		ProhibitionTime: member.ProhibitionTime,
+		ProhibitionTime: member.GetProhibitionTime(l.svcCtx.Redis, l.svcCtx.DB),
 	}
 	// 查询用户列表信息
 

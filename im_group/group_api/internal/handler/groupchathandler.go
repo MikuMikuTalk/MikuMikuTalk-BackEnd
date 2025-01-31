@@ -143,11 +143,11 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			}
 
 			// 我是不是被禁言了
-			if member.ProhibitionTime != nil {
+			if member.GetProhibitionTime(svcCtx.Redis, svcCtx.DB) != nil {
 				SendTipErrMsg(conn, "当前用户正在禁言中")
 				continue
 			}
-
+			
 			switch request.Msg.Type {
 			case ctype.WithdrawMsgType: //撤回消息
 				withdrawMsg := request.Msg.WithdrawMsg
