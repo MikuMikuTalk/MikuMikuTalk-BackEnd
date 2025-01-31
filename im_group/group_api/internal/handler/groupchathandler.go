@@ -130,12 +130,24 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			}
 			//判断自己是不是这个群的成员
 			var member group_models.GroupMemberModel
-			err = svcCtx.DB.Take(&member, "group_id = ? and user_id = ? ", request.GroupID, userID).Error
+			err = svcCtx.DB.Preload("GroupModel").Take(&member, "group_id = ? and user_id = ?", request.GroupID, userID).Error
 			if err != nil {
 				//自己不是这个群的群成员
 				SendTipErrMsg(conn, "你还不是这个群的群成员")
 				continue
 			}
+			if member.GroupModel.IsProhibition {
+				// 开启了全员禁言
+				SendTipErrMsg(conn, "当前群正在全员禁言中")
+				continue
+			}
+
+			// 我是不是被禁言了
+			if member.ProhibitionTime != nil {
+				SendTipErrMsg(conn, "当前用户正在禁言中")
+				continue
+			}
+
 			switch request.Msg.Type {
 			case ctype.WithdrawMsgType: //撤回消息
 				withdrawMsg := request.Msg.WithdrawMsg
