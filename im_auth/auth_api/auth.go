@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"im_server/common/etcd"
+	"im_server/common/middleware"
 	"im_server/im_auth/auth_api/internal/config"
 	"im_server/im_auth/auth_api/internal/handler"
 	"im_server/im_auth/auth_api/internal/svc"
@@ -33,6 +34,8 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
 
+	// 使用中间件
+	server.Use(middleware.LogMiddleware)
 	etcd.DeliveryAddress(c.Etcd, c.Name+"_api", fmt.Sprintf("%s:%d", c.Host, c.Port))
 	logx.Infof("im_auth服务 正在监听 %s:%d...\n", c.Host, c.Port)
 	server.Start()

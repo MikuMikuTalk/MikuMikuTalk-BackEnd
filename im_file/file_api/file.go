@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"im_server/common/etcd"
+	"im_server/common/middleware"
 
 	"im_server/im_file/file_api/internal/config"
 	"im_server/im_file/file_api/internal/handler"
@@ -27,6 +28,8 @@ func main() {
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
+	// 添加中间件
+	server.Use(middleware.LogMiddleware)
 	// 上送地址
 	etcd.DeliveryAddress(c.Etcd, c.Name+"_api", fmt.Sprintf("%s:%d", c.Host, c.Port))
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
