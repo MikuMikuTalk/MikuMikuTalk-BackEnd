@@ -17,6 +17,10 @@ type Config struct {
 		AuthSecret string
 		AuthExpire int64
 	}
-	UserRpc   zrpc.RpcClientConf
-	WhiteList []string // 白名单
+	UserRpc      zrpc.RpcClientConf
+	WhiteList    []string // 白名单
+	KqPusherConf struct {
+		Brokers []string
+		Topic   string
+	}
 }

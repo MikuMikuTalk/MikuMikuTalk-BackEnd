@@ -50,6 +50,10 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 		err = fmt.Errorf("生成 JWT 失败: %w", err)
 		return nil, err
 	}
+	err = l.svcCtx.KqPusherClient.Push(context.Background(), fmt.Sprintf("%s用户登录成功", req.UserName))
+	if err != nil {
+		logx.Error(err)
+	}
 	return &types.LoginResponse{
 		Token: token,
 	}, nil

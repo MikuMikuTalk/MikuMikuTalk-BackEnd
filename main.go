@@ -8,6 +8,7 @@ import (
 	"im_server/im_chat/chat_models"
 	"im_server/im_file/file_api/file_models"
 	"im_server/im_group/group_models"
+	"im_server/im_log/logs_model"
 	"im_server/im_user/user_models"
 )
 
@@ -37,6 +38,7 @@ func main() {
 			&group_models.GroupUserTopModel{},       //用户置顶群聊表
 			&group_models.GroupUserMsgDeleteModel{}, // 用户删除聊天记录表
 			&file_models.FileModel{},                // 文件表
+			&logs_model.LogModel{},
 		)
 		if err != nil {
 			fmt.Println("表结构生成失败", err)
