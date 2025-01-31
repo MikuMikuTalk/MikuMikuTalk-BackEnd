@@ -30,7 +30,6 @@ func NewFriendSearchLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Frie
 }
 
 func (l *FriendSearchLogic) FriendSearch(req *types.SearchRequest) (resp *types.SearchResponse, err error) {
-
 	user_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 	// 所有用户
 	user_list, count, _ := list_query.ListQuery(l.svcCtx.DB, user_models.UserConfModel{

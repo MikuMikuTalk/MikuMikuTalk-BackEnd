@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+
 	"im_server/im_group/group_models"
 	"im_server/utils/jwts"
 
@@ -52,7 +53,7 @@ func (l *GroupMemberRemoveLogic) GroupMemberRemove(req *types.GroupMemberRemoveR
 		l.svcCtx.DB.Create(&group_models.GroupVerifyModel{
 			GroupID: currentMember.GroupID,
 			UserID:  myID,
-			Type:    2, //退群验证消息
+			Type:    2, // 退群验证消息
 		})
 	}
 	// 验证当前用户是否有权限（群主或管理员）
@@ -94,5 +95,4 @@ func (l *GroupMemberRemoveLogic) GroupMemberRemove(req *types.GroupMemberRemoveR
 
 	// 其他情况
 	return nil, errors.New("没有权限")
-
 }

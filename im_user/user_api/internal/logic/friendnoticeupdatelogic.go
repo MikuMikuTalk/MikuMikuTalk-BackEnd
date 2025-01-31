@@ -28,7 +28,6 @@ func NewFriendNoticeUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *FriendNoticeUpdateLogic) FriendNoticeUpdate(req *types.FriendNoticeUpdateRequest) (resp *types.FriendNoticeUpdateResponse, err error) {
-
 	user_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 	var friend user_models.FriendModel
 

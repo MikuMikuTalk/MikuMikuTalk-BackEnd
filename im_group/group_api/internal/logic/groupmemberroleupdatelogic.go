@@ -39,7 +39,7 @@ func (l *GroupMemberRoleUpdateLogic) GroupMemberRoleUpdate(req *types.GroupMembe
 	if err != nil {
 		return nil, errors.New("违规调用")
 	}
-	//如果我在这个群里，看看我是不是群主，群主才能让群成员变成管理员或者把管理员降级为群成员
+	// 如果我在这个群里，看看我是不是群主，群主才能让群成员变成管理员或者把管理员降级为群成员
 	if member.Role != 1 {
 		return nil, errors.New("权限错误")
 	}
@@ -59,5 +59,4 @@ func (l *GroupMemberRoleUpdateLogic) GroupMemberRoleUpdate(req *types.GroupMembe
 	l.svcCtx.DB.Model(&member1).Update("role", req.Role)
 
 	return
-
 }

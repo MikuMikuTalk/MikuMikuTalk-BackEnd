@@ -3,11 +3,12 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+
 	"im_server/common/contexts"
 	"im_server/common/etcd"
 	"im_server/im_settings/config"
 	"im_server/utils/jwts"
-	"net/http"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -25,7 +26,6 @@ func LogMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		var appConfig config.Config
 
 		err := json.Unmarshal([]byte(appConfiguration), &appConfig)
-
 		if err != nil {
 			http.Error(w, "json解析失败", http.StatusBadRequest)
 		}

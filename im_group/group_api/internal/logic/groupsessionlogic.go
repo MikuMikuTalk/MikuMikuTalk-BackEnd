@@ -79,7 +79,7 @@ func (l *GroupSessionLogic) GroupSession(req *types.GroupSessionRequest) (resp *
 	}
 	var groupListModel []group_models.GroupModel
 	l.svcCtx.DB.Find(&groupListModel, groupIDList)
-	var groupMap = map[uint]group_models.GroupModel{}
+	groupMap := map[uint]group_models.GroupModel{}
 	for _, model := range groupListModel {
 		groupMap[model.ID] = model
 	}

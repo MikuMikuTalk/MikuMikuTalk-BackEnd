@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+
 	"im_server/common/ctype"
 	"im_server/im_group/group_models"
 	"im_server/utils/jwts"
@@ -49,7 +50,7 @@ func (l *GroupValidAddLogic) GroupValidAdd(req *types.AddGroupRequest) (resp *ty
 	}
 
 	resp = new(types.AddGroupResponse)
-	var verifyModel = group_models.GroupVerifyModel{
+	verifyModel := group_models.GroupVerifyModel{
 		GroupID:            req.GroupID,
 		UserID:             myID,
 		Status:             0,
@@ -63,7 +64,7 @@ func (l *GroupValidAddLogic) GroupValidAdd(req *types.AddGroupRequest) (resp *ty
 		// 直接成为好友
 		// 先往验证表里面加一条记录，然后通过
 		verifyModel.Status = 1
-		var groupMember = group_models.GroupMemberModel{
+		groupMember := group_models.GroupMemberModel{
 			GroupID: req.GroupID,
 			UserID:  myID,
 			Role:    3,
@@ -109,7 +110,7 @@ func (l *GroupValidAddLogic) GroupValidAdd(req *types.AddGroupRequest) (resp *ty
 			verifyModel.Status = 1
 			verifyModel.VerificationQuestion = group.VerificationQuestion
 			// 把用户加到群里面
-			var groupMember = group_models.GroupMemberModel{
+			groupMember := group_models.GroupMemberModel{
 				GroupID: req.GroupID,
 				UserID:  myID,
 				Role:    3,
@@ -128,5 +129,4 @@ func (l *GroupValidAddLogic) GroupValidAdd(req *types.AddGroupRequest) (resp *ty
 	}
 
 	return
-
 }

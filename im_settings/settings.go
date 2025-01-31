@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+
 	"im_server/common/etcd"
 	"im_server/im_settings/config"
 
@@ -39,5 +40,4 @@ func main() {
 	// etcdStorage.Put("RedisHost", c.Redis.Host)
 	// etcdStorage.Put("RedisPass", c.Redis.Pass)
 	// etcdStorage.Put("RedisType", c.Redis.Type)
-
 }

@@ -92,7 +92,7 @@ func (l *GroupHistoryLogic) GroupHistory(req *types.GroupHistoryRequest) (resp *
 	userListResponse, err1 := l.svcCtx.UserRpc.UserListInfo(context.Background(), &user_rpc.UserListInfoRequest{
 		UserIdList: userIDList,
 	})
-	var list = make([]HistoryResponse, 0)
+	list := make([]HistoryResponse, 0)
 	for _, model := range groupMsgList {
 		info := HistoryResponse{
 			UserID:    model.SendUserID,

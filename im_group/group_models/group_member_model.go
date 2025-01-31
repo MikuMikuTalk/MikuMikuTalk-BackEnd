@@ -2,10 +2,11 @@ package group_models
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"gorm.io/gorm"
 	"im_server/common/models"
-	"time"
 )
 
 // GroupMemberModel 群成员表

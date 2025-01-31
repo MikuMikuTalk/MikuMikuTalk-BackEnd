@@ -28,7 +28,6 @@ func NewUserValidLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserVal
 }
 
 func (l *UserValidLogic) UserValid(req *types.UserValidRequest) (resp *types.UserValidResponse, err error) {
-
 	my_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 	friend_nickname := req.FriendName
 	var user_conf user_models.UserConfModel

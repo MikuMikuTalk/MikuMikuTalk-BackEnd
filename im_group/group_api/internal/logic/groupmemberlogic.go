@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"im_server/common/ctype"
 	"im_server/common/list_query"
 	"im_server/common/models"
@@ -82,7 +83,7 @@ func (l *GroupMemberLogic) GroupMember(req *types.GroupMemberRequest) (resp *typ
 	}
 
 	// 调用 UserRpc 服务获取用户信息
-	var userInfoMap = map[uint]ctype.UserInfo{}
+	userInfoMap := map[uint]ctype.UserInfo{}
 	userListResponse, err := l.svcCtx.UserRpc.UserListInfo(context.Background(), &user_rpc.UserListInfoRequest{UserIdList: userIDList})
 	if err == nil {
 		// 将用户信息存入 map 中
@@ -98,7 +99,7 @@ func (l *GroupMemberLogic) GroupMember(req *types.GroupMemberRequest) (resp *typ
 	}
 
 	// 调用 UserRpc 服务获取在线用户列表
-	var userOnlineMap = map[uint]bool{}
+	userOnlineMap := map[uint]bool{}
 	userOnlineResponse, err := l.svcCtx.UserRpc.UserOnlineList(context.Background(), &user_rpc.UserOnlineListRequest{})
 	if err == nil {
 		// 将在线用户信息存入 map 中

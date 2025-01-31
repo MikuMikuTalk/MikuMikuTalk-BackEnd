@@ -48,7 +48,7 @@ func (l *GroupfriendsListLogic) GroupfriendsList(req *types.GroupfriendsListRequ
 	// 这个群的群成员列表 组成一个map
 	var memberList []group_models.GroupMemberModel
 	l.svcCtx.DB.Find(&memberList, "group_id = ?", req.ID)
-	var memberMap = map[uint]bool{}
+	memberMap := map[uint]bool{}
 	for _, model := range memberList {
 		memberMap[model.UserID] = true
 	}

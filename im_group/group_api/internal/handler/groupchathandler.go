@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"time"
+
 	"im_server/common/ctype"
 	"im_server/common/response"
 	"im_server/common/service/redis_cache"
@@ -12,8 +15,6 @@ import (
 	"im_server/im_group/group_models"
 	"im_server/im_user/user_rpc/types/user_rpc"
 	"im_server/utils/jwts"
-	"net/http"
-	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -22,7 +23,7 @@ import (
 )
 
 type UserWsInfo struct {
-	UserInfo    ctype.UserInfo             //用户信息
+	UserInfo    ctype.UserInfo             // 用户信息
 	WsClientMap map[string]*websocket.Conn // 这个用户管理的所有ws客户端
 }
 
@@ -62,7 +63,7 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		userID := claims.UserID
-		var upGrader = websocket.Upgrader{
+		upGrader := websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				return true
 			},
@@ -111,7 +112,7 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 		_, ok1 := userWsInfo.WsClientMap[addr]
 		if !ok1 {
-			//用户第二次连接
+			// 用户第二次连接
 			UserOnlineWsMap[userID].WsClientMap[addr] = conn
 		}
 
@@ -128,11 +129,11 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				SendTipErrMsg(conn, "参数解析失败")
 				continue
 			}
-			//判断自己是不是这个群的成员
+			// 判断自己是不是这个群的成员
 			var member group_models.GroupMemberModel
 			err = svcCtx.DB.Preload("GroupModel").Take(&member, "group_id = ? and user_id = ?", request.GroupID, userID).Error
 			if err != nil {
-				//自己不是这个群的群成员
+				// 自己不是这个群的群成员
 				SendTipErrMsg(conn, "你还不是这个群的群成员")
 				continue
 			}
@@ -147,9 +148,9 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				SendTipErrMsg(conn, "当前用户正在禁言中")
 				continue
 			}
-			
+
 			switch request.Msg.Type {
-			case ctype.WithdrawMsgType: //撤回消息
+			case ctype.WithdrawMsgType: // 撤回消息
 				withdrawMsg := request.Msg.WithdrawMsg
 				if withdrawMsg == nil {
 					SendTipErrMsg(conn, "撤回消息的格式错误")
@@ -198,7 +199,7 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				}
 
 				// 如果是群主，那就能撤管理员和用户的
-				var content = "撤回了一条消息"
+				content := "撤回了一条消息"
 				content = "你" + content
 				// 前端可以判断，这个消息如果不是isMe，可以把你替换成对方的名称
 				originMsg := groupMsg.Msg
@@ -221,7 +222,7 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 					SendTipErrMsg(conn, "回复消息id必填")
 					continue
 				}
-				//找到这个原消息
+				// 找到这个原消息
 				var msgModel group_models.GroupMsgModel
 				err = svcCtx.DB.Take(&msgModel, "group_id = ? and id = ?", request.GroupID, request.Msg.ReplyMsg.MsgID).Error
 				if err != nil {
@@ -288,13 +289,12 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// resp, err := l.GroupChat(&req)
 		// // 这里如果正常，err就是nil,响应的包装好的json数据里的code就是0,如果Open_login这个逻辑在调用中发生了错误，那么会把错误信息和响应包装在响应的json数据中
 		// response.Response(r, w, resp, err)
-
 	}
 }
 
 func getOnlineUserIDList() []uint {
 	var userOnlineIDList []uint = make([]uint, 0)
-	for u, _ := range UserOnlineWsMap {
+	for u := range UserOnlineWsMap {
 		userOnlineIDList = append(userOnlineIDList, u)
 	}
 	return userOnlineIDList
@@ -317,7 +317,6 @@ func SendTipErrMsg(conn *websocket.Conn, msg string) {
 
 // 给这个群的用户发消息
 func sendGroupOnlineUserMsg(db *gorm.DB, member group_models.GroupMemberModel, msg ctype.Msg, msgID uint) {
-
 	// 查在线的用户列表
 	userOnlineIDList := getOnlineUserIDList()
 	// 查这个群的成员 并且在线
@@ -327,7 +326,7 @@ func sendGroupOnlineUserMsg(db *gorm.DB, member group_models.GroupMemberModel, m
 		Select("user_id").Scan(&groupMemberOnlineIDList)
 
 	// 构造响应
-	var chatResponse = ChatResponse{
+	chatResponse := ChatResponse{
 		UserID:         member.UserID,
 		Msg:            msg,
 		ID:             msgID,

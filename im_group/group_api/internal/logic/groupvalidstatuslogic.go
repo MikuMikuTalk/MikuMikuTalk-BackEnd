@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+
 	"im_server/im_group/group_models"
 	"im_server/utils/jwts"
 
@@ -56,7 +57,7 @@ func (l *GroupValidStatusLogic) GroupValidStatus(req *types.GroupValidStatusRequ
 		return
 	case 1: // 同意
 		// 将用户加到群里面去
-		var member1 = group_models.GroupMemberModel{
+		member1 := group_models.GroupMemberModel{
 			GroupID: groupValidModel.GroupID,
 			UserID:  groupValidModel.UserID,
 			Role:    3,

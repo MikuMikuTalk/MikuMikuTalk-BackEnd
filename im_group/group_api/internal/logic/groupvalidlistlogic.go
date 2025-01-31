@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+
 	"im_server/common/list_query"
 	"im_server/common/models"
 	"im_server/im_group/group_models"
@@ -92,5 +93,4 @@ func (l *GroupValidListLogic) GroupValidList(req *types.GroupValidListRequest) (
 	}
 
 	return
-
 }
