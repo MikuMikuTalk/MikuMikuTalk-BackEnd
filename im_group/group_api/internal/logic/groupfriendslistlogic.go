@@ -37,7 +37,7 @@ func (l *GroupfriendsListLogic) GroupfriendsList(req *types.GroupfriendsListRequ
 	// 我的好友哪些在这个群里面
 
 	// 需要去查我的好友列表
-	friendResponse, err := l.svcCtx.UserRpc.FriendList(context.Background(), &user_rpc.FriendListRequest{
+	friendResponse, err := l.svcCtx.UserRpc.FriendList(l.ctx, &user_rpc.FriendListRequest{
 		User: uint32(myID),
 	})
 	if err != nil {

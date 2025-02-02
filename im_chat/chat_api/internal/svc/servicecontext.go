@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"im_server/common/zrpc_interceptor"
 	"im_server/core"
 	"im_server/im_chat/chat_api/internal/config"
 	"im_server/im_file/file_rpc/files"
@@ -27,8 +28,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config:  c,
 		DB:      mysqlDb,
-		UserRpc: users.NewUsers(zrpc.MustNewClient(c.UserRpc)),
-		FileRpc: files.NewFiles(zrpc.MustNewClient(c.FileRpc)),
+		UserRpc: users.NewUsers(zrpc.MustNewClient(c.UserRpc, zrpc.WithUnaryClientInterceptor(zrpc_interceptor.ClientInfoInterceptor))),
+		FileRpc: files.NewFiles(zrpc.MustNewClient(c.FileRpc, zrpc.WithUnaryClientInterceptor(zrpc_interceptor.ClientInfoInterceptor))),
 		Redis:   redisDb,
 	}
 }

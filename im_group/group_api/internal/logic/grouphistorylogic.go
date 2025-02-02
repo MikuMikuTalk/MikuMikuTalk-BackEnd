@@ -89,7 +89,7 @@ func (l *GroupHistoryLogic) GroupHistory(req *types.GroupHistoryRequest) (resp *
 	// 去重
 	userIDList = list_util.DeduplicationList(userIDList)
 
-	userListResponse, err1 := l.svcCtx.UserRpc.UserListInfo(context.Background(), &user_rpc.UserListInfoRequest{
+	userListResponse, err1 := l.svcCtx.UserRpc.UserListInfo(l.ctx, &user_rpc.UserListInfoRequest{
 		UserIdList: userIDList,
 	})
 	list := make([]HistoryResponse, 0)

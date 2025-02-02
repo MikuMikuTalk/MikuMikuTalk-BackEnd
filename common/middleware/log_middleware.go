@@ -37,7 +37,7 @@ func LogMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 		ctx = context.WithValue(ctx, contexts.ContextKeyToken, token)
 		if claims != nil {
-			logx.Info(claims)
+			logx.Info("log_middleware parsed claims:", claims)
 			userID := claims.UserID
 			ctx = context.WithValue(ctx, contexts.ContextKeyUserID, userID)
 		}

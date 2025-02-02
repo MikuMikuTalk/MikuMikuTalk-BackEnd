@@ -83,7 +83,7 @@ func (l *ChatSessionLogic) ChatSession(req *types.ChatSessionRequest, token stri
 		}
 	}
 
-	response, err := l.svcCtx.UserRpc.UserListInfo(context.Background(), &user_rpc.UserListInfoRequest{
+	response, err := l.svcCtx.UserRpc.UserListInfo(l.ctx, &user_rpc.UserListInfoRequest{
 		UserIdList: userIDList,
 	})
 	if err != nil {

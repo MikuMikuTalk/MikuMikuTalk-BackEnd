@@ -1,11 +1,13 @@
 package svc
 
 import (
-	"github.com/zeromicro/go-queue/kq"
+	"im_server/common/zrpc_interceptor"
 	"im_server/core"
 	"im_server/im_auth/auth_api/internal/config"
 	"im_server/im_user/user_rpc/types/user_rpc"
 	"im_server/im_user/user_rpc/users"
+
+	"github.com/zeromicro/go-queue/kq"
 
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/zrpc"
@@ -27,7 +29,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config:         c,
 		DB:             mysqlDb,
 		RDB:            rdb,
-		UserRpc:        users.NewUsers(zrpc.MustNewClient(c.UserRpc)),
+		UserRpc:        users.NewUsers(zrpc.MustNewClient(c.UserRpc, zrpc.WithUnaryClientInterceptor(zrpc_interceptor.ClientInfoInterceptor))),
 		KqPusherClient: kq.NewPusher(c.KqPusherConf.Brokers, c.KqPusherConf.Topic),
 	}
 }

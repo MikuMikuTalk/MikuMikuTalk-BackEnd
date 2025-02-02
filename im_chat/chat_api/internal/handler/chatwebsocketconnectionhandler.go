@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -86,7 +85,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 		}()
 
 		// 获取我的用户信息
-		resMine, err := svcCtx.UserRpc.UserInfo(context.Background(), &user_rpc.UserInfoRequest{
+		resMine, err := svcCtx.UserRpc.UserInfo(r.Context(), &user_rpc.UserInfoRequest{
 			UserId: uint32(myID),
 		})
 		if err != nil {
@@ -124,7 +123,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 		}
 
 		// 通知我的好友我的在线状态
-		friendRes, err := svcCtx.UserRpc.FriendList(context.Background(), &user_rpc.FriendListRequest{
+		friendRes, err := svcCtx.UserRpc.FriendList(r.Context(), &user_rpc.FriendListRequest{
 			User: uint32(myID),
 		})
 		if err != nil {
@@ -161,7 +160,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 			}
 			// 检查接收者是否是好友
 			if myID != chatReq.RevUserID {
-				res, err := svcCtx.UserRpc.IsFriend(context.Background(), &user_rpc.IsFriendRequest{
+				res, err := svcCtx.UserRpc.IsFriend(r.Context(), &user_rpc.IsFriendRequest{
 					User2: uint32(myID),
 					User1: uint32(chatReq.RevUserID),
 				})
@@ -211,7 +210,7 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 					continue
 				}
 				fileID := nameList[len(nameList)-1]
-				fileResponse, err := svcCtx.FileRpc.FileInfo(context.Background(), &file_rpc.FileInfoRequest{
+				fileResponse, err := svcCtx.FileRpc.FileInfo(r.Context(), &file_rpc.FileInfoRequest{
 					FildId: fileID,
 				})
 				if err != nil {

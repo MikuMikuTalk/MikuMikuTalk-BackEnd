@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 
+	"im_server/common/zrpc_interceptor"
 	"im_server/im_file/file_rpc/internal/config"
 	"im_server/im_file/file_rpc/internal/server"
 	"im_server/im_file/file_rpc/internal/svc"
@@ -32,6 +33,7 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
+	s.AddUnaryInterceptors(zrpc_interceptor.ServerUnaryInterceptor)
 	defer s.Stop()
 
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)

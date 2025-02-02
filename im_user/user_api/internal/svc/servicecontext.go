@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"im_server/common/zrpc_interceptor"
 	"im_server/core"
 	"im_server/im_chat/chat_rpc/chat"
 	"im_server/im_chat/chat_rpc/types/chat_rpc"
@@ -26,8 +27,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	redisDb := redis.MustNewRedis(c.Redis.RedisConf)
 	return &ServiceContext{
 		Config:  c,
-		UserRpc: users.NewUsers(zrpc.MustNewClient(c.UserRpc)),
-		ChatRpc: chat.NewChat(zrpc.MustNewClient(c.ChatRpc)),
+		UserRpc: users.NewUsers(zrpc.MustNewClient(c.UserRpc, zrpc.WithUnaryClientInterceptor(zrpc_interceptor.ClientInfoInterceptor))),
+		ChatRpc: chat.NewChat(zrpc.MustNewClient(c.ChatRpc, zrpc.WithUnaryClientInterceptor(zrpc_interceptor.ClientInfoInterceptor))),
 		DB:      mysqlDb,
 		Redis:   redisDb,
 	}

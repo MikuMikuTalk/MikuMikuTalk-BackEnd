@@ -84,7 +84,7 @@ func (l *GroupMemberLogic) GroupMember(req *types.GroupMemberRequest) (resp *typ
 
 	// 调用 UserRpc 服务获取用户信息
 	userInfoMap := map[uint]ctype.UserInfo{}
-	userListResponse, err := l.svcCtx.UserRpc.UserListInfo(context.Background(), &user_rpc.UserListInfoRequest{UserIdList: userIDList})
+	userListResponse, err := l.svcCtx.UserRpc.UserListInfo(l.ctx, &user_rpc.UserListInfoRequest{UserIdList: userIDList})
 	if err == nil {
 		// 将用户信息存入 map 中
 		for u, info := range userListResponse.UserInfo {
@@ -100,7 +100,7 @@ func (l *GroupMemberLogic) GroupMember(req *types.GroupMemberRequest) (resp *typ
 
 	// 调用 UserRpc 服务获取在线用户列表
 	userOnlineMap := map[uint]bool{}
-	userOnlineResponse, err := l.svcCtx.UserRpc.UserOnlineList(context.Background(), &user_rpc.UserOnlineListRequest{})
+	userOnlineResponse, err := l.svcCtx.UserRpc.UserOnlineList(l.ctx, &user_rpc.UserOnlineListRequest{})
 	if err == nil {
 		// 将在线用户信息存入 map 中
 		for _, u := range userOnlineResponse.UserIdList {

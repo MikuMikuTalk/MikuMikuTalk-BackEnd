@@ -65,14 +65,14 @@ func (l *GroupInfoLogic) GroupInfo(req *types.GroupInfoRequest) (resp *types.Gro
 		userAllIDList = append(userAllIDList, uint32(model.UserID))
 	}
 	// 获取这些用户的基本信息 NickName Avatar
-	userListResponse, err := l.svcCtx.UserRpc.UserListInfo(context.Background(), &user_rpc.UserListInfoRequest{
+	userListResponse, err := l.svcCtx.UserRpc.UserListInfo(l.ctx, &user_rpc.UserListInfoRequest{
 		UserIdList: userAllIDList,
 	})
 	if err != nil {
 		return
 	}
 	// 计算在线人数总数
-	userOnlineResponse, err := l.svcCtx.UserRpc.UserOnlineList(context.Background(), &user_rpc.UserOnlineListRequest{})
+	userOnlineResponse, err := l.svcCtx.UserRpc.UserOnlineList(l.ctx, &user_rpc.UserOnlineListRequest{})
 	if err != nil {
 		// 所有的在线人数
 		allOnlineUsersIDList := userOnlineResponse.UserIdList

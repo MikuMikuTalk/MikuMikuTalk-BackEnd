@@ -36,7 +36,7 @@ func (l *UserTopLogic) UserTop(req *types.UserTopRequest, token string) (resp *t
 	}
 	my_id := claims.UserID
 	if my_id != req.FriendID {
-		res, err := l.svcCtx.UserRpc.IsFriend(context.Background(), &user_rpc.IsFriendRequest{
+		res, err := l.svcCtx.UserRpc.IsFriend(l.ctx, &user_rpc.IsFriendRequest{
 			User2: uint32(my_id),
 			User1: uint32(req.FriendID),
 		})

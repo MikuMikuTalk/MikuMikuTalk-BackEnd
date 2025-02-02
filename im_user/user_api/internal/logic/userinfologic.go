@@ -36,7 +36,7 @@ func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserIn
 	// 获取请求的用户的id
 	my_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 
-	res, err := l.svcCtx.UserRpc.UserInfo(context.Background(), &user_rpc.UserInfoRequest{
+	res, err := l.svcCtx.UserRpc.UserInfo(l.ctx, &user_rpc.UserInfoRequest{
 		UserId: uint32(my_id),
 	})
 	if err != nil {

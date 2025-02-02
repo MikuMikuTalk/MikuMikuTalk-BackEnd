@@ -47,7 +47,7 @@ func (l *FriendInfoLogic) FriendInfo(req *types.FriendInfoRequest) (resp *types.
 		logx.Errorf("用户%s不是您的好友", friend.RevUserModel.Nickname)
 		return
 	}
-	res, err := l.svcCtx.UserRpc.UserInfo(context.Background(), &user_rpc.UserInfoRequest{
+	res, err := l.svcCtx.UserRpc.UserInfo(l.ctx, &user_rpc.UserInfoRequest{
 		UserId: uint32(user.ID),
 	})
 	if err != nil {

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -87,7 +86,7 @@ func groupChatHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				delete(UserOnlineWsMap, userID)
 			}
 		}()
-		baseResponse, err := svcCtx.UserRpc.UserBaseInfo(context.Background(), &user_rpc.UserBaseInfoRequest{
+		baseResponse, err := svcCtx.UserRpc.UserBaseInfo(r.Context(), &user_rpc.UserBaseInfoRequest{
 			UserId: uint32(userID),
 		})
 		if err != nil {
