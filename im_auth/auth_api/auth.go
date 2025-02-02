@@ -35,7 +35,7 @@ func main() {
 	handler.RegisterHandlers(server, ctx)
 
 	// 使用中间件
-	server.Use(middleware.LogMiddleware)
+	server.Use(middleware.LogActionMiddleware(ctx.ActionLogs))
 	etcd.DeliveryAddress(c.Etcd, c.Name+"_api", fmt.Sprintf("%s:%d", c.Host, c.Port))
 	logx.Infof("im_auth服务 正在监听 %s:%d...\n", c.Host, c.Port)
 	server.Start()

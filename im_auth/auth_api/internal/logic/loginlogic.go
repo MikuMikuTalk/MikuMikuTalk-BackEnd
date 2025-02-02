@@ -30,8 +30,15 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, err error) {
+
 	var user auth_models.UserModel
 	err = l.svcCtx.DB.Take(&user, "nickname = ?", req.UserName).Error
+
+	l.svcCtx.ActionLogs.Info("用户登录操作")
+	l.svcCtx.ActionLogs.SetItem("nickname", req.UserName)
+	l.svcCtx.ActionLogs.IsRequest()
+	defer l.svcCtx.ActionLogs.Save(l.ctx)
+
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("用户不存在")
@@ -47,13 +54,17 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 		Role:     user.Role,
 	}, l.svcCtx.Config.Auth.AuthSecret, int(l.svcCtx.Config.Auth.AuthExpire))
 	if err != nil {
+		logx.Error(err)
+		l.svcCtx.ActionLogs.SetItem("error", err.Error())
+		l.svcCtx.ActionLogs.Err("服务内部错误")
 		err = fmt.Errorf("生成 JWT 失败: %w", err)
 		return nil, err
 	}
-	err = l.svcCtx.KqPusherClient.Push(context.Background(), fmt.Sprintf("%s用户登录成功", req.UserName))
-	if err != nil {
-		logx.Error(err)
-	}
+
+	l.svcCtx.ActionLogs.Info("用户登录成功")
+	logx.Info(l.ctx)
+	l.svcCtx.ActionLogs.SetCtx(l.ctx)
+
 	return &types.LoginResponse{
 		Token: token,
 	}, nil

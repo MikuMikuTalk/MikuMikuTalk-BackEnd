@@ -2,7 +2,6 @@ package mqs
 
 import (
 	"context"
-
 	"im_server/im_log/logs_api/internal/config"
 	"im_server/im_log/logs_api/internal/svc"
 
@@ -11,9 +10,12 @@ import (
 )
 
 func Consumers(c config.Config, ctx context.Context, svcContext *svc.ServiceContext) []service.Service {
+
 	return []service.Service{
-		// Listening for changes in consumption flow status
+		//Listening for changes in consumption flow status
 		kq.MustNewQueue(c.KqConsumerConf, NewPaymentSuccess(ctx, svcContext)),
 		//.....
+
 	}
+
 }

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 
+	"im_server/common/middleware"
 	"im_server/im_log/logs_api/internal/config"
 	"im_server/im_log/logs_api/internal/handler"
 	"im_server/im_log/logs_api/internal/mqs"
@@ -24,6 +25,8 @@ func main() {
 	conf.MustLoad(*configFile, &c)
 
 	server := rest.MustNewServer(c.RestConf)
+	// 使用全局中间件
+	server.Use(middleware.LogMiddleware)
 	defer server.Stop()
 
 	ctx := svc.NewServiceContext(c)
@@ -34,7 +37,7 @@ func main() {
 	for _, mq := range mqs.Consumers(c, context.Background(), ctx) {
 		serviceGroup.Add(mq)
 	}
-	serviceGroup.Start()
+	go serviceGroup.Start()
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()
 }
