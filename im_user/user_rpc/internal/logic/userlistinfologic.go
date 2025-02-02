@@ -25,7 +25,6 @@ func NewUserListInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *User
 }
 
 func (l *UserListInfoLogic) UserListInfo(in *user_rpc.UserListInfoRequest) (*user_rpc.UserListInfoResponse, error) {
-
 	logx.Debug("userlistnfo rpc:", l.ctx.Value("clientIP"), "		", l.ctx.Value("userID"))
 	var userList []user_models.UserModel
 	l.svcCtx.DB.Find(&userList, in.UserIdList)
