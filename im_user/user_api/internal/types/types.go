@@ -136,6 +136,19 @@ type UserInfoUpdateRequest struct {
 type UserInfoUpdateResponse struct {
 }
 
+type UserListInfoResponse struct {
+	ID              uint   `json:"id"`
+	CreatedAt       string `json:"createdAt"`
+	Nickname        string `json:"nickname"`
+	Avatar          string `json:"avatar"`
+	IP              string `json:"ip"`
+	Addr            string `json:"addr"`
+	IsOnline        bool   `json:"isOnline"`
+	SendMsgCount    int    `json:"sendMsgCount"`    // 发送消息个数
+	GroupAdminCount int    `json:"groupAdminCount"` // 建群数量
+	GroupCount      int    `json:"groupCount"`      // 进群数量
+}
+
 type UserValidRequest struct {
 	FriendName string `json:"friend_name"`
 }
@@ -152,4 +165,32 @@ type VerificationQuestion struct {
 	Answer1  *string `json:"answer1,optional" user_conf:"answer1"`
 	Answer2  *string `json:"answer2,optional" user_conf:"answer2"`
 	Answer3  *string `json:"answer3,optional" user_conf:"answer3"`
+}
+
+type UserCurtailRequest struct {
+	CurtailChat        bool `json:"curtailChat"`        // 限制聊天
+	CurtailAddUser     bool `json:"curtailAddUser"`     // 限制加人
+	CurtailCreateGroup bool `json:"curtailCreateGroup"` // 限制建群
+	CurtailInGroupChat bool `json:"curtailInGroupChat"` // 限制加群
+}
+
+type UserCurtailResponse struct {
+}
+
+type UserDeleteRequest struct {
+	IdList []uint `json:"idList"`
+}
+
+type UserDeleteResponse struct {
+}
+
+type UserListRequest struct {
+	Key   string `form:"key,optional"` // 用户id和昵称
+	Page  int    `form:"page,optional"`
+	Limit int    `form:"limit,optional"`
+}
+
+type UserListResponse struct {
+	List  []UserListInfoResponse `json:"list"`
+	Count int64                  `json:"count"`
 }

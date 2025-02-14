@@ -6,6 +6,7 @@ package handler
 import (
 	"net/http"
 
+	admin "im_server/im_user/user_api/internal/handler/admin"
 	"im_server/im_user/user_api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -82,5 +83,28 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 		rest.WithPrefix("/api/user"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AdminMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/api/user/curtail",
+					Handler: admin.UserCurtailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/api/user/users",
+					Handler: admin.UserListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/api/user/users",
+					Handler: admin.UserDeleteHandler(serverCtx),
+				},
+			}...,
+		),
 	)
 }
