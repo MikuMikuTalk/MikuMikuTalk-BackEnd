@@ -12,9 +12,10 @@ type Config struct {
 	Mysql struct {
 		DataSource string
 	}
-	UserRpc zrpc.RpcClientConf
-	ChatRpc zrpc.RpcClientConf
-	Auth    struct {
+	UserRpc  zrpc.RpcClientConf
+	ChatRpc  zrpc.RpcClientConf
+	GroupRpc zrpc.RpcClientConf
+	Auth     struct {
 		AuthSecret string
 		AuthExpire int64
 	}
