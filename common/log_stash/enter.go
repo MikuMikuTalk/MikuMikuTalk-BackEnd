@@ -114,6 +114,10 @@ func (p *Pusher) setItem(level string, label string, val any) {
 	}
 	logItem := fmt.Sprintf("<div class=\"log_item %s\">%s</div>", level, str)
 	p.items = append(p.items, logItem)
+	if p.LogType == 3 {
+		// 如果是运行日志 那就调一下发送
+		p.Save(p.ctx)
+	}
 }
 func (p *Pusher) SetItem(label string, val any) {
 	p.setItem("info", label, val)
@@ -136,6 +140,9 @@ func (p *Pusher) Save(ctx context.Context) {
 	if p.isResponse && p.count == 0 {
 		p.count = 1
 		return
+	}
+	if ctx == nil {
+		p.ctx = context.Background()
 	}
 	if p.ctx == nil {
 		p.ctx = ctx
@@ -166,13 +173,16 @@ func (p *Pusher) Save(ctx context.Context) {
 	userID, ok := p.ctx.Value(contexts.ContextKeyUserID).(uint)
 	if !ok {
 		logx.Error("userID 不存在")
+		return
 	}
+	p.UserID = userID
 	clientIP, ok := p.ctx.Value(contexts.ContextKeyClientIP).(string)
 	if !ok {
 		logx.Error("clientIP 不存在")
+		return
 	}
 	p.IP = clientIP
-	p.UserID = userID
+
 	if p.Level == "" {
 		p.Level = "info"
 	}
@@ -186,7 +196,6 @@ func (p *Pusher) Save(ctx context.Context) {
 		logx.Error(err)
 		return
 	}
-	fmt.Println(err)
 }
 
 func NewPusher(client *kq.Pusher, LogType int8, serviceName string) *Pusher {

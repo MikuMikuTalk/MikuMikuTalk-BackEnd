@@ -51,6 +51,7 @@ func (l *LogoutLogic) Logout() (string, error) {
 		l.Logger.Error("Redis 错误: ", err)
 		return "", errors.New("注销失败，请稍后重试")
 	}
+	l.svcCtx.RuntimeLogs.Info("用户注销成功")
 	l.svcCtx.RuntimeLogs.SetItem(claims.Nickname, "注销了")
 	l.svcCtx.RuntimeLogs.Save(l.ctx)
 	return "注销成功", nil
