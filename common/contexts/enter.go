@@ -7,4 +7,5 @@ const (
 	ContextKeyClientIP contextKey = "clientIP"
 	ContextKeyToken    contextKey = "token"
 	ContextKeyUserID   contextKey = "userID"
+	ContextKeyUserName contextKey = "userName"
 )

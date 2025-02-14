@@ -31,13 +31,5 @@ func main() {
 	etcdStorage.Put("config", string(result))
 
 	logx.Info("配置文件输入成功")
-	// // 存储jwt
-	// etcdStorage.Put("AuthSecret", c.Auth.AuthSecret)
-	// etcdStorage.Put("AuthExpire", authExpireStr)
-	// // 存储数据库datasource
-	// etcdStorage.Put("MySqlDataSource", c.Mysql.DataSource)
-	// // 存储redis配置
-	// etcdStorage.Put("RedisHost", c.Redis.Host)
-	// etcdStorage.Put("RedisPass", c.Redis.Pass)
-	// etcdStorage.Put("RedisType", c.Redis.Type)
+
 }

@@ -15,21 +15,38 @@ import (
 )
 
 type Pusher struct {
-	LogType   int8   `json:"logType"`
-	IP        string `json:"ip"`
-	UserID    uint   `json:"userID"`
-	Level     string `json:"level"`
-	Title     string `json:"title"`
-	Content   string `json:"content"`
-	Service   string `json:"service"`
-	client    *kq.Pusher
-	items     []string
-	ctx       context.Context
-	isRequest bool
+	LogType    int8   `json:"logType"`
+	IP         string `json:"ip"`
+	UserID     uint   `json:"userID"`
+	Level      string `json:"level"`
+	Title      string `json:"title"`
+	Content    string `json:"content"`
+	Service    string `json:"service"`
+	client     *kq.Pusher
+	items      []string
+	ctx        context.Context
+	isRequest  bool
+	isHeaders  bool
+	isResponse bool
+	request    string
+	headers    string
+	count      int
+	response   string
 }
 
 func (p *Pusher) IsRequest() {
 	p.isRequest = true
+}
+
+func (p *Pusher) IsHeaders() {
+	p.isHeaders = true
+}
+
+func (p *Pusher) IsResponse() {
+	p.isResponse = true
+}
+func (p *Pusher) GetResponse() bool {
+	return p.isResponse
 }
 
 // SetRequest 设置一组入参
@@ -43,7 +60,7 @@ func (p *Pusher) SetRequest(r *http.Request) {
 	path := r.URL.String()
 	byteData, _ := io.ReadAll(r.Body)
 	r.Body = io.NopCloser(bytes.NewBuffer(byteData))
-	p.items = append(p.items, fmt.Sprintf(
+	p.request = fmt.Sprintf(
 		`<div class="log_request">
   <div class="log_request_head">
     <span class="log_request_method %s">%s</span>
@@ -52,7 +69,22 @@ func (p *Pusher) SetRequest(r *http.Request) {
   <div class="log_request_body">
     <pre class="log_json_body">%s</pre>
   </div>
-</div>`, strings.ToLower(method), method, path, string(byteData)))
+</div>`, strings.ToLower(method), method, path, string(byteData))
+}
+
+func (p *Pusher) SetHeaders(r *http.Request) {
+	byteData, _ := json.Marshal(r.Header)
+	p.headers = fmt.Sprintf(
+		`<div class="log_request_header">
+  <div class="log_request_body">
+    <pre class="log_json_body">%s</pre>
+  </div>
+</div>`, string(byteData))
+}
+
+func (p *Pusher) SetResponse(w string) {
+	p.response = fmt.Sprintf("<div class=\"log_response\">\n  <pre class=\"log_json_body\">%s</pre>\n</div>", w)
+	p.Save(p.ctx)
 }
 
 func (p *Pusher) Info(title string) {
@@ -100,33 +132,47 @@ func (p *Pusher) SetItemErr(label, val string) {
 func (p *Pusher) SetCtx(ctx context.Context) {
 	p.ctx = ctx
 }
-
 func (p *Pusher) Save(ctx context.Context) {
+	if p.isResponse && p.count == 0 {
+		p.count = 1
+		return
+	}
 	if p.ctx == nil {
 		p.ctx = ctx
 	}
 	if p.client == nil {
 		return
 	}
-	if len(p.items) > 0 {
-		for _, item := range p.items {
-			if !p.isRequest {
-				if strings.Contains(item, "log_request") {
-					continue
-				}
-			}
-			p.Content += item
-		}
-		p.items = []string{}
+
+	var items []string
+	if p.isRequest {
+		items = append(items, p.request)
 	}
-	logx.Debug("log_stash info:", p.ctx)
-	userID := p.ctx.Value(contexts.ContextKeyUserID).(uint)
-	logx.Debug("log_stash info: userid:", userID)
-	clientIP := p.ctx.Value(contexts.ContextKeyClientIP).(string)
-	logx.Debug("log_stash info: CLIENTip:", clientIP)
+	if p.isHeaders {
+		items = append(items, p.headers)
+	}
+
+	items = append(items, p.items...)
+	if p.isResponse {
+		items = append(items, p.response)
+	}
+
+	for _, item := range items {
+		p.Content += item
+	}
+
+	p.items = []string{}
+
+	userID, ok := p.ctx.Value(contexts.ContextKeyUserID).(uint)
+	if !ok {
+		logx.Error("userID 不存在")
+	}
+	clientIP, ok := p.ctx.Value(contexts.ContextKeyClientIP).(string)
+	if !ok {
+		logx.Error("clientIP 不存在")
+	}
 	p.IP = clientIP
 	p.UserID = userID
-
 	if p.Level == "" {
 		p.Level = "info"
 	}
@@ -135,14 +181,12 @@ func (p *Pusher) Save(ctx context.Context) {
 		logx.Error(err)
 		return
 	}
-
-	err = p.client.Push(ctx, string(byteData))
-	logx.Debug("log_stash info json: ", string(byteData))
+	err = p.client.Push(p.ctx, string(byteData))
 	if err != nil {
 		logx.Error(err)
 		return
 	}
-
+	fmt.Println(err)
 }
 
 func NewPusher(client *kq.Pusher, LogType int8, serviceName string) *Pusher {
