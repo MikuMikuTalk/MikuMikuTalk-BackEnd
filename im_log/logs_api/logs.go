@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 
+	"im_server/common/etcd"
 	"im_server/common/middleware"
 	"im_server/im_log/logs_api/internal/config"
 	"im_server/im_log/logs_api/internal/handler"
@@ -37,6 +38,7 @@ func main() {
 	for _, mq := range mqs.Consumers(c, context.Background(), ctx) {
 		serviceGroup.Add(mq)
 	}
+	etcd.DeliveryAddress(c.Etcd, c.Name+"_api", fmt.Sprintf("%s:%d", c.Host, c.Port))
 	go serviceGroup.Start()
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()
