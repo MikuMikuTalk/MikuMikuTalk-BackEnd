@@ -1,30 +1,58 @@
 package addr
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/netip"
 
-	"github.com/oschwald/maxminddb-golang/v2"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-var db *maxminddb.Reader
+// BaiduAPIResponse 是百度 IP 归属地 API 的返回结构
+type BaiduAPIResponse struct {
+	Status string `json:"status"`
+	Data   []struct {
+		Location string `json:"location"`
+	} `json:"data"`
+}
 
-func init() {
-	var err error
-	db, err = maxminddb.Open("GeoLite2-City.mmdb")
+// GetAddr 使用百度 API 查询 IP 归属地
+func GetAddr(ip string) string {
+	addr, err := netip.ParseAddr(ip)
 	if err != nil {
-		panic(err)
+		logx.Info("错误IP")
+		return "错误IP"
 	}
+	if IsInternalIP(addr) {
+		return "内网IP"
+	}
+
+	// 调用百度 API
+	url := fmt.Sprintf("https://opendata.baidu.com/api.php?query=%s&co=&resource_id=6006&oe=utf8", ip)
+	resp, err := http.Get(url)
+	if err != nil {
+		logx.Errorf("查询 IP 归属地失败: %v", err)
+		return "查询失败"
+	}
+	defer resp.Body.Close()
+
+	var result BaiduAPIResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		logx.Errorf("解析 API 响应失败: %v", err)
+		return "解析失败"
+	}
+
+	if result.Status != "0" || len(result.Data) == 0 {
+		logx.Errorf("API 返回错误: status=%s", result.Status)
+		return "API 错误"
+	}
+
+	// 返回归属地信息
+	return result.Data[0].Location
 }
 
-// Close 关闭数据库连接
-func Close() {
-	if db != nil {
-		db.Close()
-	}
-}
-
+// IsInternalIP 判断是否为内网 IP
 func IsInternalIP(addr netip.Addr) bool {
 	if addr.IsLoopback() {
 		return true
@@ -40,61 +68,4 @@ func IsInternalIP(addr netip.Addr) bool {
 		(ip4[0] == 172 && ip4[1] >= 16 && ip4[1] <= 32) ||
 		(ip4[0] == 10) ||
 		(ip4[0] == 169 && ip4[1] == 254)
-}
-
-func GetAddr(ip string) string {
-	addr, err := netip.ParseAddr(ip)
-	if err != nil {
-		logx.Info("错误IP")
-		return "错误IP"
-	}
-	if IsInternalIP(addr) {
-		return "内网IP"
-	}
-
-	var record struct {
-		City struct {
-			Names map[string]string `maxminddb:"names"`
-		} `maxminddb:"city"`
-		Subdivisions []struct {
-			Names   map[string]string `maxminddb:"names"`
-			IsoCode string            `maxminddb:"iso_code"`
-		} `maxminddb:"subdivisions"`
-		Country struct {
-			Names   map[string]string `maxminddb:"names"`
-			IsoCode string            `maxminddb:"iso_code"`
-		} `maxminddb:"country"`
-	}
-
-	// 使用 db.Lookup 获取 Result
-	lookup := db.Lookup(addr)
-	if err := lookup.Decode(&record); err != nil {
-		return "错误的地址"
-	}
-
-	// 获取国家名称作为后备选项
-	country := record.Country.Names["zh-CN"]
-	if country == "" {
-		return "未知地址"
-	}
-
-	// 获取省份名称
-	var province string
-	if len(record.Subdivisions) > 0 {
-		province = record.Subdivisions[0].Names["zh-CN"]
-	}
-
-	// 获取城市名称
-	city := record.City.Names["zh-CN"]
-
-	// 根据可用信息构建地址字符串
-	if province != "" && city != "" {
-		return fmt.Sprintf("%s-%s", province, city)
-	} else if province != "" {
-		return fmt.Sprintf("%s-%s", country, province)
-	} else if city != "" {
-		return fmt.Sprintf("%s-%s", country, city)
-	}
-
-	return country
 }
