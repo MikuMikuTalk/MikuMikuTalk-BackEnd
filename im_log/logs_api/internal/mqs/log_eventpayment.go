@@ -7,6 +7,7 @@ import (
 	"im_server/im_log/logs_api/internal/svc"
 	"im_server/im_log/logs_model"
 	"im_server/im_user/user_rpc/types/user_rpc"
+	"im_server/utils/addr"
 	"sync"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -47,7 +48,7 @@ func (l *LogEvent) Consume(ctx context.Context, key, val string) error {
 		LogType: req.LogType,
 		IP:      req.IP,
 		UserID:  req.UserID,
-		Addr:    "内网地址",
+		Addr:    addr.GetAddr(req.IP),
 		Level:   req.Level,
 		Title:   req.Title,
 		Content: req.Content,
