@@ -68,28 +68,32 @@ func LogActionMiddleware(pusher *log_stash.Pusher) func(next http.HandlerFunc) h
 			ctx := context.WithValue(r.Context(), contexts.ContextKeyClientIP, clientIP)
 
 			// // header中取出authorization 中的jwt字段值
-			// token := r.Header.Get("Authorization")
-			// etcdStorage := etcd.NewEtcdStorage("127.0.0.1:2379")
-			// appConfiguration, _ := etcdStorage.Get("config")
+			token := r.Header.Get("Authorization")
+			if token != "" {
+				ctx = context.WithValue(ctx, contexts.ContextKeyToken, token)
+				etcdStorage := etcd.NewEtcdStorage("127.0.0.1:2379")
+				appConfiguration, _ := etcdStorage.Get("config")
 
-			// var appConfig config.Config
+				var appConfig config.Config
 
-			// err := json.Unmarshal([]byte(appConfiguration), &appConfig)
-			// if err != nil {
-			// 	http.Error(w, "json解析失败", http.StatusBadRequest)
-			// }
+				err := json.Unmarshal([]byte(appConfiguration), &appConfig)
+				if err != nil {
+					http.Error(w, "json解析失败", http.StatusBadRequest)
+				}
 
-			// claims, err := jwts.ParseToken(token, appConfig.Auth.AuthSecret)
-			// if err != nil {
-			// 	http.Error(w, "jwt解析失败", http.StatusBadRequest)
-			// }
+				claims, err := jwts.ParseToken(token, appConfig.Auth.AuthSecret)
+				if err != nil {
+					http.Error(w, "jwt解析失败", http.StatusBadRequest)
+				}
 
-			// ctx = context.WithValue(ctx, contexts.ContextKeyToken, token)
-			// if claims != nil {
-			// 	logx.Info("log_middleware parsed claims:", claims)
-			// 	userID := claims.UserID
-			// 	ctx = context.WithValue(ctx, contexts.ContextKeyUserID, userID)
-			// }
+				ctx = context.WithValue(ctx, contexts.ContextKeyToken, token)
+				if claims != nil {
+					// logx.Info("log_middleware parsed claims:", claims)
+					userID := claims.UserID
+					ctx = context.WithValue(ctx, contexts.ContextKeyUserID, userID)
+					ctx = context.WithValue(ctx, contexts.ContextKeyUserName, claims.Nickname)
+				}
+			}
 
 			var nw = Writer{
 				ResponseWriter: w,

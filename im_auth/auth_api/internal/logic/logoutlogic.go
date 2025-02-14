@@ -29,11 +29,11 @@ func NewLogoutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LogoutLogi
 }
 
 func (l *LogoutLogic) Logout() (string, error) {
-	token := l.ctx.Value(contexts.ContextKeyToken).(string)
-	if token == "" {
+	token, ok := l.ctx.Value(contexts.ContextKeyToken).(string)
+	if !ok {
 		return "", errors.New("登陆后才可以注销哦")
 	}
-
+	logx.Info(token)
 	claims, err := jwts.ParseToken(token, l.svcCtx.Config.Auth.AuthSecret)
 	if err != nil {
 		return "", err
@@ -51,6 +51,7 @@ func (l *LogoutLogic) Logout() (string, error) {
 		l.Logger.Error("Redis 错误: ", err)
 		return "", errors.New("注销失败，请稍后重试")
 	}
-
+	l.svcCtx.RuntimeLogs.SetItem(claims.Nickname, "注销了")
+	l.svcCtx.RuntimeLogs.Save(l.ctx)
 	return "注销成功", nil
 }

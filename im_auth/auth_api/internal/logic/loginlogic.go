@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"im_server/common/contexts"
 	"im_server/im_auth/auth_api/internal/svc"
 	"im_server/im_auth/auth_api/internal/types"
 	"im_server/im_auth/auth_models"
@@ -34,8 +33,7 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 
 	var user auth_models.UserModel
 	err = l.svcCtx.DB.Take(&user, "nickname = ?", req.UserName).Error
-	l.ctx = context.WithValue(l.ctx, contexts.ContextKeyUserID, user.ID)
-	l.ctx = context.WithValue(l.ctx, contexts.ContextKeyUserName, user.Nickname)
+
 	l.svcCtx.ActionLogs.Info("用户登录操作")
 	l.svcCtx.ActionLogs.SetItem("nickname", req.UserName)
 	l.svcCtx.ActionLogs.IsRequest()
