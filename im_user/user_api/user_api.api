@@ -235,16 +235,20 @@ type userListRequest {
 }
 
 type UserListInfoResponse {
-	ID              uint   `json:"id"`
-	CreatedAt       string `json:"createdAt"`
-	Nickname        string `json:"nickname"`
-	Avatar          string `json:"avatar"`
-	IP              string `json:"ip"`
-	Addr            string `json:"addr"`
-	IsOnline        bool   `json:"isOnline"`
-	SendMsgCount    int    `json:"sendMsgCount"` // 发送消息个数
-	GroupAdminCount int    `json:"groupAdminCount"` // 建群数量
-	GroupCount      int    `json:"groupCount"` // 进群数量
+	ID                 uint   `json:"id"`
+	CreatedAt          string `json:"createdAt"`
+	Nickname           string `json:"nickname"`
+	Avatar             string `json:"avatar"`
+	IP                 string `json:"ip"`
+	Addr               string `json:"addr"`
+	IsOnline           bool   `json:"isOnline"`
+	SendMsgCount       int    `json:"sendMsgCount"` // 发送消息个数
+	GroupAdminCount    int    `json:"groupAdminCount"` // 建群数量
+	GroupCount         int    `json:"groupCount"` // 进群数量
+	CurtailChat        bool   `json:"curtailChat"` // 限制聊天
+	CurtailAddUser     bool   `json:"curtailAddUser"` // 限制加人
+	CurtailCreateGroup bool   `json:"curtailCreateGroup"` // 限制建群
+	CurtailInGroupChat bool   `json:"curtailInGroupChat"` // 限制加群
 }
 
 type userListResponse {
@@ -253,6 +257,7 @@ type userListResponse {
 }
 
 type userCurtailRequest {
+	UserID             uint `json:"userId"` // 限制的用户
 	CurtailChat        bool `json:"curtailChat"` // 限制聊天
 	CurtailAddUser     bool `json:"curtailAddUser"` // 限制加人
 	CurtailCreateGroup bool `json:"curtailCreateGroup"` // 限制建群

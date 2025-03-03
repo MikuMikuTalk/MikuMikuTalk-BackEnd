@@ -19,6 +19,10 @@ type UserConfModel struct {
 	Verification         int8                        `gorm:"default:2;comment:'验证类型: 0 不允许任何人, 1 允许任何人, 2 验证消息, 3 回答问题, 4 正确回答问题'" json:"verification"`
 	VerificationQuestion *ctype.VerificationQuestion `gorm:"type:json;comment:'验证问题'" json:"verificationQuestion"`
 	Online               bool                        `gorm:"default:false;comment:'是否在线'" json:"online"`
+	CurtailChat          bool                        `json:"curtailChat"`        // 限制聊天
+	CurtailAddUser       bool                        `json:"curtailAddUser"`     // 限制加人
+	CurtailCreateGroup   bool                        `json:"curtailCreateGroup"` // 限制建群
+	CurtailInGroupChat   bool                        `json:"curtailInGroupChat"` // 限制加群
 }
 
 // ProblemCount 问题的个数

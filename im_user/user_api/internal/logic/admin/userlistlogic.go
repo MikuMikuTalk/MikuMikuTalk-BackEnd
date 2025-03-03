@@ -35,7 +35,8 @@ func (l *UserListLogic) UserList(req *types.UserListRequest) (resp *types.UserLi
 			Page:  req.Page,
 			Key:   req.Key,
 		},
-		Likes: []string{"nickname", "ip"},
+		Preload: []string{"UserConfModel"},
+		Likes:   []string{"nickname", "ip"},
 	})
 	resp = new(types.UserListResponse)
 	var userIDList []uint32
@@ -71,15 +72,19 @@ func (l *UserListLogic) UserList(req *types.UserListRequest) (resp *types.UserLi
 	// 查用户发送的消息个数
 	for _, model := range list {
 		info := types.UserListInfoResponse{
-			ID:              model.ID,
-			CreatedAt:       model.CreatedAt.String(),
-			Nickname:        model.Nickname,
-			Avatar:          model.Avatar,
-			IP:              model.IP,
-			Addr:            model.Addr,
-			IsOnline:        userOnlineMap[model.ID],
-			GroupAdminCount: int(groupResponse1.Result[uint32(model.ID)]),
-			GroupCount:      int(groupResponse2.Result[uint32(model.ID)]),
+			ID:                 model.ID,
+			CreatedAt:          model.CreatedAt.String(),
+			Nickname:           model.Nickname,
+			Avatar:             model.Avatar,
+			IP:                 model.IP,
+			Addr:               model.Addr,
+			IsOnline:           userOnlineMap[model.ID],
+			GroupAdminCount:    int(groupResponse1.Result[uint32(model.ID)]),
+			GroupCount:         int(groupResponse2.Result[uint32(model.ID)]),
+			CurtailChat:        model.UserConfModel.CurtailChat,
+			CurtailAddUser:     model.UserConfModel.CurtailAddUser,
+			CurtailCreateGroup: model.UserConfModel.CurtailCreateGroup,
+			CurtailInGroupChat: model.UserConfModel.CurtailInGroupChat,
 		}
 		resp.List = append(resp.List, info)
 	}
