@@ -14,11 +14,15 @@ import (
 )
 
 type (
-	UserChatRequest  = chat_rpc.UserChatRequest
-	UserChatResponse = chat_rpc.UserChatResponse
+	ChatCountMessage          = chat_rpc.ChatCountMessage
+	UserChatRequest           = chat_rpc.UserChatRequest
+	UserChatResponse          = chat_rpc.UserChatResponse
+	UserListChatCountRequest  = chat_rpc.UserListChatCountRequest
+	UserListChatCountResponse = chat_rpc.UserListChatCountResponse
 
 	Chat interface {
 		UserChat(ctx context.Context, in *UserChatRequest, opts ...grpc.CallOption) (*UserChatResponse, error)
+		UserListChatCount(ctx context.Context, in *UserListChatCountRequest, opts ...grpc.CallOption) (*UserListChatCountResponse, error)
 	}
 
 	defaultChat struct {
@@ -35,4 +39,9 @@ func NewChat(cli zrpc.Client) Chat {
 func (m *defaultChat) UserChat(ctx context.Context, in *UserChatRequest, opts ...grpc.CallOption) (*UserChatResponse, error) {
 	client := chat_rpc.NewChatClient(m.cli.Conn())
 	return client.UserChat(ctx, in, opts...)
+}
+
+func (m *defaultChat) UserListChatCount(ctx context.Context, in *UserListChatCountRequest, opts ...grpc.CallOption) (*UserListChatCountResponse, error) {
+	client := chat_rpc.NewChatClient(m.cli.Conn())
+	return client.UserListChatCount(ctx, in, opts...)
 }

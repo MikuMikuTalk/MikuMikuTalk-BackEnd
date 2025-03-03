@@ -27,3 +27,8 @@ func (s *ChatServer) UserChat(ctx context.Context, in *chat_rpc.UserChatRequest)
 	l := logic.NewUserChatLogic(ctx, s.svcCtx)
 	return l.UserChat(in)
 }
+
+func (s *ChatServer) UserListChatCount(ctx context.Context, in *chat_rpc.UserListChatCountRequest) (*chat_rpc.UserListChatCountResponse, error) {
+	l := logic.NewUserListChatCountLogic(ctx, s.svcCtx)
+	return l.UserListChatCount(in)
+}

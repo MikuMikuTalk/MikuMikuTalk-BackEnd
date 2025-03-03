@@ -12,8 +12,22 @@ message UserChatRequest {
 message UserChatResponse {
 
 }
+
+message UserListChatCountRequest{
+    repeated uint32 user_id_list = 1;
+  }
+  
+  message ChatCountMessage {
+    int32 send_msg_count = 1;
+    int32 rev_msg_count = 2;
+  }
+  
+  message UserListChatCountResponse{
+    map<uint32, ChatCountMessage>result = 1;
+  }
 service Chat {
     rpc UserChat(UserChatRequest) returns(UserChatResponse); // 用户对话
+    rpc UserListChatCount(UserListChatCountRequest) returns(UserListChatCountResponse); // 算每个用户发送的消息个数
 }
 
 // goctl rpc protoc chat_rpc.proto --go_out=./types --go-grpc_out=./types --zrpc_out=.
