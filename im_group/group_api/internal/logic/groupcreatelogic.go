@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"im_server/im_group/group_api/internal/svc"
 	"im_server/im_group/group_api/internal/types"
 	"im_server/im_group/group_models"
+	"im_server/im_user/user_models"
 	"im_server/im_user/user_rpc/types/user_rpc"
 	"im_server/utils/jwts"
 	"im_server/utils/set"
@@ -44,6 +46,19 @@ func (l *GroupCreateLogic) GroupCreate(req *types.GroupCreateRequest) (resp *typ
 		IsSearch:     false,
 		Verification: 2,
 		Size:         50,
+	}
+	// 获取用户基本信息
+	userInfo, err := l.svcCtx.UserRpc.UserInfo(l.ctx, &user_rpc.UserInfoRequest{
+		UserId: uint32(my_id),
+	})
+	if err != nil {
+		logx.Error(err)
+		return nil, errors.New("用户服务错误")
+	}
+	var userInfoModel user_models.UserModel
+	json.Unmarshal(userInfo.Data, &userInfoModel)
+	if userInfoModel.UserConfModel.CurtailCreateGroup {
+		return nil, errors.New("当前用户被限制建群")
 	}
 	groupUserList := []uint{my_id}
 	switch req.Mode {

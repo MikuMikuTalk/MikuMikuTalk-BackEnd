@@ -2,10 +2,13 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
 	"im_server/common/ctype"
 	"im_server/im_group/group_models"
+	"im_server/im_user/user_models"
+	"im_server/im_user/user_rpc/types/user_rpc"
 	"im_server/utils/jwts"
 
 	"im_server/im_group/group_api/internal/svc"
@@ -36,6 +39,22 @@ func (l *GroupValidAddLogic) GroupValidAdd(req *types.AddGroupRequest) (resp *ty
 	}
 	myID := claims.UserID
 	// 加群
+
+	// 获取用户基本信息
+	userInfo, err := l.svcCtx.UserRpc.UserInfo(l.ctx, &user_rpc.UserInfoRequest{
+		UserId: uint32(myID),
+	})
+	if err != nil {
+		logx.Error(err)
+		return nil, errors.New("用户服务错误")
+	}
+	var userInfoModel user_models.UserModel
+	// 如果被限制加群了，那就返回错误
+	json.Unmarshal(userInfo.Data, &userInfoModel)
+	if userInfoModel.UserConfModel.CurtailInGroupChat {
+		return nil, errors.New("当前用户被限制加群")
+	}
+
 	// 如果自己已经在群里面了
 	var member group_models.GroupMemberModel
 	err = l.svcCtx.DB.Take(&member, "group_id = ? and user_id = ?", req.GroupID, myID).Error
