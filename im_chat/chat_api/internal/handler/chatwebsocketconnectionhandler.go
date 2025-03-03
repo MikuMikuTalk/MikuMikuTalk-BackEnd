@@ -147,7 +147,10 @@ func chatWebsocketConnectionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc
 				logx.Error("WebSocket read error: ", err)
 				break
 			}
-
+			if userInfoMine.UserConfModel.CurtailChat {
+				SendTipErrMsg(conn, "当前用户被限制聊天")
+				continue
+			}
 			var chatReq ChatRequest
 			if err := json.Unmarshal(message, &chatReq); err != nil {
 				errorMsg := fmt.Sprintf("消息格式错误: %s", err.Error())
