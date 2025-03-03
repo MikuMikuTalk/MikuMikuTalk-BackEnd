@@ -31,6 +31,17 @@ func NewAddUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddUserLo
 func (l *AddUserLogic) AddUser(req *types.AddFriendRequest) (resp *types.AddFriendResponse, err error) {
 	my_id := l.ctx.Value(contexts.ContextKeyUserID).(uint)
 	friend_nickname := req.FriendName
+
+	// 限制用户加好友
+	var conf user_models.UserConfModel
+	err = l.svcCtx.DB.Take(&conf, "user_id = ?", my_id).Error
+	if err != nil {
+		return nil, errors.New("用户不存在")
+	}
+	if conf.CurtailAddUser {
+		return nil, errors.New("当前用户限制加好友")
+	}
+
 	var user user_models.UserModel
 	err = l.svcCtx.DB.Take(&user, "nickname = ?", friend_nickname).Error
 	if err != nil {
