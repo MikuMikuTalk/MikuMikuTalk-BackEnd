@@ -1,0 +1,280 @@
+version: '3'
+services:
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    volumes:
+      - ./mysql/conf:/etc/mysql/conf.d
+      - ./mysql/datadir:/var/lib/mysql
+      - ./mysql/db.sql:/docker-entrypoint-initdb.d/db.sql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: im_server_db
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.20
+    ports:
+      - "3306:3306"
+    deploy:
+      resources:
+        limits:
+          memory: 500M
+        reservations:
+          memory: 200M
+
+
+  redis:
+    restart: always
+    image: "redis:5.0.5"
+    ports:
+      - "6379:6379"
+    #    environment:
+    #      - REDIS_PASSWORD=1234
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.21
+    deploy:
+      resources:
+        limits:
+          memory: 50M
+        reservations:
+          memory: 20M
+
+  etcd:
+    image: bitnami/etcd:3.5.12
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://10.0.0.22:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://10.0.0.22:2379
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.22
+    command: [ "etcd" ]
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+        reservations:
+          memory: 100M
+
+  zookeeper-server:
+    image: bitnami/zookeeper:latest
+    restart: always
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.23
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 100M
+
+  kafka-server:
+    image: bitnami/kafka:latest
+    restart: always
+    ports:
+      - "9092:9092"
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://10.0.0.3:9092
+      - KAFKA_HEAP_OPTS=-Xmx256M -Xms128M
+    depends_on:
+      - zookeeper-server
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.24
+    deploy:
+      resources:
+        limits:
+          cpus: 0.1
+          memory: 500M
+        reservations:
+          memory: 130M
+
+  kafka-map:
+    image: dushixiang/kafka-map:latest
+    restart: always
+    ports:
+      - "9001:8080"
+    environment:
+      - DEFAULT_USERNAME=admin
+      - DEFAULT_PASSWORD=admin
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.25
+    deploy:
+      resources:
+        limits:
+          memory: 50M
+        reservations:
+          memory: 20M
+
+
+  gateway:
+    build:
+      context: im_gateway
+    restart: always
+    volumes:
+      - ./im_gateway/gateway.yaml:/app/gateway.yaml
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.2
+    ports:
+      - "8080:8080"
+  auth_api:
+    build:
+      context: im_auth/auth_api
+    restart: always
+    volumes:
+      - ./im_auth/auth_api/auth.yaml:/app/auth.yaml
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.3
+    depends_on:
+      - mysql
+      - redis
+      - user_rpc
+      - kafka-server
+  chat_api:
+    build:
+      context: im_chat/chat_api
+    restart: always
+    volumes:
+      - ./im_chat/chat_api/chat.yaml:/app/chat.yaml
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.4
+    depends_on:
+      - mysql
+      - redis
+      - user_rpc
+      - file_rpc
+  chat_rpc:
+    build:
+      context: im_chat/chat_rpc
+    restart: always
+    volumes:
+      - ./im_chat/chat_rpc/chatrpc.yaml:/app/chatrpc.yaml
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.5
+    depends_on:
+      - mysql
+  file_api:
+    build:
+      context: im_file/file_api
+    restart: always
+    volumes:
+      - ./im_file/file_api/file.yaml:/app/file.yaml
+      - ./im_file/file_api/uploads:/app/uploads
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.6
+    depends_on:
+      - mysql
+      - user_rpc
+  file_rpc:
+    build:
+      context: im_file/file_rpc
+    restart: always
+    volumes:
+      - ./im_file/file_rpc/filerpc.yaml:/app/filerpc.yaml
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.7
+    depends_on:
+      - mysql
+  group_api:
+    build:
+      context: im_group/group_api
+    restart: always
+    volumes:
+      - ./im_group/group_api/group.yaml:/app/group.yaml
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.8
+    depends_on:
+      - mysql
+      - redis
+      - user_rpc
+      - group_rpc
+  group_rpc:
+    build:
+      context: im_group/group_rpc
+    restart: always
+    volumes:
+      - ./im_group/group_rpc/grouprpc.yaml:/app/grouprpc.yaml
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.9
+    depends_on:
+      - mysql
+      - redis
+  logs_api:
+    build:
+      context: im_logs/logs_api
+    restart: always
+    volumes:
+      - ./im_logs/logs_api/logs.yaml:/app/logs.yaml
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.10
+    depends_on:
+      - mysql
+      - user_rpc
+      - kafka-server
+  user_api:
+    build:
+      context: im_user/user_api
+    restart: always
+    volumes:
+      - ./im_user/user_api/users.yaml:/app/users.yaml
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.13
+    depends_on:
+      - mysql
+      - redis
+      - user_rpc
+      - chat_rpc
+      - group_rpc
+  user_rpc:
+    build:
+      context: im_user/user_rpc
+    restart: always
+    volumes:
+      - ./im_user/user_rpc/userrpc.yaml:/app/userrpc.yaml
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.14
+    depends_on:
+      - mysql
+      - redis
+
+  im_web:
+    image: nginx:latest
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/logs:/var/log/nginx/
+      - ./im_web/dist:/usr/share/nginx/im_web
+      - ./nginx/cert/:/usr/share/nginx/cert
+    networks:
+      im_network:
+        ipv4_address: 10.0.0.15
+    ports:
+      - "80:80"
+      - "443:443"
+networks:
+  im_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.0.0/24

@@ -1,0 +1,6 @@
+addr: 10.0.0.2:8080
+etcd: 10.0.0.22:2379
+Log:
+  Encoding: plain
+  TimeFormat: 2006-01-02 15:04:05
+  Stat: false
