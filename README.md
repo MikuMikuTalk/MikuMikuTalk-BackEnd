@@ -1,5 +1,6 @@
 # im_server
 即时通信程序后端
+![项目架构图](https://github.com/user-attachments/assets/386285b9-477d-4b72-8fe1-6022777d819a)
 
 # 系统服务端口
 
